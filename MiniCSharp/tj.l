@@ -73,6 +73,10 @@ REAL3	(0|[1-9][0-9]*)([eE][-+]?(0|[1-9][0-9]*))
 						col += yyleng;
 						return TRUE;
 					}
+"is"				{
+						col += yyleng;
+						return IS;
+					}
 "extends"			{
 						col += yyleng;
 						return EXTENDS;

@@ -65,9 +65,9 @@
 %token	<tInteger>	INTEGER 
 %token	<tReal>		REAL
 
-%token CLASS BOOLEAN DOUBLE INT
+%token CLASS BOOLEAN DOUBLE INT IS
 %token IF ELSE WHILE FOR 
-%token FALSE TRUE EXTENDS 
+%token FALSE TRUE EXTENDS
 %token INSTANCEOF NEW 
 %token THIS NUL PRIVATE STATIC 
 %token VOID RETURN 
@@ -78,23 +78,31 @@
 %right '='
 %left OR
 %left AND
-%left EQ NE
-%left '>' '<' LE SE 
+%left EQ NE IS
+%left '>' '<' LE SE
 %nonassoc INSTANCEOF
 %left '+' '-'
 %left '*'  '/'  '%'
 %left '!' INCREMENT DECREMENT UNARY_OP
+%nonassoc change_type
 %left '.'
 %left '(' 
 
 %%
-class_def:		  CLASS IDENT '{' fields '}' 
+file:			  /* empty */
+				| file class_def
+;
+
+class_def:		CLASS IDENT '{' fields '}' 
 					{
 						$$ = new ClassDef($2, $4, lin, col);						
 						symtab->AddSym($2, 1, -1);	
 						classDef = $$;
 										
-					}			
+					}
+				| CLASS IDENT ':' IDENT '{' fields '}'
+					{
+					}
 ;
 
 fields:			  /* empty */
@@ -105,14 +113,46 @@ fields:			  /* empty */
 						$$ = $1;
 					}
 ;
-field:			  variable 
+field:			  variable
 					{$$ = $1;}
+				| constructor
+					{}
 				| method
 					{$$ = $1;}
 ;
 
+variable:		  acc_modif expr_type var_decls ';'
+					{
+					}
+				| expr_type var_decls ';'
+					{
+						$$ = new Variable($1, $2, lin, col);						
+						symtab->AddVars($2, $1);
+					}
+;
 
-method:			  expr_type IDENT '('
+constructor:	  IDENT '(' params_e ')' '{' insts '}'
+					{
+					}
+				| acc_modif IDENT '(' params_e ')' '{' insts '}'
+					{
+					}
+;
+
+
+method:			  acc_modif expr_type IDENT '('
+					{
+					}				 
+				   params_e ')' '{'insts '}' 
+					{
+					}
+				| acc_modif VOID IDENT '(' 
+					 {
+					 }				 
+				   params_e ')' '{'insts '}' 
+					{ 
+					}
+				| expr_type IDENT '('
 					{
 						symtab->AddNewScope();
 					}				 
@@ -132,32 +172,7 @@ method:			  expr_type IDENT '('
 						symtab->OutScope();
 						symtab->AddSym($2, 2, -1, $5, 4, $$);
 					}
-;
-
-variable:		  expr_type var_decls ';'
-					{
-						$$ = new Variable($1, $2, lin, col);						
-						symtab->AddVars($2, $1);
-					}
-;
-var_decls:		  var_decl 
-					{
-						$$ = new VarDecls($1, lin, col);
-					}
-				| var_decls ',' var_decl
-					{
-						$1->AddVarDecl($3);
-						$$ = $1;
-					}
-;
-var_decl:		  IDENT 
-					{
-						$$ = new VarDecl($1, lin, col);
-					}
-				| IDENT '=' expr
-					{
-						$$ = new VarDecl($1, $3, lin, col);
-					}
+				
 ;
 
 param :			  expr_type IDENT
@@ -188,64 +203,105 @@ params_e:		  /* empty */
 					}
 ;
 
-expr_type:		  INT 
+var_decls:		  var_decl 
 					{
-						$$ = new ExprType(1, lin, col);
+						$$ = new VarDecls($1, lin, col);
 					}
-				| DOUBLE 
+				| var_decls ',' var_decl
 					{
-						$$ = new ExprType(2, lin, col);
-					}  
-				| BOOLEAN 
-					{
-						$$ = new ExprType(3, lin, col);
+						$1->AddVarDecl($3);
+						$$ = $1;
 					}
-				
+;
+var_decl:		  IDENT 
+					{
+						$$ = new VarDecl($1, lin, col);
+					}
+				| IDENT '=' expr
+					{
+						$$ = new VarDecl($1, $3, lin, col);
+					}
 ;
 
-expr:			  INTEGER 
+acc_modif:		  PRIVATE
+				| STATIC
+				| PRIVATE STATIC
+;
+
+expr_type:		  no_arr_type
 					{
-						$$ = $1;
+					}
+				| arr_type
+					{
+					}
+;
+
+no_arr_type:	  IDENT
+					{
+					}
+				| no_arr_ident
+					{
+					}
+;
+
+no_arr_ident:	  BOOLEAN
+					{
+						//$$ = new ExprType(3, lin, col);
+					}
+				| INT
+					{
+						//$$ = new ExprType(1, lin, col);
+					}
+				| DOUBLE
+					{
+						//$$ = new ExprType(2, lin, col);
+					}
+;
+
+arr_type:		  IDENT '[' ']'
+					{
+					}
+				| IDENT '[' ',' ']'
+					{
+					}
+				| IDENT '[' ',' ',' ']'
+					{
+					}
+				| no_arr_ident '[' ']'
+					{
+					}
+				| no_arr_ident '[' ',' ']'
+					{
+					}
+				| no_arr_ident '[' ',' ',' ']'
+					{
+					}
+;
+
+expr:			  INCREMENT IDENT
+					{
+						// $$ = new Incr($2, true, lin, col);
+						// symtab->IsDeclared($2);
 					} 
-				| REAL 
+				| DECREMENT IDENT  
 					{
-						$$ = $1;
+						// $$ = new Decr($2, true, lin, col);
+						// symtab->IsDeclared($2);
 					} 
-				|TRUE 
+				| IDENT INCREMENT  
 					{
-						$$ = new True(lin, col);
+						// $$ = new Incr($1, false, lin, col);
+						// symtab->IsDeclared($1);
 					} 
-				| FALSE 
+				| IDENT DECREMENT 
 					{
-						$$ = new False(lin, col);
-					} 
-				| NUL 
-					{
-						$$ = new Null(lin, col);
-					} 
-				| '(' expr ')' 
-					{
-						$$ = new Paren($2, lin, col);
-					} 
-				| IDENT 
-					{
-						$$ = new IdentExpr($1, lin, col);
-						symtab->IsDeclared($1, def);
-					}  
-				| IDENT '=' expr  
-					{
-						$$ = new Assign($1, $3, lin, col);
-						symtab->IsDeclared($1);
-					} 
-				| IDENT '(' expr_list_e ')'	 
-					{
-						$$ = new Invoke($1, $3, lin, col);
-						//symtab->IsDeclared($1, $3);
-					} 						
+						// $$ = new Decr($1, false, lin, col);
+						// symtab->IsDeclared($1);
+					}
 				| '!' expr  
 					{
 						$$ = new Not($2, lin, col);
-					} 
+					}
 				| '-' expr %prec UNARY_OP 
 					{
 						$$ = new Minus($2, lin, col);
@@ -254,25 +310,57 @@ expr:			  INTEGER
 					{
 						$$ = new Plus($2, lin, col);
 					} 
-				| INCREMENT IDENT  
+				| '(' expr ')' 
 					{
-						$$ = new Incr($2, true, lin, col);
-						symtab->IsDeclared($2);
+						$$ = new Paren($2, lin, col);
 					} 
-				| DECREMENT IDENT  
+				| q_name_arr 
 					{
-						$$ = new Decr($2, true, lin, col);
-						symtab->IsDeclared($2);
+						// $$ = new IdentExpr($1, lin, col);
+						// symtab->IsDeclared($1, def);
+					}  
+				| q_name_arr '=' expr  
+					{
+						// $$ = new Assign($1, $3, lin, col);
+						// symtab->IsDeclared($1);
 					} 
-				| IDENT INCREMENT  
+				| qual_name '(' expr_list_e ')'	 
 					{
-						$$ = new Incr($1, false, lin, col);
-						symtab->IsDeclared($1);
+						// $$ = new Invoke($1, $3, lin, col);
+						// //symtab->IsDeclared($1, $3);
+					}
+				| qual_name '(' expr_list_e ')' arr_index
+					{
+					}
+				| NEW IDENT '(' expr_list_e ')'
+					{
+					}
+				| NEW IDENT arr_index
+					{
+					}
+				| expr EQ expr 
+					{
+						$$ = new Equal($1, $3, lin, col);
 					} 
-				| IDENT DECREMENT 
+				| expr NE expr 
 					{
-						$$ = new Decr($1, false, lin, col);
-						symtab->IsDeclared($1);
+						$$ = new NotEq($1, $3, lin, col);
+					} 
+				| expr '<' expr 
+					{
+						$$ = new Smaller($1, $3, lin, col);
+					} 
+				| expr SE expr 
+					{
+						$$ = new LargerEq($1, $3, lin, col);
+					}
+				| expr '>' expr 
+					{
+						$$ = new Larger($1, $3, lin, col);
+					} 
+				| expr LE expr 
+					{
+						$$ = new SmallerEq($1, $3, lin, col);
 					} 
 				| expr '+' expr 
 					{
@@ -294,30 +382,6 @@ expr:			  INTEGER
 					{
 						$$ = new Mod($1, $3, lin, col);
 					} 
-				| expr '<' expr 
-					{
-						$$ = new Smaller($1, $3, lin, col);
-					} 
-				| expr '>' expr 
-					{
-						$$ = new Larger($1, $3, lin, col);
-					} 
-				| expr LE expr 
-					{
-						$$ = new SmallerEq($1, $3, lin, col);
-					} 
-				| expr SE expr 
-					{
-						$$ = new LargerEq($1, $3, lin, col);
-					} 
-				| expr EQ expr 
-					{
-						$$ = new Equal($1, $3, lin, col);
-					} 
-				| expr NE expr 
-					{
-						$$ = new NotEq($1, $3, lin, col);
-					} 
 				| expr AND expr 
 					{
 						$$ = new And($1, $3, lin, col);
@@ -325,10 +389,70 @@ expr:			  INTEGER
 				| expr OR expr 
 					{
 						$$ = new Or($1, $3, lin, col);
-					} 				
+					}
+				| expr IS expr_type
+					{
+					}
+				| '(' no_arr_ident ')' expr %prec change_type
+					{
+					}
+				| INTEGER 
+					{
+						$$ = $1;
+					} 
+				| REAL 
+					{
+						$$ = $1;
+					} 
+				| TRUE 
+					{
+						$$ = new True(lin, col);
+					} 
+				| FALSE 
+					{
+						$$ = new False(lin, col);
+					}
+				| THIS
+					{
+					}
+				| NUL 
+					{
+						$$ = new Null(lin, col);
+					}			
 ;
 
+arr_index:		  '[' expr ']'
+					{
+					}
+				| '[' expr ',' expr ']'
+					{
+					}
+				| '[' expr ',' expr ',' expr ']'
+					{
+					}
+;
 
+qual_name:		  IDENT
+					{
+					}
+				| expr '.' IDENT
+					{
+					}
+;
+
+q_name_arr:		  IDENT
+					{
+					}
+				| IDENT arr_index
+					{
+					}
+				| expr '.' IDENT
+					{
+					}
+				| expr '.' IDENT arr_index
+					{
+					}
+;
 
 expr_list:		  expr  
 					{
@@ -350,7 +474,23 @@ expr_list_e:	  /* empty */
 					} 
 ;
 
-inst:			  expr ';'
+inst:			  IF '(' expr ')' inst %prec IF_PREC
+					{
+						$$ = new If($3, $5, lin, col);
+					} 
+				| IF '(' expr ')' inst ELSE inst
+					{
+						$$ = new IfElse($3, $5, $7, lin, col);
+					}	
+				| WHILE '(' expr ')'  inst
+					{
+						$$ = new While($3, $5, lin, col);
+					} 
+				| FOR '(' vars_decl_e ';' expr_e ';' expr_e ')' inst
+					{
+						$$ = new For($3, $5, $7, $9, lin, col);
+					}  
+				| expr ';'
 					{
 						$$ = new ExprInst($1, lin, col);
 					}  					
@@ -359,27 +499,6 @@ inst:			  expr ';'
 						$$ = new VarDeclsInst($1, $2, lin, col);
 						for(int i = 0; i < $2->varDecls->size(); i++)
 							symtab->AddSym($2->varDecls->at(i)->name, 3, $1->type);
-					}
-					
-				| IF '(' expr ')' inst %prec IF_PREC
-					{
-						$$ = new If($3, $5, lin, col);
-					} 
-				| IF '(' expr ')' inst ELSE inst
-					{
-						$$ = new IfElse($3, $5, $7, lin, col);
-					} 
-				| WHILE '(' expr ')'  inst
-					{
-						$$ = new While($3, $5, lin, col);
-					} 
-				| FOR '(' vars_decl_e ';' expr_e ';' expr_e ')' inst
-					{
-						$$ = new For($3, $5, $7, $9, lin, col);
-					} 
-				| RETURN expr_e ';'
-					{
-						$$ = new Return($2, lin, col);
 					} 
 				|   '{'
 						{
@@ -390,6 +509,10 @@ inst:			  expr ';'
 							$$ = new Block($3, lin, col);
 							symtab->OutScope();
 						 }
+				| RETURN expr_e ';'
+					{
+						$$ = new Return($2, lin, col);
+					}
 ;
 
 insts:			  /* Empty */
