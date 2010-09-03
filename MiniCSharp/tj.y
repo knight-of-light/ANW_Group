@@ -42,23 +42,23 @@
 		Ident		*tIdent;				
 	}
 	
-%type	<tClassDef>	class_def
-%type	<tFields>	fields
+%type	<tClassDef>	class
+%type	<tFields>	member
 %type	<tField>	field
-%type	<tMethod>	method
-%type	<tVariable>	variable
+%type	<tMethod>	function
+%type	<tVariable>	global
 
-%type	<tVarDecls>	var_decls
-%type	<tVarDecl>	var_decl
-%type	<tParams>	params	params_e
-%type	<tParam>	param
+%type	<tVarDecls>	variables
+%type	<tVarDecl>	variable
+%type	<tParams>	arg	arg_e
+%type	<tParam>	args
 
-%type	<tExprType>	expr_type
-%type	<tExpr>		expr	expr_e
+%type	<tExprType>	type
+%type	<tExpr>		expression	expr_e
 %type	<tExprList>	expr_list	expr_list_e
 
-%type	<tInsts>	insts
-%type	<tInst>	inst
+%type	<tInsts>	statements
+%type	<tInst>	statement
 %type	<tVarsDecl>	vars_decl_e
 
 %token	<tIdent>	IDENT	
@@ -89,74 +89,74 @@
 %left '(' 
 
 %%
-file:			  /* empty */
-				| file class_def
+root:			  /* empty */
+				| root class
 ;
 
-class_def:		CLASS IDENT '{' fields '}' 
+class:		CLASS IDENT '{' member '}' 
 					{
 						$$ = new ClassDef($2, $4, lin, col);						
 						symtab->AddSym($2, 1, -1);	
 						classDef = $$;
 										
 					}
-				| CLASS IDENT ':' IDENT '{' fields '}'
+				| CLASS IDENT ':' IDENT '{' member '}'
 					{
 					}
 ;
 
-fields:			  /* empty */
+member:			  /* empty */
 					{$$ = new Fields(lin, col);}
-				| fields field 
+				| member field 
 					{
 						$1->AddField($2);
 						$$ = $1;
 					}
 ;
-field:			  variable
+field:			  global
 					{$$ = $1;}
 				| constructor
 					{}
-				| method
+				| function
 					{$$ = $1;}
 ;
 
-variable:		  acc_modif expr_type var_decls ';'
+global:		  accessmodif type variables ';'
 					{
 					}
-				| expr_type var_decls ';'
+				| type variables ';'
 					{
 						$$ = new Variable($1, $2, lin, col);						
 						symtab->AddVars($2, $1);
 					}
 ;
 
-constructor:	  IDENT '(' params_e ')' '{' insts '}'
+constructor:	  IDENT '(' arg_e ')' '{' statements '}'
 					{
 					}
-				| acc_modif IDENT '(' params_e ')' '{' insts '}'
+				| accessmodif IDENT '(' arg_e ')' '{' statements '}'
 					{
 					}
 ;
 
 
-method:			  acc_modif expr_type IDENT '('
+function:			  accessmodif type IDENT '('
 					{
 					}				 
-				   params_e ')' '{'insts '}' 
+				   arg_e ')' '{'statements '}' 
 					{
 					}
-				| acc_modif VOID IDENT '(' 
+				| accessmodif VOID IDENT '(' 
 					 {
 					 }				 
-				   params_e ')' '{'insts '}' 
+				   arg_e ')' '{'statements '}' 
 					{ 
 					}
-				| expr_type IDENT '('
+				| type IDENT '('
 					{
 						symtab->AddNewScope();
 					}				 
-				   params_e ')' '{'insts '}' 
+				   arg_e ')' '{'statements '}' 
 					{ 
 						$$ = new Method($1, $2, $5, $8, lin, col); 
 						symtab->OutScope();	
@@ -166,7 +166,7 @@ method:			  acc_modif expr_type IDENT '('
 					 {
 						symtab->AddNewScope();
 					 }				 
-				   params_e ')' '{'insts '}' 
+				   arg_e ')' '{'statements '}' 
 					{ 
 						$$ = new Method($2, $5, $8, lin, col); 
 						symtab->OutScope();
@@ -175,60 +175,60 @@ method:			  acc_modif expr_type IDENT '('
 				
 ;
 
-param :			  expr_type IDENT
+args :			  type IDENT
 					{
 						$$ = new Param($1, $2, lin, col);
 						symtab->AddSym($2, 6, $1->type);
 					}
 ;
 
-params:			  param
+arg:			  args
 					{
 						$$ = new Params($1, lin, col);
 					}
-				| params ',' param 
+				| arg ',' args 
 					{
 						$1->AddParam($3);
 						$$ = $1;
 					}
 ;
 
-params_e:		  /* empty */
+arg_e:		  /* empty */
 					{
 						$$ = new Params(lin, col);
 					}
-				| params
+				| arg
 					{
 						$$ = $1;						
 					}
 ;
 
-var_decls:		  var_decl 
+variables:		  variable 
 					{
 						$$ = new VarDecls($1, lin, col);
 					}
-				| var_decls ',' var_decl
+				| variables ',' variable
 					{
 						$1->AddVarDecl($3);
 						$$ = $1;
 					}
 ;
-var_decl:		  IDENT 
+variable:		  IDENT 
 					{
 						$$ = new VarDecl($1, lin, col);
 					}
-				| IDENT '=' expr
+				| IDENT '=' expression
 					{
 						$$ = new VarDecl($1, $3, lin, col);
 					}
 ;
 
-acc_modif:		  PRIVATE
+accessmodif:		  PRIVATE
 				| STATIC
 				| PRIVATE STATIC
 ;
 
-expr_type:		  no_arr_type
+type:		  noarraytype
 					{
 					}
 				| arr_type
@@ -236,15 +236,15 @@ expr_type:		  no_arr_type
 					}
 ;
 
-no_arr_type:	  IDENT
+noarraytype:	  IDENT
 					{
 					}
-				| no_arr_ident
+				| arraytype
 					{
 					}
 ;
 
-no_arr_ident:	  BOOLEAN
+arraytype:	  BOOLEAN
 					{
 						//$$ = new ExprType(3, lin, col);
 					}
@@ -267,18 +267,18 @@ arr_type:		  IDENT '[' ']'
 				| IDENT '[' ',' ',' ']'
 					{
 					}
-				| no_arr_ident '[' ']'
+				| arraytype '[' ']'
 					{
 					}
-				| no_arr_ident '[' ',' ']'
+				| arraytype '[' ',' ']'
 					{
 					}
-				| no_arr_ident '[' ',' ',' ']'
+				| arraytype '[' ',' ',' ']'
 					{
 					}
 ;
 
-expr:			  INCREMENT IDENT
+expression:			  INCREMENT IDENT
 					{
 						// $$ = new Incr($2, true, lin, col);
 						// symtab->IsDeclared($2);
@@ -298,102 +298,102 @@ expr:			  INCREMENT IDENT
 						// $$ = new Decr($1, false, lin, col);
 						// symtab->IsDeclared($1);
 					}
-				| '!' expr  
+				| '!' expression  
 					{
 						$$ = new Not($2, lin, col);
 					}
-				| '-' expr %prec UNARY_OP 
+				| '-' expression %prec UNARY_OP 
 					{
 						$$ = new Minus($2, lin, col);
 					} 
-				| '+' expr %prec UNARY_OP 
+				| '+' expression %prec UNARY_OP 
 					{
 						$$ = new Plus($2, lin, col);
 					} 
-				| '(' expr ')' 
+				| '(' expression ')' 
 					{
 						$$ = new Paren($2, lin, col);
 					} 
-				| q_name_arr 
+				| qualnameorarray 
 					{
 						// $$ = new IdentExpr($1, lin, col);
 						// symtab->IsDeclared($1, def);
 					}  
-				| q_name_arr '=' expr  
+				| qualnameorarray '=' expression  
 					{
 						// $$ = new Assign($1, $3, lin, col);
 						// symtab->IsDeclared($1);
 					} 
-				| qual_name '(' expr_list_e ')'	 
+				| qualifiedname '(' expr_list_e ')'	 
 					{
 						// $$ = new Invoke($1, $3, lin, col);
 						// //symtab->IsDeclared($1, $3);
 					}
-				| qual_name '(' expr_list_e ')' arr_index
+				| qualifiedname '(' expr_list_e ')' arrayindex
 					{
 					}
 				| NEW IDENT '(' expr_list_e ')'
 					{
 					}
-				| NEW IDENT arr_index
+				| NEW IDENT arrayindex
 					{
 					}
-				| expr EQ expr 
+				| expression EQ expression 
 					{
 						$$ = new Equal($1, $3, lin, col);
 					} 
-				| expr NE expr 
+				| expression NE expression 
 					{
 						$$ = new NotEq($1, $3, lin, col);
 					} 
-				| expr '<' expr 
+				| expression '<' expression 
 					{
 						$$ = new Smaller($1, $3, lin, col);
 					} 
-				| expr SE expr 
+				| expression SE expression 
 					{
 						$$ = new LargerEq($1, $3, lin, col);
 					}
-				| expr '>' expr 
+				| expression '>' expression 
 					{
 						$$ = new Larger($1, $3, lin, col);
 					} 
-				| expr LE expr 
+				| expression LE expression 
 					{
 						$$ = new SmallerEq($1, $3, lin, col);
 					} 
-				| expr '+' expr 
+				| expression '+' expression 
 					{
 						$$ = new Add($1, $3, lin, col);
 					} 
-				| expr '-' expr 
+				| expression '-' expression 
 					{
 						$$ = new Sub($1, $3, lin, col);
 					} 
-				| expr '*' expr 
+				| expression '*' expression 
 					{
 						$$ = new Mult($1, $3, lin, col);
 					} 
-				| expr '/' expr 
+				| expression '/' expression 
 					{
 						$$ = new Div($1, $3, lin, col);
 					} 
-				| expr '%' expr 
+				| expression '%' expression 
 					{
 						$$ = new Mod($1, $3, lin, col);
 					} 
-				| expr AND expr 
+				| expression AND expression 
 					{
 						$$ = new And($1, $3, lin, col);
 					} 
-				| expr OR expr 
+				| expression OR expression 
 					{
 						$$ = new Or($1, $3, lin, col);
 					}
-				| expr IS expr_type
+				| expression IS type
 					{
 					}
-				| '(' no_arr_ident ')' expr %prec change_type
+				| '(' arraytype ')' expression %prec change_type
 					{
 					}
 				| INTEGER 
@@ -421,44 +421,44 @@ expr:			  INCREMENT IDENT
 					}			
 ;
 
-arr_index:		  '[' expr ']'
+arrayindex:		  '[' expression ']'
 					{
 					}
-				| '[' expr ',' expr ']'
+				| '[' expression ',' expression ']'
 					{
 					}
-				| '[' expr ',' expr ',' expr ']'
-					{
-					}
-;
-
-qual_name:		  IDENT
-					{
-					}
-				| expr '.' IDENT
+				| '[' expression ',' expression ',' expression ']'
 					{
 					}
 ;
 
-q_name_arr:		  IDENT
+qualifiedname:		  IDENT
 					{
 					}
-				| IDENT arr_index
-					{
-					}
-				| expr '.' IDENT
-					{
-					}
-				| expr '.' IDENT arr_index
+				| expression '.' IDENT
 					{
 					}
 ;
 
-expr_list:		  expr  
+qualnameorarray:		  IDENT
+					{
+					}
+				| IDENT arrayindex
+					{
+					}
+				| expression '.' IDENT
+					{
+					}
+				| expression '.' IDENT arrayindex
+					{
+					}
+;
+
+expr_list:		  expression  
 					{
 						$$ = new ExprList($1, lin, col);
 					} 
-				| expr_list ',' expr 
+				| expr_list ',' expression 
 					{
 						$1->AddExpr($3);
 						$$ = $1;
@@ -474,27 +474,27 @@ expr_list_e:	  /* empty */
 					} 
 ;
 
-inst:			  IF '(' expr ')' inst %prec IF_PREC
+statement:			  IF '(' expression ')' statement %prec IF_PREC
 					{
 						$$ = new If($3, $5, lin, col);
 					} 
-				| IF '(' expr ')' inst ELSE inst
+				| IF '(' expression ')' statement ELSE statement
 					{
 						$$ = new IfElse($3, $5, $7, lin, col);
 					}	
-				| WHILE '(' expr ')'  inst
+				| WHILE '(' expression ')'  statement
 					{
 						$$ = new While($3, $5, lin, col);
 					} 
-				| FOR '(' vars_decl_e ';' expr_e ';' expr_e ')' inst
+				| FOR '(' vars_decl_e ';' expr_e ';' expr_e ')' statement
 					{
 						$$ = new For($3, $5, $7, $9, lin, col);
 					}  
-				| expr ';'
+				| expression ';'
 					{
 						$$ = new ExprInst($1, lin, col);
 					}  					
-				| expr_type var_decls ';'
+				| type variables ';'
 					{
 						$$ = new VarDeclsInst($1, $2, lin, col);
 						for(int i = 0; i < $2->varDecls->size(); i++)
@@ -504,7 +504,7 @@ inst:			  IF '(' expr ')' inst %prec IF_PREC
 						{
 							symtab->AddNewScope();
 						}
-					 insts '}' 
+					 statements '}' 
 						 {
 							$$ = new Block($3, lin, col);
 							symtab->OutScope();
@@ -515,11 +515,11 @@ inst:			  IF '(' expr ')' inst %prec IF_PREC
 					}
 ;
 
-insts:			  /* Empty */
+statements:			  /* Empty */
 					{
 						$$ = new Insts(lin, col);
 					} 
-				|insts inst
+				|statements statement
 					{
 						$1->AddInst($2);
 						$$ = $1;
@@ -530,7 +530,7 @@ vars_decl_e:		  /* Empty */
 					{
 						$$ = NULL;
 					} 
-				| expr_type var_decls
+				| type variables
 					{
 						$$ = new VarsDecl($1, $2, lin, col);
 					} 
@@ -540,7 +540,7 @@ expr_e:			  /* Empty */
 					{
 						$$ = new Expr(lin, col);
 					} 
-				| expr
+				| expression
 					{
 						$$ = $1;
 					} 
