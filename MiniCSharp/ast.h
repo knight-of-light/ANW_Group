@@ -25,9 +25,9 @@ class Global ;
 class Function;
 class Variables;
 class Variable ;
-class Params;
-class Param ;
-class ExprType;
+class Args;
+class Arg ;
+class Type;
 class Ident;
 class Expr;
 class Integer;
@@ -122,23 +122,23 @@ public:
 class Global : public Member
 {
 public:
-	ExprType	*exprType;	
+	Type	*exprType;	
 	Variables	*varDecls;
 
-	Global(ExprType *, Variables *, int , int);
+	Global(Type *, Variables *, int , int);
 	virtual void accept(Visitor *);
 };
 
 class Function : public Member
 {
 public:
-	ExprType	*exprType;
+	Type	*exprType;
 	Ident		*name;
-	Params		*params;
+	Args		*params;
 	Insts		*insts;
 
-	Function(ExprType *, Ident *, Params *, Insts *, int, int);
-	Function(Ident *, Params *, Insts *, int, int);
+	Function(Type *, Ident *, Args *, Insts *, int, int);
+	Function(Ident *, Args *, Insts *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -164,34 +164,34 @@ public:
 	virtual void accept(Visitor *);
 };
 
-class Params : public Node
+class Args : public Node
 {
 public:
-	vector<Param *>	 *params;
+	vector<Arg *>	 *params;
 
-	Params(int, int);
-	Params(Param *, int, int);
-	void AddParam(Param *);
+	Args(int, int);
+	Args(Arg *, int, int);
+	void AddArg(Arg *);
 	virtual void accept(Visitor *);
 };
 
-class Param : public Node
+class Arg : public Node
 {
 public:
-	ExprType	*exprType;
+	Type	*exprType;
 	Ident		*name;
 
-	Param(ExprType *, Ident *, int, int);
+	Arg(Type *, Ident *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class ExprType : public Node
+class Type : public Node
 {
 public:	
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
 	int type;
 
-	ExprType(int, int, int);
+	Type(int, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -515,9 +515,9 @@ public:
 class VariablesInst : public Inst
 {
 public:
-	ExprType	*exprType;
+	Type	*exprType;
 	Variables	*vardecls;
-	VariablesInst(ExprType *, Variables *, int, int);
+	VariablesInst(Type *, Variables *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -553,9 +553,9 @@ public:
 class VarsDecl : public Node
 {
 public:
-	ExprType	*exprType;
+	Type	*exprType;
 	Variables	*varDecls;
-	VarsDecl(ExprType *, Variables *, int, int);
+	VarsDecl(Type *, Variables *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -603,7 +603,7 @@ public:
 	int returnType;
 	Function *method;
 	Sym(string n, int kind, int type);
-	Sym(std::string , int kind, int type, Params * ps, int returnType, Function *meth);	
+	Sym(std::string , int kind, int type, Args * ps, int returnType, Function *meth);	
 };
 
 typedef CHashTable<Sym> HashTab;
@@ -635,12 +635,12 @@ public:
 	bool IsDeclared(Ident *id, ExprList *el);
 	bool IsDeclared(Ident *id, Deffered *def);
 	bool AddSym(Ident *id, int kind, int type);
-	bool AddSym(Ident *id, int kind, int type, Params *ps, int returnType, Function *meth);	
+	bool AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth);	
 
 	void AddNewScope();
 	void OutScope();
 
-	void AddVars(Variables *v, ExprType *et);
+	void AddVars(Variables *v, Type *et);
 };
 //*************************************************************
 class Deffered
@@ -687,9 +687,9 @@ public:
 	virtual void Visit(Function *) = 0;
 	virtual void Visit(Variables *) = 0;
 	virtual void Visit(Variable  *) = 0;
-	virtual void Visit(Params *) = 0;
-	virtual void Visit(Param  *) = 0;
-	virtual void Visit(ExprType *) = 0;
+	virtual void Visit(Args *) = 0;
+	virtual void Visit(Arg  *) = 0;
+	virtual void Visit(Type *) = 0;
 	virtual void Visit(Ident *) = 0;
 	virtual void Visit(Expr *) = 0;
 	virtual void Visit(Integer *) = 0;

@@ -26,7 +26,7 @@ public:
 	int type;
 	vector<int> *argTypes;
 	int returnType;
-	Sym(std::string , int kind, int type, Params * ps, int returnType);
+	Sym(std::string , int kind, int type, Args * ps, int returnType);
 	Sym(string n, int kind, int type);
 	
 };
@@ -59,7 +59,7 @@ public:
 
 	Sym Lookup(string name);
 	bool AddSym(Ident *id, int kind, int type);
-	bool AddSym(Ident *id, int kind, int type, Params *ps, int returnType);	
+	bool AddSym(Ident *id, int kind, int type, Args *ps, int returnType);	
 };
 
 #endif

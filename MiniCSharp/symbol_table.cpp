@@ -10,7 +10,7 @@ Sym::Sym(string name, int kind, int type)
 }
 
 Sym::Sym(string n, int kind, int type, 
-		 Params *ps, int returnType, Function *meth)
+		 Args *ps, int returnType, Function *meth)
 {
 	this->name = n;
 	this->kind = kind;
@@ -158,7 +158,7 @@ SymTab::AddSym(Ident *id, int kind, int type)
 }
 
 bool
-SymTab::AddSym(Ident *id, int kind, int type, Params *ps, int returnType, Function *meth)
+SymTab::AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth)
 {
 	string key = id->name;
 	for(int i = 0; i < ps->params->size(); i++)
@@ -183,7 +183,7 @@ SymTab::AddSym(Ident *id, int kind, int type, Params *ps, int returnType, Functi
 }
 
 void 
-SymTab::AddVars(Variables *v, ExprType *et)
+SymTab::AddVars(Variables *v, Type *et)
 {
 	for(int i = 0; i < v->varDecls->size(); i++)
 		this->AddSym(v->varDecls->at(i)->name, 3, et->type);

@@ -85,19 +85,19 @@ TypeVisitor::Visit(Variable  *n)
 
 
 void
-TypeVisitor::Visit(Params *n)
+TypeVisitor::Visit(Args *n)
 {
 	
 }
 
 void
-TypeVisitor::Visit(Param  *n)
+TypeVisitor::Visit(Arg  *n)
 {
 	
 }
 
 void
-TypeVisitor::Visit(ExprType *n)
+TypeVisitor::Visit(Type *n)
 {
 	
 }

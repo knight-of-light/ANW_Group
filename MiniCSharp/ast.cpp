@@ -34,7 +34,7 @@ Member::Member(int l, int c) : Node(l, c)
 	
 }
 
-Global::Global(ExprType *et, Variables *vs, int l,int c) : Member(l, c)
+Global::Global(Type *et, Variables *vs, int l,int c) : Member(l, c)
 {
 	this->exprType = et;
 	this->varDecls = vs;
@@ -42,7 +42,7 @@ Global::Global(ExprType *et, Variables *vs, int l,int c) : Member(l, c)
 	vs->father = this;
 }
 
-Function::Function(ExprType *et, Ident *n, Params *ps, Insts *is, int l, int c) : Member(l, c)
+Function::Function(Type *et, Ident *n, Args *ps, Insts *is, int l, int c) : Member(l, c)
 {
 	this->exprType = et;
 	this->name = n;
@@ -54,7 +54,7 @@ Function::Function(ExprType *et, Ident *n, Params *ps, Insts *is, int l, int c) 
 	is->father = this;
 }
 
-Function::Function(Ident *n, Params *ps, Insts *is, int l, int c) : Member(l, c)
+Function::Function(Ident *n, Args *ps, Insts *is, int l, int c) : Member(l, c)
 {
 	this->exprType = NULL;
 	this->name = n;
@@ -98,25 +98,25 @@ Variable::Variable(Ident *n, Expr *e, int l, int c) : Node(l, c)
 	e->father = this;
 }
 
-Params::Params(int l, int c) : Node(l, c)
+Args::Args(int l, int c) : Node(l, c)
 {
-	this->params = new vector<Param *>;
+	this->params = new vector<Arg *>;
 }
 
-Params::Params(Param *p, int l, int c) : Node(l, c)
+Args::Args(Arg *p, int l, int c) : Node(l, c)
 {
-	this->params = new vector<Param *>;
-	this->AddParam(p);
+	this->params = new vector<Arg *>;
+	this->AddArg(p);
 }
 
 void
-Params::AddParam(Param *p)
+Args::AddArg(Arg *p)
 {
 	this->params->push_back(p);
 	p->father = this;
 }
 
-Param::Param(ExprType *et, Ident *n, int l, int c) : Node(l, c)
+Arg::Arg(Type *et, Ident *n, int l, int c) : Node(l, c)
 {
 	this->exprType = et;
 	this->name = n;
@@ -124,7 +124,7 @@ Param::Param(ExprType *et, Ident *n, int l, int c) : Node(l, c)
 	n->father = this;
 }
 
-ExprType::ExprType(int t, int l, int c) : Node(l, c)
+Type::Type(int t, int l, int c) : Node(l, c)
 {
 	this->type = t;
 }
@@ -385,7 +385,7 @@ ExprInst::ExprInst(Expr *e, int l, int c) : Inst(l, c)
 	e->father = this;
 }
 
-VariablesInst::VariablesInst(ExprType *et, Variables *vds, int l, int c) : Inst(l, c)
+VariablesInst::VariablesInst(Type *et, Variables *vds, int l, int c) : Inst(l, c)
 {
 	this->exprType = et;
 	this->vardecls = vds;
@@ -415,7 +415,7 @@ While::While(Expr *e, Inst *i, int l, int c) : Inst(l, c)
 	i->father = this;
 }
 
-VarsDecl::VarsDecl(ExprType *et, Variables *vds, int l,int c) : Node(l, c)
+VarsDecl::VarsDecl(Type *et, Variables *vds, int l,int c) : Node(l, c)
 {
 	this->exprType = et;
 	this->varDecls = vds;
@@ -538,19 +538,19 @@ Variable ::accept(Visitor *v)
 }
 
 void
-Params::accept(Visitor *v)
+Args::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Param ::accept(Visitor *v)
+Arg ::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-ExprType::accept(Visitor *v)
+Type::accept(Visitor *v)
 {
 	v->Visit(this);
 }

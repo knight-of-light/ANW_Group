@@ -14,9 +14,9 @@ public:
 	virtual void Visit( Function *);
 	virtual void Visit( Variables *);
 	virtual void Visit( Variable  *);
-	virtual void Visit( Params *);
-	virtual void Visit( Param  *);
-	virtual void Visit( ExprType *);
+	virtual void Visit( Args *);
+	virtual void Visit( Arg  *);
+	virtual void Visit( Type *);
 	virtual void Visit( Ident *);
 	virtual void Visit( Expr *);
 	virtual void Visit( Integer *);

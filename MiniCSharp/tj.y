@@ -26,10 +26,10 @@
 		
 		Variables	*tVariables;
 		Variable	*tVariable;
-		Params		*tParams;
-		Param		*tParam;
+		Args		*tArgs;
+		Arg			*tArg;
 		
-		ExprType	*tExprType;
+		Type		*tType;
 		Expr		*tExpr;
 		ExprList	*tExprList;
 		
@@ -42,28 +42,28 @@
 		Ident		*tIdent;				
 	}
 	
-%type	<tClassDef>	class
-%type	<tMembers>	members
-%type	<tMember>	member
-%type	<tFunction>	function
-%type	<tGlobal>	global
+%type	<tClassDef>		class
+%type	<tMembers>		members
+%type	<tMember>		member
+%type	<tFunction>		function
+%type	<tGlobal>		global
 
 %type	<tVariables>	variables
-%type	<tVariable>	variable
-%type	<tParams>	args	args_e
-%type	<tParam>	arg
+%type	<tVariable>		variable
+%type	<tArgs>			args	args_e
+%type	<tArg>			arg
 
-%type	<tExprType>	type
-%type	<tExpr>		expression	expr_e
-%type	<tExprList>	expr_list	expr_list_e
+%type	<tType>			type
+%type	<tExpr>			expr	expr_e
+%type	<tExprList>		expr_list	expr_list_e
 
-%type	<tInsts>	statements
-%type	<tInst>	statement
-%type	<tVarsDecl>	vars_decl_e
+%type	<tInsts>		statements
+%type	<tInst>			statement
+%type	<tVarsDecl>		vars_decl_e
 
-%token	<tIdent>	IDENT	
-%token	<tInteger>	INTEGER 
-%token	<tReal>		REAL
+%token	<tIdent>		IDENT	
+%token	<tInteger>		INTEGER 
+%token	<tReal>			REAL
 
 %token CLASS BOOLEAN DOUBLE INT IS
 %token IF ELSE WHILE FOR 
@@ -177,25 +177,25 @@ function:			  accessmodif type IDENT '('
 
 arg :			  type IDENT
 					{
-						$$ = new Param($1, $2, lin, col);
+						$$ = new Arg($1, $2, lin, col);
 						symtab->AddSym($2, 6, $1->type);
 					}
 ;
 
 args:			  arg
 					{
-						$$ = new Params($1, lin, col);
+						$$ = new Args($1, lin, col);
 					}
 				| args ',' arg 
 					{
-						$1->AddParam($3);
+						$1->AddArg($3);
 						$$ = $1;
 					}
 ;
 
 args_e:			  /* empty */
 					{
-						$$ = new Params(lin, col);
+						$$ = new Args(lin, col);
 					}
 				| args
 					{
@@ -217,7 +217,7 @@ variable:		  IDENT
 					{
 						$$ = new Variable($1, lin, col);
 					}
-				| IDENT '=' expression
+				| IDENT '=' expr
 					{
 						$$ = new Variable($1, $3, lin, col);
 					}
@@ -246,15 +246,15 @@ noarraytype:	  IDENT
 
 arraytype:	  BOOLEAN
 					{
-						//$$ = new ExprType(3, lin, col);
+						//$$ = new Type(3, lin, col);
 					}
 				| INT
 					{
-						//$$ = new ExprType(1, lin, col);
+						//$$ = new Type(1, lin, col);
 					}
 				| DOUBLE
 					{
-						//$$ = new ExprType(2, lin, col);
+						//$$ = new Type(2, lin, col);
 					}
 ;
 
@@ -278,7 +278,7 @@ arr_type:		  IDENT '[' ']'
 					}
 ;
 
-expression:			  INCREMENT IDENT
+expr:			  INCREMENT IDENT
 					{
 						// $$ = new Incr($2, true, lin, col);
 						// symtab->IsDeclared($2);
@@ -298,19 +298,19 @@ expression:			  INCREMENT IDENT
 						// $$ = new Decr($1, false, lin, col);
 						// symtab->IsDeclared($1);
 					}
-				| '!' expression  
+				| '!' expr  
 					{
 						$$ = new Not($2, lin, col);
 					}
-				| '-' expression %prec UNARY_OP 
+				| '-' expr %prec UNARY_OP 
 					{
 						$$ = new Minus($2, lin, col);
 					} 
-				| '+' expression %prec UNARY_OP 
+				| '+' expr %prec UNARY_OP 
 					{
 						$$ = new Plus($2, lin, col);
 					} 
-				| '(' expression ')' 
+				| '(' expr ')' 
 					{
 						$$ = new Paren($2, lin, col);
 					} 
@@ -319,7 +319,7 @@ expression:			  INCREMENT IDENT
 						// $$ = new IdentExpr($1, lin, col);
 						// symtab->IsDeclared($1, def);
 					}  
-				| qualnameorarray '=' expression  
+				| qualnameorarray '=' expr  
 					{
 						// $$ = new Assign($1, $3, lin, col);
 						// symtab->IsDeclared($1);
@@ -338,62 +338,62 @@ expression:			  INCREMENT IDENT
 				| NEW IDENT arrayindex
 					{
 					}
-				| expression EQ expression 
+				| expr EQ expr 
 					{
 						$$ = new Equal($1, $3, lin, col);
 					} 
-				| expression NE expression 
+				| expr NE expr 
 					{
 						$$ = new NotEq($1, $3, lin, col);
 					} 
-				| expression '<' expression 
+				| expr '<' expr 
 					{
 						$$ = new Smaller($1, $3, lin, col);
 					} 
-				| expression SE expression 
+				| expr SE expr 
 					{
 						$$ = new LargserEq($1, $3, lin, col);
 					}
-				| expression '>' expression 
+				| expr '>' expr 
 					{
 						$$ = new Largser($1, $3, lin, col);
 					} 
-				| expression LE expression 
+				| expr LE expr 
 					{
 						$$ = new SmallerEq($1, $3, lin, col);
 					} 
-				| expression '+' expression 
+				| expr '+' expr 
 					{
 						$$ = new Add($1, $3, lin, col);
 					} 
-				| expression '-' expression 
+				| expr '-' expr 
 					{
 						$$ = new Sub($1, $3, lin, col);
 					} 
-				| expression '*' expression 
+				| expr '*' expr 
 					{
 						$$ = new Mult($1, $3, lin, col);
 					} 
-				| expression '/' expression 
+				| expr '/' expr 
 					{
 						$$ = new Div($1, $3, lin, col);
 					} 
-				| expression '%' expression 
+				| expr '%' expr 
 					{
 						$$ = new Mod($1, $3, lin, col);
 					} 
-				| expression AND expression 
+				| expr AND expr 
 					{
 						$$ = new And($1, $3, lin, col);
 					} 
-				| expression OR expression 
+				| expr OR expr 
 					{
 						$$ = new Or($1, $3, lin, col);
 					}
-				| expression IS type
+				| expr IS type
 					{
 					}
-				| '(' arraytype ')' expression %prec change_type
+				| '(' arraytype ')' expr %prec change_type
 					{
 					}
 				| INTEGER 
@@ -421,13 +421,13 @@ expression:			  INCREMENT IDENT
 					}			
 ;
 
-arrayindex:		  '[' expression ']'
+arrayindex:		  '[' expr ']'
 					{
 					}
-				| '[' expression ',' expression ']'
+				| '[' expr ',' expr ']'
 					{
 					}
-				| '[' expression ',' expression ',' expression ']'
+				| '[' expr ',' expr ',' expr ']'
 					{
 					}
 ;
@@ -435,7 +435,7 @@ arrayindex:		  '[' expression ']'
 qualifiedname:		  IDENT
 					{
 					}
-				| expression '.' IDENT
+				| expr '.' IDENT
 					{
 					}
 ;
@@ -446,19 +446,19 @@ qualnameorarray:		  IDENT
 				| IDENT arrayindex
 					{
 					}
-				| expression '.' IDENT
+				| expr '.' IDENT
 					{
 					}
-				| expression '.' IDENT arrayindex
+				| expr '.' IDENT arrayindex
 					{
 					}
 ;
 
-expr_list:		  expression  
+expr_list:		  expr  
 					{
 						$$ = new ExprList($1, lin, col);
 					} 
-				| expr_list ',' expression 
+				| expr_list ',' expr 
 					{
 						$1->AddExpr($3);
 						$$ = $1;
@@ -474,15 +474,15 @@ expr_list_e:	  /* empty */
 					} 
 ;
 
-statement:			  IF '(' expression ')' statement %prec IF_PREC
+statement:			  IF '(' expr ')' statement %prec IF_PREC
 					{
 						$$ = new If($3, $5, lin, col);
 					} 
-				| IF '(' expression ')' statement ELSE statement
+				| IF '(' expr ')' statement ELSE statement
 					{
 						$$ = new IfElse($3, $5, $7, lin, col);
 					}	
-				| WHILE '(' expression ')'  statement
+				| WHILE '(' expr ')'  statement
 					{
 						$$ = new While($3, $5, lin, col);
 					} 
@@ -490,7 +490,7 @@ statement:			  IF '(' expression ')' statement %prec IF_PREC
 					{
 						$$ = new For($3, $5, $7, $9, lin, col);
 					}  
-				| expression ';'
+				| expr ';'
 					{
 						$$ = new ExprInst($1, lin, col);
 					}  					
@@ -540,7 +540,7 @@ expr_e:			  /* Empty */
 					{
 						$$ = new Expr(lin, col);
 					} 
-				| expression
+				| expr
 					{
 						$$ = $1;
 					} 
