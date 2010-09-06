@@ -9,30 +9,30 @@ TypeVisitor::Visit(ClassDef *n)
 	types[2] = "double";
 	types[3] = "boolean";
 	types[4] = "void";
-	n->fields->accept(this);
+	n->members->accept(this);
 }
 
 void
-TypeVisitor::Visit(Fields *n)
+TypeVisitor::Visit(Members *n)
 {
-	for(int i = 0; i < n->fields->size(); i++)
-		n->fields->at(i)->accept(this);
+	for(int i = 0; i < n->members->size(); i++)
+		n->members->at(i)->accept(this);
 }
 
 void
-TypeVisitor::Visit(Field  *n)
+TypeVisitor::Visit(Member  *n)
 {
 	
 }
 
 void
-TypeVisitor::Visit(Variable  *n)
+TypeVisitor::Visit(Global  *n)
 {
 	n->varDecls->accept(this);		
 }
 
 void
-TypeVisitor::Visit(Method *n)
+TypeVisitor::Visit(Function *n)
 {
 	n->insts->accept(this);
 }
@@ -342,7 +342,7 @@ void
 TypeVisitor::Visit(Return *n)
 {
 	/*n->expr->accept(this);
-	int left = ((Method *)(n->father))->exprType->type;
+	int left = ((Function *)(n->father))->exprType->type;
 	int right = n->expr->type;
 	
 	bool mismatch = false;

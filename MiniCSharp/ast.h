@@ -19,10 +19,10 @@ using std::string;
 
 class Node;
 class ClassDef;
-class Fields;
-class Field ;
-class Variable ;
-class Method;
+class Members;
+class Member ;
+class Global ;
+class Function;
 class VarDecls;
 class VarDecl ;
 class Params;
@@ -95,41 +95,41 @@ class ClassDef : public Node
 {
 public:
 	Ident	*name;
-	Fields	*fields;
+	Members	*members;
 
-	ClassDef(Ident *, Fields *, int, int);
+	ClassDef(Ident *, Members *, int, int);
 	virtual void accept(Visitor *);
 };
 
 
-class Fields : public Node
+class Members : public Node
 {
 public:
-	vector<Field *>	*fields;
+	vector<Member *>	*members;
 
-	Fields(int, int);
-	void AddField(Field *);
+	Members(int, int);
+	void AddMember(Member *);
 	virtual void accept(Visitor *);
 };
 
-class Field : public Node
+class Member : public Node
 {
 public:
-	Field(int, int);
+	Member(int, int);
 	virtual void accept(Visitor *);
 };
 
-class Variable : public Field
+class Global : public Member
 {
 public:
 	ExprType	*exprType;	
 	VarDecls	*varDecls;
 
-	Variable(ExprType *, VarDecls *, int , int);
+	Global(ExprType *, VarDecls *, int , int);
 	virtual void accept(Visitor *);
 };
 
-class Method : public Field
+class Function : public Member
 {
 public:
 	ExprType	*exprType;
@@ -137,8 +137,8 @@ public:
 	Params		*params;
 	Insts		*insts;
 
-	Method(ExprType *, Ident *, Params *, Insts *, int, int);
-	Method(Ident *, Params *, Insts *, int, int);
+	Function(ExprType *, Ident *, Params *, Insts *, int, int);
+	Function(Ident *, Params *, Insts *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -594,16 +594,16 @@ public:
 class Sym
 {
 public:
-	//1:class 2: func, 3: global Variable, 4: constructor, 5: Local Variable, 6: Argument
+	//1:class 2: func, 3: global Global, 4: constructor, 5: Local Global, 6: Argument
 	int kind;
 	string name;
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
 	int type;
 	vector<int> *argsTypes;
 	int returnType;
-	Method *method;
+	Function *method;
 	Sym(string n, int kind, int type);
-	Sym(std::string , int kind, int type, Params * ps, int returnType, Method *meth);	
+	Sym(std::string , int kind, int type, Params * ps, int returnType, Function *meth);	
 };
 
 typedef CHashTable<Sym> HashTab;
@@ -635,7 +635,7 @@ public:
 	bool IsDeclared(Ident *id, ExprList *el);
 	bool IsDeclared(Ident *id, Deffered *def);
 	bool AddSym(Ident *id, int kind, int type);
-	bool AddSym(Ident *id, int kind, int type, Params *ps, int returnType, Method *meth);	
+	bool AddSym(Ident *id, int kind, int type, Params *ps, int returnType, Function *meth);	
 
 	void AddNewScope();
 	void OutScope();
@@ -681,10 +681,10 @@ class Visitor
 {
 public:
 	virtual void Visit(ClassDef *) = 0;
-	virtual void Visit(Fields *) = 0;
-	virtual void Visit(Field  *) = 0;
-	virtual void Visit(Variable  *) = 0;
-	virtual void Visit(Method *) = 0;
+	virtual void Visit(Members *) = 0;
+	virtual void Visit(Member  *) = 0;
+	virtual void Visit(Global  *) = 0;
+	virtual void Visit(Function *) = 0;
 	virtual void Visit(VarDecls *) = 0;
 	virtual void Visit(VarDecl  *) = 0;
 	virtual void Visit(Params *) = 0;

@@ -19,10 +19,10 @@
 
 %union{
 		ClassDef	*tClassDef;
-		Fields		*tFields;
-		Field		*tField;
-		Method		*tMethod;
-		Variable	*tVariable;
+		Members		*tMembers;
+		Member		*tMember;
+		Function	*tFunction;
+		Global		*tGlobal;
 		
 		VarDecls	*tVarDecls;
 		VarDecl		*tVarDecl;
@@ -43,10 +43,10 @@
 	}
 	
 %type	<tClassDef>	class
-%type	<tFields>	member
-%type	<tField>	field
-%type	<tMethod>	function
-%type	<tVariable>	global
+%type	<tMembers>	members
+%type	<tMember>	member
+%type	<tFunction>	function
+%type	<tGlobal>	global
 
 %type	<tVarDecls>	variables
 %type	<tVarDecl>	variable
@@ -93,27 +93,27 @@ root:			  /* empty */
 				| root class
 ;
 
-class:		CLASS IDENT '{' member '}' 
+class:		CLASS IDENT '{' members '}' 
 					{
 						$$ = new ClassDef($2, $4, lin, col);						
 						symtab->AddSym($2, 1, -1);	
 						classDef = $$;
 										
 					}
-				| CLASS IDENT ':' IDENT '{' member '}'
+				| CLASS IDENT ':' IDENT '{' members '}'
 					{
 					}
 ;
 
-member:			  /* empty */
-					{$$ = new Fields(lin, col);}
-				| member field 
+members:			  /* empty */
+					{$$ = new Members(lin, col);}
+				| members member 
 					{
-						$1->AddField($2);
+						$1->AddMember($2);
 						$$ = $1;
 					}
 ;
-field:			  global
+member:			  global
 					{$$ = $1;}
 				| constructor
 					{}
@@ -126,7 +126,7 @@ global:		  accessmodif type variables ';'
 					}
 				| type variables ';'
 					{
-						$$ = new Variable($1, $2, lin, col);						
+						$$ = new Global($1, $2, lin, col);						
 						symtab->AddVars($2, $1);
 					}
 ;
@@ -158,7 +158,7 @@ function:			  accessmodif type IDENT '('
 					}				 
 				   arg_e ')' '{'statements '}' 
 					{ 
-						$$ = new Method($1, $2, $5, $8, lin, col); 
+						$$ = new Function($1, $2, $5, $8, lin, col); 
 						symtab->OutScope();	
 						symtab->AddSym($2, 2, -1, $5, $1->type, $$);					
 					}
@@ -168,7 +168,7 @@ function:			  accessmodif type IDENT '('
 					 }				 
 				   arg_e ')' '{'statements '}' 
 					{ 
-						$$ = new Method($2, $5, $8, lin, col); 
+						$$ = new Function($2, $5, $8, lin, col); 
 						symtab->OutScope();
 						symtab->AddSym($2, 2, -1, $5, 4, $$);
 					}

@@ -8,10 +8,10 @@ class TypeVisitor : public Visitor
 {
 public:	
 	virtual void Visit( ClassDef *);
-	virtual void Visit( Fields *);
-	virtual void Visit( Field  *);
-	virtual void Visit( Variable  *);
-	virtual void Visit( Method *);
+	virtual void Visit( Members *);
+	virtual void Visit( Member  *);
+	virtual void Visit( Global  *);
+	virtual void Visit( Function *);
 	virtual void Visit( VarDecls *);
 	virtual void Visit( VarDecl  *);
 	virtual void Visit( Params *);

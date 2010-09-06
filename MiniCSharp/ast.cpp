@@ -8,33 +8,33 @@ Node::Node(int line, int column)
 	this->father = NULL;
 }
 
-ClassDef::ClassDef(Ident *n, Fields *fs, int l, int c): Node(l, c)
+ClassDef::ClassDef(Ident *n, Members *fs, int l, int c): Node(l, c)
 {
 	this->name = n;
-	this->fields = fs;
+	this->members = fs;
 	
 	n->father = this;
 	fs->father = this;
 }
 
-Fields::Fields(int l, int c) : Node(l, c)
+Members::Members(int l, int c) : Node(l, c)
 {
-	this->fields = new vector<Field *>;
+	this->members = new vector<Member *>;
 }
 
 void
-Fields::AddField(Field *f)
+Members::AddMember(Member *f)
 {
-	this->fields->push_back(f);
+	this->members->push_back(f);
 	f->father = this;
 }
 
-Field::Field(int l, int c) : Node(l, c)
+Member::Member(int l, int c) : Node(l, c)
 {
 	
 }
 
-Variable::Variable(ExprType *et, VarDecls *vs, int l,int c) : Field(l, c)
+Global::Global(ExprType *et, VarDecls *vs, int l,int c) : Member(l, c)
 {
 	this->exprType = et;
 	this->varDecls = vs;
@@ -42,7 +42,7 @@ Variable::Variable(ExprType *et, VarDecls *vs, int l,int c) : Field(l, c)
 	vs->father = this;
 }
 
-Method::Method(ExprType *et, Ident *n, Params *ps, Insts *is, int l, int c) : Field(l, c)
+Function::Function(ExprType *et, Ident *n, Params *ps, Insts *is, int l, int c) : Member(l, c)
 {
 	this->exprType = et;
 	this->name = n;
@@ -54,7 +54,7 @@ Method::Method(ExprType *et, Ident *n, Params *ps, Insts *is, int l, int c) : Fi
 	is->father = this;
 }
 
-Method::Method(Ident *n, Params *ps, Insts *is, int l, int c) : Field(l, c)
+Function::Function(Ident *n, Params *ps, Insts *is, int l, int c) : Member(l, c)
 {
 	this->exprType = NULL;
 	this->name = n;
@@ -502,25 +502,25 @@ ClassDef::accept(Visitor *v)
 }
 
 void
-Fields::accept(Visitor *v)
+Members::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Field ::accept(Visitor *v)
+Member ::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Variable ::accept(Visitor *v)
+Global ::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Method::accept(Visitor *v)
+Function::accept(Visitor *v)
 {
 	v->Visit(this);
 }
