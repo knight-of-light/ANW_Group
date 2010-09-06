@@ -23,8 +23,8 @@ class Members;
 class Member ;
 class Global ;
 class Function;
-class VarDecls;
-class VarDecl ;
+class Variables;
+class Variable ;
 class Params;
 class Param ;
 class ExprType;
@@ -44,12 +44,12 @@ class Minus;
 class Incr;
 class Add;
 class Mult;
-class Larger;
-class LargerEq;
+class Largser;
+class LargserEq;
 class Inst;
 class Insts;
 class ExprInst;
-class VarDeclsInst;
+class VariablesInst;
 class If;
 class IfElse;
 class While;
@@ -123,9 +123,9 @@ class Global : public Member
 {
 public:
 	ExprType	*exprType;	
-	VarDecls	*varDecls;
+	Variables	*varDecls;
 
-	Global(ExprType *, VarDecls *, int , int);
+	Global(ExprType *, Variables *, int , int);
 	virtual void accept(Visitor *);
 };
 
@@ -142,25 +142,25 @@ public:
 	virtual void accept(Visitor *);
 };
 
-class VarDecls	: public Node
+class Variables	: public Node
 {
 public:
-	vector<VarDecl *>	*varDecls;
+	vector<Variable *>	*varDecls;
 
-	VarDecls(int, int);
-	VarDecls(VarDecl *, int , int );
-	void AddVarDecl(VarDecl *);
+	Variables(int, int);
+	Variables(Variable *, int , int );
+	void AddVariable(Variable *);
 	virtual void accept(Visitor *);
 };
 
-class VarDecl : public Node
+class Variable : public Node
 {
 public:
 	Ident	*name;
 	Expr	*expr;
 
-	VarDecl(Ident *, int, int);
-	VarDecl(Ident *, Expr *, int, int);
+	Variable(Ident *, int, int);
+	Variable(Ident *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -412,13 +412,13 @@ public:
 	virtual void accept(Visitor *);
 };
 
-class Larger  : public Expr
+class Largser  : public Expr
 {
 public:
 	Expr	*left;
 	Expr	*right;
 
-	Larger(Expr *, Expr *, int, int);
+	Largser(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -432,13 +432,13 @@ public:
 	virtual void accept(Visitor *);
 };
 
-class LargerEq  : public Expr
+class LargserEq  : public Expr
 {
 public:
 	Expr	*left;
 	Expr	*right;
 
-	LargerEq(Expr *, Expr *, int, int);
+	LargserEq(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -512,12 +512,12 @@ public:
 	virtual void accept(Visitor *);
 };
 
-class VarDeclsInst : public Inst
+class VariablesInst : public Inst
 {
 public:
 	ExprType	*exprType;
-	VarDecls	*vardecls;
-	VarDeclsInst(ExprType *, VarDecls *, int, int);
+	Variables	*vardecls;
+	VariablesInst(ExprType *, Variables *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -554,8 +554,8 @@ class VarsDecl : public Node
 {
 public:
 	ExprType	*exprType;
-	VarDecls	*varDecls;
-	VarsDecl(ExprType *, VarDecls *, int, int);
+	Variables	*varDecls;
+	VarsDecl(ExprType *, Variables *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -599,7 +599,7 @@ public:
 	string name;
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
 	int type;
-	vector<int> *argsTypes;
+	vector<int> *argTypes;
 	int returnType;
 	Function *method;
 	Sym(string n, int kind, int type);
@@ -640,7 +640,7 @@ public:
 	void AddNewScope();
 	void OutScope();
 
-	void AddVars(VarDecls *v, ExprType *et);
+	void AddVars(Variables *v, ExprType *et);
 };
 //*************************************************************
 class Deffered
@@ -685,8 +685,8 @@ public:
 	virtual void Visit(Member  *) = 0;
 	virtual void Visit(Global  *) = 0;
 	virtual void Visit(Function *) = 0;
-	virtual void Visit(VarDecls *) = 0;
-	virtual void Visit(VarDecl  *) = 0;
+	virtual void Visit(Variables *) = 0;
+	virtual void Visit(Variable  *) = 0;
 	virtual void Visit(Params *) = 0;
 	virtual void Visit(Param  *) = 0;
 	virtual void Visit(ExprType *) = 0;
@@ -706,12 +706,12 @@ public:
 	virtual void Visit(Incr *) = 0;
 	virtual void Visit(Add *) = 0;
 	virtual void Visit(Mult *) = 0;
-	virtual void Visit(Larger *) = 0;
-	virtual void Visit(LargerEq *) = 0;
+	virtual void Visit(Largser *) = 0;
+	virtual void Visit(LargserEq *) = 0;
 	virtual void Visit(Inst *) = 0;
 	virtual void Visit(Insts *) = 0;
 	virtual void Visit(ExprInst *) = 0;
-	virtual void Visit(VarDeclsInst *) = 0;
+	virtual void Visit(VariablesInst *) = 0;
 	virtual void Visit(If *) = 0;
 	virtual void Visit(IfElse *) = 0;
 	virtual void Visit(While *) = 0;

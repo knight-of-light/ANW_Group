@@ -12,8 +12,8 @@ public:
 	virtual void Visit( Member  *);
 	virtual void Visit( Global  *);
 	virtual void Visit( Function *);
-	virtual void Visit( VarDecls *);
-	virtual void Visit( VarDecl  *);
+	virtual void Visit( Variables *);
+	virtual void Visit( Variable  *);
 	virtual void Visit( Params *);
 	virtual void Visit( Param  *);
 	virtual void Visit( ExprType *);
@@ -33,12 +33,12 @@ public:
 	virtual void Visit( Incr *);
 	virtual void Visit( Add *);
 	virtual void Visit( Mult *);
-	virtual void Visit( Larger *);
-	virtual void Visit( LargerEq *);
+	virtual void Visit( Largser *);
+	virtual void Visit( LargserEq *);
 	virtual void Visit( Inst *);
 	virtual void Visit( Insts *);
 	virtual void Visit( ExprInst *);
-	virtual void Visit( VarDeclsInst *);
+	virtual void Visit( VariablesInst *);
 	virtual void Visit( If *);
 	virtual void Visit( IfElse *);
 	virtual void Visit( While *);

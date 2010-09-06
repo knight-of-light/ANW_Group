@@ -20,11 +20,11 @@ class SymTab;
 class Sym
 {
 public:
-	//1: func, 2: arg, 3: variable, 
+	//1: func, 2: args, 3: variable, 
 	int kind;
 	string name;
 	int type;
-	vector<int> *argsTypes;
+	vector<int> *argTypes;
 	int returnType;
 	Sym(std::string , int kind, int type, Params * ps, int returnType);
 	Sym(string n, int kind, int type);

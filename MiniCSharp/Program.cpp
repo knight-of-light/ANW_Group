@@ -19,11 +19,11 @@ SymTab *symtab;
 Errors *errors;
 Deffered *def;
 
-int main(int argc, char **argv)
+int main(int argsc, char **argsv)
 {
-	++argv, --argc;  
-    if ( argc > 0 )
-            yyin = fopen( argv[0], "r" );
+	++argsv, --argsc;  
+    if ( argsc > 0 )
+            yyin = fopen( argsv[0], "r" );
     else
             yyin = stdin;        
 

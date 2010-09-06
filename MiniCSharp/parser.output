@@ -24,32 +24,32 @@ Grammar
    10 global: accessmodif type variables ';'
    11       | type variables ';'
 
-   12 constructor: IDENT '(' arg_e ')' '{' statements '}'
-   13            | accessmodif IDENT '(' arg_e ')' '{' statements '}'
+   12 constructor: IDENT '(' args_e ')' '{' statements '}'
+   13            | accessmodif IDENT '(' args_e ')' '{' statements '}'
 
    14 @1: /* empty */
 
-   15 function: accessmodif type IDENT '(' @1 arg_e ')' '{' statements '}'
+   15 function: accessmodif type IDENT '(' @1 args_e ')' '{' statements '}'
 
    16 @2: /* empty */
 
-   17 function: accessmodif VOID IDENT '(' @2 arg_e ')' '{' statements '}'
+   17 function: accessmodif VOID IDENT '(' @2 args_e ')' '{' statements '}'
 
    18 @3: /* empty */
 
-   19 function: type IDENT '(' @3 arg_e ')' '{' statements '}'
+   19 function: type IDENT '(' @3 args_e ')' '{' statements '}'
 
    20 @4: /* empty */
 
-   21 function: VOID IDENT '(' @4 arg_e ')' '{' statements '}'
+   21 function: VOID IDENT '(' @4 args_e ')' '{' statements '}'
 
-   22 args: type IDENT
+   22 arg: type IDENT
 
-   23 arg: args
-   24    | arg ',' args
+   23 args: arg
+   24     | args ',' arg
 
-   25 arg_e: /* empty */
-   26      | arg
+   25 args_e: /* empty */
+   26       | args
 
    27 variables: variable
    28          | variables ',' variable
@@ -240,11 +240,11 @@ function (63)
     on left: 18, on right: 19
 @4 (67)
     on left: 20, on right: 21
-args (68)
+arg (68)
     on left: 22, on right: 23 24
-arg (69)
+args (69)
     on left: 23 24, on right: 24 26
-arg_e (70)
+args_e (70)
     on left: 25 26, on right: 12 13 15 17 19 21
 variables (71)
     on left: 27 28, on right: 10 11 28 100 107
@@ -388,7 +388,7 @@ state 9
 
 state 10
 
-   12 constructor: IDENT . '(' arg_e ')' '{' statements '}'
+   12 constructor: IDENT . '(' args_e ')' '{' statements '}'
    36 noarraytype: IDENT .
    41 arr_type: IDENT . '[' ']'
    42         | IDENT . '[' ',' ']'
@@ -440,7 +440,7 @@ state 15
 
 state 16
 
-   21 function: VOID . IDENT '(' @4 arg_e ')' '{' statements '}'
+   21 function: VOID . IDENT '(' @4 args_e ')' '{' statements '}'
 
     IDENT  shift, and go to state 31
 
@@ -483,9 +483,9 @@ state 21
 state 22
 
    10 global: accessmodif . type variables ';'
-   13 constructor: accessmodif . IDENT '(' arg_e ')' '{' statements '}'
-   15 function: accessmodif . type IDENT '(' @1 arg_e ')' '{' statements '}'
-   17         | accessmodif . VOID IDENT '(' @2 arg_e ')' '{' statements '}'
+   13 constructor: accessmodif . IDENT '(' args_e ')' '{' statements '}'
+   15 function: accessmodif . type IDENT '(' @1 args_e ')' '{' statements '}'
+   17         | accessmodif . VOID IDENT '(' @2 args_e ')' '{' statements '}'
 
     IDENT    shift, and go to state 32
     BOOLEAN  shift, and go to state 11
@@ -502,7 +502,7 @@ state 22
 state 23
 
    11 global: type . variables ';'
-   19 function: type . IDENT '(' @3 arg_e ')' '{' statements '}'
+   19 function: type . IDENT '(' @3 args_e ')' '{' statements '}'
 
     IDENT  shift, and go to state 35
 
@@ -547,18 +547,18 @@ state 27
 
 state 28
 
-   12 constructor: IDENT '(' . arg_e ')' '{' statements '}'
+   12 constructor: IDENT '(' . args_e ')' '{' statements '}'
 
     IDENT    shift, and go to state 40
     BOOLEAN  shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
 
-    $default  reduce using rule 25 (arg_e)
+    $default  reduce using rule 25 (args_e)
 
-    args         go to state 41
-    arg          go to state 42
-    arg_e        go to state 43
+    arg          go to state 41
+    args         go to state 42
+    args_e       go to state 43
     type         go to state 44
     noarraytype  go to state 24
     arraytype    go to state 25
@@ -584,14 +584,14 @@ state 30
 
 state 31
 
-   21 function: VOID IDENT . '(' @4 arg_e ')' '{' statements '}'
+   21 function: VOID IDENT . '(' @4 args_e ')' '{' statements '}'
 
     '('  shift, and go to state 47
 
 
 state 32
 
-   13 constructor: accessmodif IDENT . '(' arg_e ')' '{' statements '}'
+   13 constructor: accessmodif IDENT . '(' args_e ')' '{' statements '}'
    36 noarraytype: IDENT .
    41 arr_type: IDENT . '[' ']'
    42         | IDENT . '[' ',' ']'
@@ -605,7 +605,7 @@ state 32
 
 state 33
 
-   17 function: accessmodif VOID . IDENT '(' @2 arg_e ')' '{' statements '}'
+   17 function: accessmodif VOID . IDENT '(' @2 args_e ')' '{' statements '}'
 
     IDENT  shift, and go to state 49
 
@@ -613,7 +613,7 @@ state 33
 state 34
 
    10 global: accessmodif type . variables ';'
-   15 function: accessmodif type . IDENT '(' @1 arg_e ')' '{' statements '}'
+   15 function: accessmodif type . IDENT '(' @1 args_e ')' '{' statements '}'
 
     IDENT  shift, and go to state 50
 
@@ -623,7 +623,7 @@ state 34
 
 state 35
 
-   19 function: type IDENT . '(' @3 arg_e ')' '{' statements '}'
+   19 function: type IDENT . '(' @3 args_e ')' '{' statements '}'
    29 variable: IDENT .
    30         | IDENT . '=' expression
 
@@ -698,31 +698,31 @@ state 40
 
 state 41
 
-   23 arg: args .
+   23 args: arg .
 
-    $default  reduce using rule 23 (arg)
+    $default  reduce using rule 23 (args)
 
 
 state 42
 
-   24 arg: arg . ',' args
-   26 arg_e: arg .
+   24 args: args . ',' arg
+   26 args_e: args .
 
     ','  shift, and go to state 59
 
-    $default  reduce using rule 26 (arg_e)
+    $default  reduce using rule 26 (args_e)
 
 
 state 43
 
-   12 constructor: IDENT '(' arg_e . ')' '{' statements '}'
+   12 constructor: IDENT '(' args_e . ')' '{' statements '}'
 
     ')'  shift, and go to state 60
 
 
 state 44
 
-   22 args: type . IDENT
+   22 arg: type . IDENT
 
     IDENT  shift, and go to state 61
 
@@ -745,7 +745,7 @@ state 46
 
 state 47
 
-   21 function: VOID IDENT '(' . @4 arg_e ')' '{' statements '}'
+   21 function: VOID IDENT '(' . @4 args_e ')' '{' statements '}'
 
     $default  reduce using rule 20 (@4)
 
@@ -754,18 +754,18 @@ state 47
 
 state 48
 
-   13 constructor: accessmodif IDENT '(' . arg_e ')' '{' statements '}'
+   13 constructor: accessmodif IDENT '(' . args_e ')' '{' statements '}'
 
     IDENT    shift, and go to state 40
     BOOLEAN  shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
 
-    $default  reduce using rule 25 (arg_e)
+    $default  reduce using rule 25 (args_e)
 
-    args         go to state 41
-    arg          go to state 42
-    arg_e        go to state 65
+    arg          go to state 41
+    args         go to state 42
+    args_e       go to state 65
     type         go to state 44
     noarraytype  go to state 24
     arraytype    go to state 25
@@ -774,14 +774,14 @@ state 48
 
 state 49
 
-   17 function: accessmodif VOID IDENT . '(' @2 arg_e ')' '{' statements '}'
+   17 function: accessmodif VOID IDENT . '(' @2 args_e ')' '{' statements '}'
 
     '('  shift, and go to state 66
 
 
 state 50
 
-   15 function: accessmodif type IDENT . '(' @1 arg_e ')' '{' statements '}'
+   15 function: accessmodif type IDENT . '(' @1 args_e ')' '{' statements '}'
    29 variable: IDENT .
    30         | IDENT . '=' expression
 
@@ -826,7 +826,7 @@ state 52
 
 state 53
 
-   19 function: type IDENT '(' . @3 arg_e ')' '{' statements '}'
+   19 function: type IDENT '(' . @3 args_e ')' '{' statements '}'
 
     $default  reduce using rule 18 (@3)
 
@@ -874,14 +874,14 @@ state 58
 
 state 59
 
-   24 arg: arg ',' . args
+   24 args: args ',' . arg
 
     IDENT    shift, and go to state 40
     BOOLEAN  shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
 
-    args         go to state 91
+    arg          go to state 91
     type         go to state 44
     noarraytype  go to state 24
     arraytype    go to state 25
@@ -890,16 +890,16 @@ state 59
 
 state 60
 
-   12 constructor: IDENT '(' arg_e ')' . '{' statements '}'
+   12 constructor: IDENT '(' args_e ')' . '{' statements '}'
 
     '{'  shift, and go to state 92
 
 
 state 61
 
-   22 args: type IDENT .
+   22 arg: type IDENT .
 
-    $default  reduce using rule 22 (args)
+    $default  reduce using rule 22 (arg)
 
 
 state 62
@@ -918,18 +918,18 @@ state 63
 
 state 64
 
-   21 function: VOID IDENT '(' @4 . arg_e ')' '{' statements '}'
+   21 function: VOID IDENT '(' @4 . args_e ')' '{' statements '}'
 
     IDENT    shift, and go to state 40
     BOOLEAN  shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
 
-    $default  reduce using rule 25 (arg_e)
+    $default  reduce using rule 25 (args_e)
 
-    args         go to state 41
-    arg          go to state 42
-    arg_e        go to state 94
+    arg          go to state 41
+    args         go to state 42
+    args_e       go to state 94
     type         go to state 44
     noarraytype  go to state 24
     arraytype    go to state 25
@@ -938,14 +938,14 @@ state 64
 
 state 65
 
-   13 constructor: accessmodif IDENT '(' arg_e . ')' '{' statements '}'
+   13 constructor: accessmodif IDENT '(' args_e . ')' '{' statements '}'
 
     ')'  shift, and go to state 95
 
 
 state 66
 
-   17 function: accessmodif VOID IDENT '(' . @2 arg_e ')' '{' statements '}'
+   17 function: accessmodif VOID IDENT '(' . @2 args_e ')' '{' statements '}'
 
     $default  reduce using rule 16 (@2)
 
@@ -954,7 +954,7 @@ state 66
 
 state 67
 
-   15 function: accessmodif type IDENT '(' . @1 arg_e ')' '{' statements '}'
+   15 function: accessmodif type IDENT '(' . @1 args_e ')' '{' statements '}'
 
     $default  reduce using rule 14 (@1)
 
@@ -1211,18 +1211,18 @@ state 85
 
 state 86
 
-   19 function: type IDENT '(' @3 . arg_e ')' '{' statements '}'
+   19 function: type IDENT '(' @3 . args_e ')' '{' statements '}'
 
     IDENT    shift, and go to state 40
     BOOLEAN  shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
 
-    $default  reduce using rule 25 (arg_e)
+    $default  reduce using rule 25 (args_e)
 
-    args         go to state 41
-    arg          go to state 42
-    arg_e        go to state 127
+    arg          go to state 41
+    args         go to state 42
+    args_e       go to state 127
     type         go to state 44
     noarraytype  go to state 24
     arraytype    go to state 25
@@ -1262,14 +1262,14 @@ state 90
 
 state 91
 
-   24 arg: arg ',' args .
+   24 args: args ',' arg .
 
-    $default  reduce using rule 24 (arg)
+    $default  reduce using rule 24 (args)
 
 
 state 92
 
-   12 constructor: IDENT '(' arg_e ')' '{' . statements '}'
+   12 constructor: IDENT '(' args_e ')' '{' . statements '}'
 
     $default  reduce using rule 104 (statements)
 
@@ -1285,32 +1285,32 @@ state 93
 
 state 94
 
-   21 function: VOID IDENT '(' @4 arg_e . ')' '{' statements '}'
+   21 function: VOID IDENT '(' @4 args_e . ')' '{' statements '}'
 
     ')'  shift, and go to state 130
 
 
 state 95
 
-   13 constructor: accessmodif IDENT '(' arg_e ')' . '{' statements '}'
+   13 constructor: accessmodif IDENT '(' args_e ')' . '{' statements '}'
 
     '{'  shift, and go to state 131
 
 
 state 96
 
-   17 function: accessmodif VOID IDENT '(' @2 . arg_e ')' '{' statements '}'
+   17 function: accessmodif VOID IDENT '(' @2 . args_e ')' '{' statements '}'
 
     IDENT    shift, and go to state 40
     BOOLEAN  shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
 
-    $default  reduce using rule 25 (arg_e)
+    $default  reduce using rule 25 (args_e)
 
-    args         go to state 41
-    arg          go to state 42
-    arg_e        go to state 132
+    arg          go to state 41
+    args         go to state 42
+    args_e       go to state 132
     type         go to state 44
     noarraytype  go to state 24
     arraytype    go to state 25
@@ -1319,18 +1319,18 @@ state 96
 
 state 97
 
-   15 function: accessmodif type IDENT '(' @1 . arg_e ')' '{' statements '}'
+   15 function: accessmodif type IDENT '(' @1 . args_e ')' '{' statements '}'
 
     IDENT    shift, and go to state 40
     BOOLEAN  shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
 
-    $default  reduce using rule 25 (arg_e)
+    $default  reduce using rule 25 (args_e)
 
-    args         go to state 41
-    arg          go to state 42
-    arg_e        go to state 133
+    arg          go to state 41
+    args         go to state 42
+    args_e       go to state 133
     type         go to state 44
     noarraytype  go to state 24
     arraytype    go to state 25
@@ -1924,7 +1924,7 @@ state 126
 
 state 127
 
-   19 function: type IDENT '(' @3 arg_e . ')' '{' statements '}'
+   19 function: type IDENT '(' @3 args_e . ')' '{' statements '}'
 
     ')'  shift, and go to state 158
 
@@ -1938,7 +1938,7 @@ state 128
 
 state 129
 
-   12 constructor: IDENT '(' arg_e ')' '{' statements . '}'
+   12 constructor: IDENT '(' args_e ')' '{' statements . '}'
   105 statements: statements . statement
 
     IDENT      shift, and go to state 159
@@ -1977,14 +1977,14 @@ state 129
 
 state 130
 
-   21 function: VOID IDENT '(' @4 arg_e ')' . '{' statements '}'
+   21 function: VOID IDENT '(' @4 args_e ')' . '{' statements '}'
 
     '{'  shift, and go to state 169
 
 
 state 131
 
-   13 constructor: accessmodif IDENT '(' arg_e ')' '{' . statements '}'
+   13 constructor: accessmodif IDENT '(' args_e ')' '{' . statements '}'
 
     $default  reduce using rule 104 (statements)
 
@@ -1993,14 +1993,14 @@ state 131
 
 state 132
 
-   17 function: accessmodif VOID IDENT '(' @2 arg_e . ')' '{' statements '}'
+   17 function: accessmodif VOID IDENT '(' @2 args_e . ')' '{' statements '}'
 
     ')'  shift, and go to state 171
 
 
 state 133
 
-   15 function: accessmodif type IDENT '(' @1 arg_e . ')' '{' statements '}'
+   15 function: accessmodif type IDENT '(' @1 args_e . ')' '{' statements '}'
 
     ')'  shift, and go to state 172
 
@@ -2641,7 +2641,7 @@ state 157
 
 state 158
 
-   19 function: type IDENT '(' @3 arg_e ')' . '{' statements '}'
+   19 function: type IDENT '(' @3 args_e ')' . '{' statements '}'
 
     '{'  shift, and go to state 180
 
@@ -2729,7 +2729,7 @@ state 164
 
 state 165
 
-   12 constructor: IDENT '(' arg_e ')' '{' statements '}' .
+   12 constructor: IDENT '(' args_e ')' '{' statements '}' .
 
     $default  reduce using rule 12 (constructor)
 
@@ -2792,7 +2792,7 @@ state 168
 
 state 169
 
-   21 function: VOID IDENT '(' @4 arg_e ')' '{' . statements '}'
+   21 function: VOID IDENT '(' @4 args_e ')' '{' . statements '}'
 
     $default  reduce using rule 104 (statements)
 
@@ -2801,7 +2801,7 @@ state 169
 
 state 170
 
-   13 constructor: accessmodif IDENT '(' arg_e ')' '{' statements . '}'
+   13 constructor: accessmodif IDENT '(' args_e ')' '{' statements . '}'
   105 statements: statements . statement
 
     IDENT      shift, and go to state 159
@@ -2840,14 +2840,14 @@ state 170
 
 state 171
 
-   17 function: accessmodif VOID IDENT '(' @2 arg_e ')' . '{' statements '}'
+   17 function: accessmodif VOID IDENT '(' @2 args_e ')' . '{' statements '}'
 
     '{'  shift, and go to state 192
 
 
 state 172
 
-   15 function: accessmodif type IDENT '(' @1 arg_e ')' . '{' statements '}'
+   15 function: accessmodif type IDENT '(' @1 args_e ')' . '{' statements '}'
 
     '{'  shift, and go to state 193
 
@@ -2962,7 +2962,7 @@ state 179
 
 state 180
 
-   19 function: type IDENT '(' @3 arg_e ')' '{' . statements '}'
+   19 function: type IDENT '(' @3 args_e ')' '{' . statements '}'
 
     $default  reduce using rule 104 (statements)
 
@@ -3141,7 +3141,7 @@ state 189
 
 state 190
 
-   21 function: VOID IDENT '(' @4 arg_e ')' '{' statements . '}'
+   21 function: VOID IDENT '(' @4 args_e ')' '{' statements . '}'
   105 statements: statements . statement
 
     IDENT      shift, and go to state 159
@@ -3180,14 +3180,14 @@ state 190
 
 state 191
 
-   13 constructor: accessmodif IDENT '(' arg_e ')' '{' statements '}' .
+   13 constructor: accessmodif IDENT '(' args_e ')' '{' statements '}' .
 
     $default  reduce using rule 13 (constructor)
 
 
 state 192
 
-   17 function: accessmodif VOID IDENT '(' @2 arg_e ')' '{' . statements '}'
+   17 function: accessmodif VOID IDENT '(' @2 args_e ')' '{' . statements '}'
 
     $default  reduce using rule 104 (statements)
 
@@ -3196,7 +3196,7 @@ state 192
 
 state 193
 
-   15 function: accessmodif type IDENT '(' @1 arg_e ')' '{' . statements '}'
+   15 function: accessmodif type IDENT '(' @1 args_e ')' '{' . statements '}'
 
     $default  reduce using rule 104 (statements)
 
@@ -3300,7 +3300,7 @@ state 197
 
 state 198
 
-   19 function: type IDENT '(' @3 arg_e ')' '{' statements . '}'
+   19 function: type IDENT '(' @3 args_e ')' '{' statements . '}'
   105 statements: statements . statement
 
     IDENT      shift, and go to state 159
@@ -3488,14 +3488,14 @@ state 205
 
 state 206
 
-   21 function: VOID IDENT '(' @4 arg_e ')' '{' statements '}' .
+   21 function: VOID IDENT '(' @4 args_e ')' '{' statements '}' .
 
     $default  reduce using rule 21 (function)
 
 
 state 207
 
-   17 function: accessmodif VOID IDENT '(' @2 arg_e ')' '{' statements . '}'
+   17 function: accessmodif VOID IDENT '(' @2 args_e ')' '{' statements . '}'
   105 statements: statements . statement
 
     IDENT      shift, and go to state 159
@@ -3534,7 +3534,7 @@ state 207
 
 state 208
 
-   15 function: accessmodif type IDENT '(' @1 arg_e ')' '{' statements . '}'
+   15 function: accessmodif type IDENT '(' @1 args_e ')' '{' statements . '}'
   105 statements: statements . statement
 
     IDENT      shift, and go to state 159
@@ -3604,7 +3604,7 @@ state 210
 
 state 211
 
-   19 function: type IDENT '(' @3 arg_e ')' '{' statements '}' .
+   19 function: type IDENT '(' @3 args_e ')' '{' statements '}' .
 
     $default  reduce using rule 19 (function)
 
@@ -3730,14 +3730,14 @@ state 216
 
 state 217
 
-   17 function: accessmodif VOID IDENT '(' @2 arg_e ')' '{' statements '}' .
+   17 function: accessmodif VOID IDENT '(' @2 args_e ')' '{' statements '}' .
 
     $default  reduce using rule 17 (function)
 
 
 state 218
 
-   15 function: accessmodif type IDENT '(' @1 arg_e ')' '{' statements '}' .
+   15 function: accessmodif type IDENT '(' @1 args_e ')' '{' statements '}' .
 
     $default  reduce using rule 15 (function)
 

@@ -34,7 +34,7 @@ Member::Member(int l, int c) : Node(l, c)
 	
 }
 
-Global::Global(ExprType *et, VarDecls *vs, int l,int c) : Member(l, c)
+Global::Global(ExprType *et, Variables *vs, int l,int c) : Member(l, c)
 {
 	this->exprType = et;
 	this->varDecls = vs;
@@ -65,32 +65,32 @@ Function::Function(Ident *n, Params *ps, Insts *is, int l, int c) : Member(l, c)
 	is->father = this;
 }
 
-VarDecls::VarDecls(int l, int c) : Node(l, c)
+Variables::Variables(int l, int c) : Node(l, c)
 {
-	this->varDecls = new vector<VarDecl *>;
+	this->varDecls = new vector<Variable *>;
 }
 
-VarDecls::VarDecls(VarDecl *vd, int l, int c) : Node(l, c)
+Variables::Variables(Variable *vd, int l, int c) : Node(l, c)
 {
-	this->varDecls = new vector<VarDecl *>;
-	this->AddVarDecl(vd);
+	this->varDecls = new vector<Variable *>;
+	this->AddVariable(vd);
 }
 
 void
-VarDecls::AddVarDecl(VarDecl *vd)
+Variables::AddVariable(Variable *vd)
 {
 	this->varDecls->push_back(vd);
 	vd->father = this;
 }
 
-VarDecl::VarDecl(Ident *n, int l, int c) : Node(l, c)
+Variable::Variable(Ident *n, int l, int c) : Node(l, c)
 {
 	this->name = n;	
 	n->father = this;
 	this->expr = NULL;
 }
 
-VarDecl::VarDecl(Ident *n, Expr *e, int l, int c) : Node(l, c)
+Variable::Variable(Ident *n, Expr *e, int l, int c) : Node(l, c)
 {
 	this->name = n;
 	this->expr = e;
@@ -297,7 +297,7 @@ Smaller::Smaller(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
-Larger::Larger(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+Largser::Largser(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
 	this->right = r;
@@ -313,7 +313,7 @@ SmallerEq::SmallerEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
-LargerEq::LargerEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+LargserEq::LargserEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
 	this->right = r;
@@ -385,7 +385,7 @@ ExprInst::ExprInst(Expr *e, int l, int c) : Inst(l, c)
 	e->father = this;
 }
 
-VarDeclsInst::VarDeclsInst(ExprType *et, VarDecls *vds, int l, int c) : Inst(l, c)
+VariablesInst::VariablesInst(ExprType *et, Variables *vds, int l, int c) : Inst(l, c)
 {
 	this->exprType = et;
 	this->vardecls = vds;
@@ -415,7 +415,7 @@ While::While(Expr *e, Inst *i, int l, int c) : Inst(l, c)
 	i->father = this;
 }
 
-VarsDecl::VarsDecl(ExprType *et, VarDecls *vds, int l,int c) : Node(l, c)
+VarsDecl::VarsDecl(ExprType *et, Variables *vds, int l,int c) : Node(l, c)
 {
 	this->exprType = et;
 	this->varDecls = vds;
@@ -526,13 +526,13 @@ Function::accept(Visitor *v)
 }
 
 void
-VarDecls::accept(Visitor *v)
+Variables::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-VarDecl ::accept(Visitor *v)
+Variable ::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -652,13 +652,13 @@ Mult::accept(Visitor *v)
 }
 
 void
-Larger::accept(Visitor *v)
+Largser::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-LargerEq::accept(Visitor *v)
+LargserEq::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -682,7 +682,7 @@ ExprInst::accept(Visitor *v)
 }
 
 void
-VarDeclsInst::accept(Visitor *v)
+VariablesInst::accept(Visitor *v)
 {
 	v->Visit(this);
 }

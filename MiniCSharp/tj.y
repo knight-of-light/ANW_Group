@@ -24,8 +24,8 @@
 		Function	*tFunction;
 		Global		*tGlobal;
 		
-		VarDecls	*tVarDecls;
-		VarDecl		*tVarDecl;
+		Variables	*tVariables;
+		Variable	*tVariable;
 		Params		*tParams;
 		Param		*tParam;
 		
@@ -48,10 +48,10 @@
 %type	<tFunction>	function
 %type	<tGlobal>	global
 
-%type	<tVarDecls>	variables
-%type	<tVarDecl>	variable
-%type	<tParams>	arg	arg_e
-%type	<tParam>	args
+%type	<tVariables>	variables
+%type	<tVariable>	variable
+%type	<tParams>	args	args_e
+%type	<tParam>	arg
 
 %type	<tExprType>	type
 %type	<tExpr>		expression	expr_e
@@ -93,7 +93,7 @@ root:			  /* empty */
 				| root class
 ;
 
-class:		CLASS IDENT '{' members '}' 
+class:			CLASS IDENT '{' members '}' 
 					{
 						$$ = new ClassDef($2, $4, lin, col);						
 						symtab->AddSym($2, 1, -1);	
@@ -105,7 +105,7 @@ class:		CLASS IDENT '{' members '}'
 					}
 ;
 
-members:			  /* empty */
+members:		  /* empty */
 					{$$ = new Members(lin, col);}
 				| members member 
 					{
@@ -121,7 +121,7 @@ member:			  global
 					{$$ = $1;}
 ;
 
-global:		  accessmodif type variables ';'
+global:			  accessmodif type variables ';'
 					{
 					}
 				| type variables ';'
@@ -131,10 +131,10 @@ global:		  accessmodif type variables ';'
 					}
 ;
 
-constructor:	  IDENT '(' arg_e ')' '{' statements '}'
+constructor:	  IDENT '(' args_e ')' '{' statements '}'
 					{
 					}
-				| accessmodif IDENT '(' arg_e ')' '{' statements '}'
+				| accessmodif IDENT '(' args_e ')' '{' statements '}'
 					{
 					}
 ;
@@ -143,20 +143,20 @@ constructor:	  IDENT '(' arg_e ')' '{' statements '}'
 function:			  accessmodif type IDENT '('
 					{
 					}				 
-				   arg_e ')' '{'statements '}' 
+				   args_e ')' '{'statements '}' 
 					{
 					}
 				| accessmodif VOID IDENT '(' 
 					 {
 					 }				 
-				   arg_e ')' '{'statements '}' 
+				   args_e ')' '{'statements '}' 
 					{ 
 					}
 				| type IDENT '('
 					{
 						symtab->AddNewScope();
 					}				 
-				   arg_e ')' '{'statements '}' 
+				   args_e ')' '{'statements '}' 
 					{ 
 						$$ = new Function($1, $2, $5, $8, lin, col); 
 						symtab->OutScope();	
@@ -166,7 +166,7 @@ function:			  accessmodif type IDENT '('
 					 {
 						symtab->AddNewScope();
 					 }				 
-				   arg_e ')' '{'statements '}' 
+				   args_e ')' '{'statements '}' 
 					{ 
 						$$ = new Function($2, $5, $8, lin, col); 
 						symtab->OutScope();
@@ -175,29 +175,29 @@ function:			  accessmodif type IDENT '('
 				
 ;
 
-args :			  type IDENT
+arg :			  type IDENT
 					{
 						$$ = new Param($1, $2, lin, col);
 						symtab->AddSym($2, 6, $1->type);
 					}
 ;
 
-arg:			  args
+args:			  arg
 					{
 						$$ = new Params($1, lin, col);
 					}
-				| arg ',' args 
+				| args ',' arg 
 					{
 						$1->AddParam($3);
 						$$ = $1;
 					}
 ;
 
-arg_e:		  /* empty */
+args_e:			  /* empty */
 					{
 						$$ = new Params(lin, col);
 					}
-				| arg
+				| args
 					{
 						$$ = $1;						
 					}
@@ -205,21 +205,21 @@ arg_e:		  /* empty */
 
 variables:		  variable 
 					{
-						$$ = new VarDecls($1, lin, col);
+						$$ = new Variables($1, lin, col);
 					}
 				| variables ',' variable
 					{
-						$1->AddVarDecl($3);
+						$1->AddVariable($3);
 						$$ = $1;
 					}
 ;
 variable:		  IDENT 
 					{
-						$$ = new VarDecl($1, lin, col);
+						$$ = new Variable($1, lin, col);
 					}
 				| IDENT '=' expression
 					{
-						$$ = new VarDecl($1, $3, lin, col);
+						$$ = new Variable($1, $3, lin, col);
 					}
 ;
 
@@ -352,11 +352,11 @@ expression:			  INCREMENT IDENT
 					} 
 				| expression SE expression 
 					{
-						$$ = new LargerEq($1, $3, lin, col);
+						$$ = new LargserEq($1, $3, lin, col);
 					}
 				| expression '>' expression 
 					{
-						$$ = new Larger($1, $3, lin, col);
+						$$ = new Largser($1, $3, lin, col);
 					} 
 				| expression LE expression 
 					{
@@ -496,7 +496,7 @@ statement:			  IF '(' expression ')' statement %prec IF_PREC
 					}  					
 				| type variables ';'
 					{
-						$$ = new VarDeclsInst($1, $2, lin, col);
+						$$ = new VariablesInst($1, $2, lin, col);
 						for(int i = 0; i < $2->varDecls->size(); i++)
 							symtab->AddSym($2->varDecls->at(i)->name, 3, $1->type);
 					} 

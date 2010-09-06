@@ -38,14 +38,14 @@ TypeVisitor::Visit(Function *n)
 }
 
 void
-TypeVisitor::Visit(VarDecls *n)
+TypeVisitor::Visit(Variables *n)
 {
 	for(int i = 0; i < n->varDecls->size(); i++)
 		n->varDecls->at(i)->accept(this);
 }
 
 void
-TypeVisitor::Visit(VarDecl  *n)
+TypeVisitor::Visit(Variable  *n)
 {
 	if(n->expr != NULL)
 		{
@@ -272,13 +272,13 @@ TypeVisitor::Visit(Mult *n)
 }
 
 void
-TypeVisitor::Visit(Larger *n)
+TypeVisitor::Visit(Largser *n)
 {
 	
 }
 
 void
-TypeVisitor::Visit(LargerEq *n)
+TypeVisitor::Visit(LargserEq *n)
 {
 	
 }
@@ -303,7 +303,7 @@ TypeVisitor::Visit(ExprInst *n)
 }
 
 void
-TypeVisitor::Visit(VarDeclsInst *n)
+TypeVisitor::Visit(VariablesInst *n)
 {
 	n->vardecls->accept(this);
 }

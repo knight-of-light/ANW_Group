@@ -5,7 +5,7 @@ Sym::Sym(string name, int kind, int type)
 	this->name = name;
 	this->kind = kind;
 	this->type = type;
-	this->argsTypes = NULL;
+	this->argTypes = NULL;
 
 }
 
@@ -17,10 +17,10 @@ Sym::Sym(string n, int kind, int type,
 	this->type = type;
 	this->method = meth;
 	this->returnType = returnType;
-	this->argsTypes = new vector<int>;
+	this->argTypes = new vector<int>;
 
 	for(int i = 0; i < ps->params->size(); i++)
-		this->argsTypes->push_back(ps->params->at(i)->exprType->type);
+		this->argTypes->push_back(ps->params->at(i)->exprType->type);
 }
 
 
@@ -183,7 +183,7 @@ SymTab::AddSym(Ident *id, int kind, int type, Params *ps, int returnType, Functi
 }
 
 void 
-SymTab::AddVars(VarDecls *v, ExprType *et)
+SymTab::AddVars(Variables *v, ExprType *et)
 {
 	for(int i = 0; i < v->varDecls->size(); i++)
 		this->AddSym(v->varDecls->at(i)->name, 3, et->type);
