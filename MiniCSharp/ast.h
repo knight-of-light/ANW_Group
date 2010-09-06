@@ -46,10 +46,10 @@ class Add;
 class Mult;
 class Largser;
 class LargserEq;
-class Inst;
-class Insts;
-class ExprInst;
-class VariablesInst;
+class Stat;
+class Stats;
+class ExprStat;
+class VariablesStat;
 class If;
 class IfElse;
 class While;
@@ -135,10 +135,10 @@ public:
 	Type	*exprType;
 	Ident		*name;
 	Args		*params;
-	Insts		*insts;
+	Stats		*insts;
 
-	Function(Type *, Ident *, Args *, Insts *, int, int);
-	Function(Ident *, Args *, Insts *, int, int);
+	Function(Type *, Ident *, Args *, Stats *, int, int);
+	Function(Ident *, Args *, Stats *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -483,104 +483,104 @@ public:
 };
 
 //***********************************************************************
-//					Inst
+//					Stat
 //***********************************************************************
 
-class Inst : public Node
+class Stat : public Node
 {
 public:
-	Inst(int, int);
+	Stat(int, int);
 	virtual void accept(Visitor *);
 };
 
-class Insts : public Node
+class Stats : public Node
 {
 public:
-	vector<Inst	*>	*insts;
+	vector<Stat	*>	*insts;
 
-	Insts(int, int);
-	Insts(Inst *, int, int);
-	void AddInst(Inst *);
+	Stats(int, int);
+	Stats(Stat *, int, int);
+	void AddStat(Stat *);
 	virtual void accept(Visitor *);
 };
 
-class ExprInst : public Inst
+class ExprStat : public Stat
 {
 public:
 	Expr	*expr;
-	ExprInst(Expr *, int, int);
+	ExprStat(Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class VariablesInst : public Inst
+class VariablesStat : public Stat
 {
 public:
 	Type	*exprType;
 	Variables	*vardecls;
-	VariablesInst(Type *, Variables *, int, int);
+	VariablesStat(Type *, Variables *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class If : public Inst
+class If : public Stat
 {
 public:
 	Expr	*expr;
-	Inst	*inst;
+	Stat	*inst;
 	
-	If(Expr *, Inst *, int, int);
+	If(Expr *, Stat *, int, int);
 	virtual void accept(Visitor *);
 };
 
 class IfElse : public If
 {
 public:
-	Inst		*elseInst;
+	Stat		*elseStat;
 
-	IfElse(Expr *, Inst *, Inst *, int , int );
+	IfElse(Expr *, Stat *, Stat *, int , int );
 	virtual void accept(Visitor *);
 };
 
-class While : public Inst
+class While : public Stat
 {
 public:
 	Expr	*expr;
-	Inst	*inst;
+	Stat	*inst;
 	
-	While(Expr *, Inst *, int, int);
+	While(Expr *, Stat *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class VarsDecl : public Node
+class Variables_e : public Node
 {
 public:
 	Type	*exprType;
 	Variables	*varDecls;
-	VarsDecl(Type *, Variables *, int, int);
+	Variables_e(Type *, Variables *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class For : public Inst
+class For : public Stat
 {
 public:
-	VarsDecl	*varsDecl;
+	Variables_e	*varsDecl;
 	Expr	*exprCond;
 	Expr	*exprCount;
-	Inst	*inst;
+	Stat	*inst;
 	
-	For(VarsDecl *, Expr *, Expr *, Inst *, int , int );
+	For(Variables_e *, Expr *, Expr *, Stat *, int , int );
 	virtual void accept(Visitor *);
 };
 
-class Block : public Inst
+class Block : public Stat
 {
 public:
-	Insts *insts;
+	Stats *insts;
 
-	Block(Insts *, int , int );
+	Block(Stats *, int , int );
 	virtual void accept(Visitor *);
 };
 
-class Return : public Inst
+class Return : public Stat
 {
 public:
 	Expr	*expr;
@@ -708,16 +708,16 @@ public:
 	virtual void Visit(Mult *) = 0;
 	virtual void Visit(Largser *) = 0;
 	virtual void Visit(LargserEq *) = 0;
-	virtual void Visit(Inst *) = 0;
-	virtual void Visit(Insts *) = 0;
-	virtual void Visit(ExprInst *) = 0;
-	virtual void Visit(VariablesInst *) = 0;
+	virtual void Visit(Stat *) = 0;
+	virtual void Visit(Stats *) = 0;
+	virtual void Visit(ExprStat *) = 0;
+	virtual void Visit(VariablesStat *) = 0;
 	virtual void Visit(If *) = 0;
 	virtual void Visit(IfElse *) = 0;
 	virtual void Visit(While *) = 0;
 	virtual void Visit(Block *) = 0;
 	virtual void Visit(Return *) = 0;
-	virtual void Visit(VarsDecl *) = 0;
+	virtual void Visit(Variables_e *) = 0;
 
 	virtual void Visit(Null *) = 0;
 	virtual void Visit(Plus *) = 0;

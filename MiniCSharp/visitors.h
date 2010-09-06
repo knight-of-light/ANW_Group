@@ -35,16 +35,16 @@ public:
 	virtual void Visit( Mult *);
 	virtual void Visit( Largser *);
 	virtual void Visit( LargserEq *);
-	virtual void Visit( Inst *);
-	virtual void Visit( Insts *);
-	virtual void Visit( ExprInst *);
-	virtual void Visit( VariablesInst *);
+	virtual void Visit( Stat *);
+	virtual void Visit( Stats *);
+	virtual void Visit( ExprStat *);
+	virtual void Visit( VariablesStat *);
 	virtual void Visit( If *);
 	virtual void Visit( IfElse *);
 	virtual void Visit( While *);
 	virtual void Visit( Block *);
 	virtual void Visit( Return *);
-	virtual void Visit(VarsDecl *);
+	virtual void Visit(Variables_e *);
 
 	virtual void Visit(Null *);
 	virtual void Visit(Plus *);

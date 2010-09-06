@@ -284,26 +284,26 @@ TypeVisitor::Visit(LargserEq *n)
 }
 
 void
-TypeVisitor::Visit(Inst *n)
+TypeVisitor::Visit(Stat *n)
 {
 	
 }
 
 void
-TypeVisitor::Visit(Insts *n)
+TypeVisitor::Visit(Stats *n)
 {
 	for(int i = 0; i < n->insts->size(); i++)
 		n->insts->at(i)->accept(this);
 }
 
 void
-TypeVisitor::Visit(ExprInst *n)
+TypeVisitor::Visit(ExprStat *n)
 {
 	n->expr->accept(this);	
 }
 
 void
-TypeVisitor::Visit(VariablesInst *n)
+TypeVisitor::Visit(VariablesStat *n)
 {
 	n->vardecls->accept(this);
 }
@@ -333,7 +333,7 @@ TypeVisitor::Visit(Block *n)
 }
 
 void
-TypeVisitor::Visit(VarsDecl *n)
+TypeVisitor::Visit(Variables_e *n)
 {
 	n->varDecls->accept(this);	
 }

@@ -42,7 +42,7 @@ Global::Global(Type *et, Variables *vs, int l,int c) : Member(l, c)
 	vs->father = this;
 }
 
-Function::Function(Type *et, Ident *n, Args *ps, Insts *is, int l, int c) : Member(l, c)
+Function::Function(Type *et, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
 {
 	this->exprType = et;
 	this->name = n;
@@ -54,7 +54,7 @@ Function::Function(Type *et, Ident *n, Args *ps, Insts *is, int l, int c) : Memb
 	is->father = this;
 }
 
-Function::Function(Ident *n, Args *ps, Insts *is, int l, int c) : Member(l, c)
+Function::Function(Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
 {
 	this->exprType = NULL;
 	this->name = n;
@@ -354,38 +354,38 @@ And::And(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 }
 
 //***********************************************************************
-//					Instruction
+//					Statruction
 //***********************************************************************
 
-Inst::Inst(int l, int c) : Node(l, c)
+Stat::Stat(int l, int c) : Node(l, c)
 {
 }
 
-Insts::Insts(int l, int c) : Node(l, c)
+Stats::Stats(int l, int c) : Node(l, c)
 {
-	this->insts = new vector<Inst *>;
+	this->insts = new vector<Stat *>;
 }
 
-Insts::Insts(Inst *i, int l, int c) : Node(l, c)
+Stats::Stats(Stat *i, int l, int c) : Node(l, c)
 {
-	this->insts = new vector<Inst *>;
-	this->AddInst(i);
+	this->insts = new vector<Stat *>;
+	this->AddStat(i);
 }
 
 void
-Insts::AddInst(Inst *i)
+Stats::AddStat(Stat *i)
 {
 	this->insts->push_back(i);
 	i->father = this;
 }
 
-ExprInst::ExprInst(Expr *e, int l, int c) : Inst(l, c)
+ExprStat::ExprStat(Expr *e, int l, int c) : Stat(l, c)
 {
 	this->expr = e;
 	e->father = this;
 }
 
-VariablesInst::VariablesInst(Type *et, Variables *vds, int l, int c) : Inst(l, c)
+VariablesStat::VariablesStat(Type *et, Variables *vds, int l, int c) : Stat(l, c)
 {
 	this->exprType = et;
 	this->vardecls = vds;
@@ -393,7 +393,7 @@ VariablesInst::VariablesInst(Type *et, Variables *vds, int l, int c) : Inst(l, c
 	vds->father = this;
 }
 
-If::If(Expr *e, Inst *i, int l, int c) : Inst(l, c)
+If::If(Expr *e, Stat *i, int l, int c) : Stat(l, c)
 {
 	this->expr = e;
 	this->inst = i;
@@ -401,13 +401,13 @@ If::If(Expr *e, Inst *i, int l, int c) : Inst(l, c)
 	i->father = this;
 }
 
-IfElse::IfElse(Expr *e, Inst *i_if, Inst *i_else, int l, int c) : If(e, i_if, l, c)
+IfElse::IfElse(Expr *e, Stat *i_if, Stat *i_else, int l, int c) : If(e, i_if, l, c)
 {
-	this->elseInst = i_else;
+	this->elseStat = i_else;
 	i_else = this;
 }
 
-While::While(Expr *e, Inst *i, int l, int c) : Inst(l, c)
+While::While(Expr *e, Stat *i, int l, int c) : Stat(l, c)
 {
 	this->expr = e;
 	this->inst = i;
@@ -415,7 +415,7 @@ While::While(Expr *e, Inst *i, int l, int c) : Inst(l, c)
 	i->father = this;
 }
 
-VarsDecl::VarsDecl(Type *et, Variables *vds, int l,int c) : Node(l, c)
+Variables_e::Variables_e(Type *et, Variables *vds, int l,int c) : Node(l, c)
 {
 	this->exprType = et;
 	this->varDecls = vds;
@@ -423,7 +423,7 @@ VarsDecl::VarsDecl(Type *et, Variables *vds, int l,int c) : Node(l, c)
 	vds->father = this;
 }
 
-For::For(VarsDecl *vsd, Expr *e_cond, Expr *e_count, Inst *i, int l, int c) : Inst(l, c)
+For::For(Variables_e *vsd, Expr *e_cond, Expr *e_count, Stat *i, int l, int c) : Stat(l, c)
 {
 	this->varsDecl = vsd;
 	this->exprCond = e_cond;
@@ -435,13 +435,13 @@ For::For(VarsDecl *vsd, Expr *e_cond, Expr *e_count, Inst *i, int l, int c) : In
 	i->father = this;
 }
 
-Block::Block(Insts *is, int l, int c) : Inst(l, c)
+Block::Block(Stats *is, int l, int c) : Stat(l, c)
 {
 	this->insts = is;
 	is->father = this;
 }
 
-Return::Return(Expr *e, int l, int c) : Inst(l, c)
+Return::Return(Expr *e, int l, int c) : Stat(l, c)
 {
 	this->expr = e;
 	e->father = this;
@@ -664,25 +664,25 @@ LargserEq::accept(Visitor *v)
 }
 
 void
-Inst::accept(Visitor *v)
+Stat::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Insts::accept(Visitor *v)
+Stats::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-ExprInst::accept(Visitor *v)
+ExprStat::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-VariablesInst::accept(Visitor *v)
+VariablesStat::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -706,7 +706,7 @@ While::accept(Visitor *v)
 }
 
 void
-VarsDecl::accept(Visitor *v)
+Variables_e::accept(Visitor *v)
 {
 	v->Visit(this);
 }

@@ -33,9 +33,9 @@
 		Expr		*tExpr;
 		ExprList	*tExprList;
 		
-		Insts		*tInsts;
-		Inst		*tInst;
-		VarsDecl	*tVarsDecl;
+		Stats		*tStats;
+		Stat		*tStat;
+		Variables_e	*tVariables_e;
 		
 		Integer		*tInteger;
 		Real		*tReal;		
@@ -57,9 +57,9 @@
 %type	<tExpr>			expr	expr_e
 %type	<tExprList>		expr_list	expr_list_e
 
-%type	<tInsts>		statements
-%type	<tInst>			statement
-%type	<tVarsDecl>		vars_decl_e
+%type	<tStats>		statements
+%type	<tStat>			statement
+%type	<tVariables_e>	variables_e
 
 %token	<tIdent>		IDENT	
 %token	<tInteger>		INTEGER 
@@ -486,17 +486,17 @@ statement:			  IF '(' expr ')' statement %prec IF_PREC
 					{
 						$$ = new While($3, $5, lin, col);
 					} 
-				| FOR '(' vars_decl_e ';' expr_e ';' expr_e ')' statement
+				| FOR '(' variables_e ';' expr_e ';' expr_e ')' statement
 					{
 						$$ = new For($3, $5, $7, $9, lin, col);
 					}  
 				| expr ';'
 					{
-						$$ = new ExprInst($1, lin, col);
+						$$ = new ExprStat($1, lin, col);
 					}  					
 				| type variables ';'
 					{
-						$$ = new VariablesInst($1, $2, lin, col);
+						$$ = new VariablesStat($1, $2, lin, col);
 						for(int i = 0; i < $2->varDecls->size(); i++)
 							symtab->AddSym($2->varDecls->at(i)->name, 3, $1->type);
 					} 
@@ -517,22 +517,22 @@ statement:			  IF '(' expr ')' statement %prec IF_PREC
 
 statements:			  /* Empty */
 					{
-						$$ = new Insts(lin, col);
+						$$ = new Stats(lin, col);
 					} 
 				|statements statement
 					{
-						$1->AddInst($2);
+						$1->AddStat($2);
 						$$ = $1;
 					} 
 ;
 
-vars_decl_e:		  /* Empty */
+variables_e:		  /* Empty */
 					{
 						$$ = NULL;
 					} 
 				| type variables
 					{
-						$$ = new VarsDecl($1, $2, lin, col);
+						$$ = new Variables_e($1, $2, lin, col);
 					} 
 ;
 

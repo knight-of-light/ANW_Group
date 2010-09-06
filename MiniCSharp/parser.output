@@ -135,7 +135,7 @@ Grammar
    95 statement: IF '(' expr ')' statement
    96          | IF '(' expr ')' statement ELSE statement
    97          | WHILE '(' expr ')' statement
-   98          | FOR '(' vars_decl_e ';' expr_e ';' expr_e ')' statement
+   98          | FOR '(' variables_e ';' expr_e ';' expr_e ')' statement
    99          | expr ';'
   100          | type variables ';'
 
@@ -147,7 +147,7 @@ Grammar
   104 statements: /* empty */
   105           | statements statement
 
-  106 vars_decl_e: /* empty */
+  106 variables_e: /* empty */
   107            | type variables
 
   108 expr_e: /* empty */
@@ -281,7 +281,7 @@ statement (84)
     on left: 101, on right: 102
 statements (86)
     on left: 104 105, on right: 12 13 15 17 19 21 102 105
-vars_decl_e (87)
+variables_e (87)
     on left: 106 107, on right: 98
 expr_e (88)
     on left: 108 109, on right: 98 103
@@ -2686,7 +2686,7 @@ state 161
 
 state 162
 
-   98 statement: FOR . '(' vars_decl_e ';' expr_e ';' expr_e ')' statement
+   98 statement: FOR . '(' variables_e ';' expr_e ';' expr_e ')' statement
 
     '('  shift, and go to state 184
 
@@ -3051,20 +3051,20 @@ state 183
 
 state 184
 
-   98 statement: FOR '(' . vars_decl_e ';' expr_e ';' expr_e ')' statement
+   98 statement: FOR '(' . variables_e ';' expr_e ';' expr_e ')' statement
 
     IDENT    shift, and go to state 40
     BOOLEAN  shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
 
-    $default  reduce using rule 106 (vars_decl_e)
+    $default  reduce using rule 106 (variables_e)
 
     type         go to state 201
     noarraytype  go to state 24
     arraytype    go to state 25
     arr_type     go to state 26
-    vars_decl_e  go to state 202
+    variables_e  go to state 202
 
 
 state 185
@@ -3418,7 +3418,7 @@ state 200
 
 state 201
 
-  107 vars_decl_e: type . variables
+  107 variables_e: type . variables
 
     IDENT  shift, and go to state 87
 
@@ -3428,7 +3428,7 @@ state 201
 
 state 202
 
-   98 statement: FOR '(' vars_decl_e . ';' expr_e ';' expr_e ')' statement
+   98 statement: FOR '(' variables_e . ';' expr_e ';' expr_e ')' statement
 
     ';'  shift, and go to state 215
 
@@ -3687,16 +3687,16 @@ state 213
 state 214
 
    28 variables: variables . ',' variable
-  107 vars_decl_e: type variables .
+  107 variables_e: type variables .
 
     ','  shift, and go to state 55
 
-    $default  reduce using rule 107 (vars_decl_e)
+    $default  reduce using rule 107 (variables_e)
 
 
 state 215
 
-   98 statement: FOR '(' vars_decl_e ';' . expr_e ';' expr_e ')' statement
+   98 statement: FOR '(' variables_e ';' . expr_e ';' expr_e ')' statement
 
     IDENT      shift, and go to state 69
     INTEGER    shift, and go to state 70
@@ -3800,7 +3800,7 @@ state 221
 
 state 222
 
-   98 statement: FOR '(' vars_decl_e ';' expr_e . ';' expr_e ')' statement
+   98 statement: FOR '(' variables_e ';' expr_e . ';' expr_e ')' statement
 
     ';'  shift, and go to state 225
 
@@ -3851,7 +3851,7 @@ state 224
 
 state 225
 
-   98 statement: FOR '(' vars_decl_e ';' expr_e ';' . expr_e ')' statement
+   98 statement: FOR '(' variables_e ';' expr_e ';' . expr_e ')' statement
 
     IDENT      shift, and go to state 69
     INTEGER    shift, and go to state 70
@@ -3885,14 +3885,14 @@ state 226
 
 state 227
 
-   98 statement: FOR '(' vars_decl_e ';' expr_e ';' expr_e . ')' statement
+   98 statement: FOR '(' variables_e ';' expr_e ';' expr_e . ')' statement
 
     ')'  shift, and go to state 228
 
 
 state 228
 
-   98 statement: FOR '(' vars_decl_e ';' expr_e ';' expr_e ')' . statement
+   98 statement: FOR '(' variables_e ';' expr_e ';' expr_e ')' . statement
 
     IDENT      shift, and go to state 159
     INTEGER    shift, and go to state 70
@@ -3929,6 +3929,6 @@ state 228
 
 state 229
 
-   98 statement: FOR '(' vars_decl_e ';' expr_e ';' expr_e ')' statement .
+   98 statement: FOR '(' variables_e ';' expr_e ';' expr_e ')' statement .
 
     $default  reduce using rule 98 (statement)
