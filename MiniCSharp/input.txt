@@ -1,4 +1,4 @@
-class Test 
+class Test d
 {	
 	int func(int s, double e) 
 	{

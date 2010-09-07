@@ -421,36 +421,45 @@ expression:			  INCREMENT IDENT
 					}			
 ;
 
-arrayindex:		  '[' expression ']'
+arr_index:		  '[' expr ']'
 					{
+					$$ = new Arr_index_1($2,lin, col);
 					}
-				| '[' expression ',' expression ']'
+				| '[' expr ',' expr ']'
 					{
+					$$ = new Arr_index_2($2,$4,lin, col);
 					}
-				| '[' expression ',' expression ',' expression ']'
+				| '[' expr ',' expr ',' expr ']'
 					{
-					}
-;
-
-qualifiedname:		  IDENT
-					{
-					}
-				| expression '.' IDENT
-					{
+					$$ = new Arr_index_3($2,$4,$6,lin, col);
 					}
 ;
 
-qualnameorarray:		  IDENT
+qual_name:		  IDENT
 					{
+					$$ = new qual_name_id($1,lin, col);
 					}
-				| IDENT arrayindex
+				| expr '.' IDENT
 					{
+					$$ = new qual_name_id_exp($3,$1,lin, col);
 					}
-				| expression '.' IDENT
+;
+
+q_name_arr:		  IDENT
 					{
+					$$ = new qual_name_array_ident($1,lin, col);
 					}
-				| expression '.' IDENT arrayindex
+				| IDENT arr_index
 					{
+					$$ = new qual_name_array_ident_index($1,$2,lin, col);
+					}
+				| expr '.' IDENT
+					{
+					$$ = new qual_name_array_exp_ident($3,$1,lin, col);
+					}
+				| expr '.' IDENT arr_index
+					{
+					$$ = new qual_name_array_exp_ident_index($3,$1,$4,lin, col);
 					}
 ;
 

@@ -78,6 +78,18 @@ class Deffered;
 class Errors;
 
 class Visitor;
+class Arr_index;
+class qual_name;
+class qual_name_id;
+class qual_name_array_ident_index;
+class qual_name_array_ident;
+class qual_name_id_exp;
+class qual_name_array_exp_ident;
+class qual_name_array_exp_ident_index;
+class qual_name_array ;
+class Arr_index_1;
+class Arr_index_2;
+class Arr_index_3;
 
 class Node
 {
@@ -587,7 +599,92 @@ public:
 	Return(Expr *, int, int);
 	virtual void accept(Visitor *);
 };
-
+class Arr_index : public Node
+{
+public:
+	Arr_index( int, int);
+	virtual void accept(Visitor *);
+};
+class Arr_index_1 :public Arr_index
+{
+public:
+	Expr	*expr1;
+	Arr_index_1(Expr *, int, int);
+	virtual void accept(Visitor *);
+};
+class Arr_index_2 : public Arr_index
+{
+public:
+	Expr	*expr1,  *expr2  ;
+	Arr_index_2(Expr *,Expr *, int, int);
+	virtual void accept(Visitor *);
+};
+class Arr_index_3 : public Arr_index
+{
+public:
+	Expr	*expr1,  *expr2 ,*expr3 ;
+	Arr_index_3(Expr *,Expr *,Expr *, int, int);
+	virtual void accept(Visitor *);
+};
+class qual_name : public Node
+{
+public:
+	qual_name( int, int);
+	virtual void accept(Visitor *);
+};
+class qual_name_id : public qual_name
+{
+public:
+	Ident   *ident ;
+	qual_name_id(Ident *, int, int);
+	virtual void accept(Visitor *);
+};
+class qual_name_id_exp : public qual_name
+{
+public:
+	Ident   *ident ;
+	Expr	*expr;
+	qual_name_id_exp(Ident *,Expr * , int, int);
+	virtual void accept(Visitor *);
+};
+class qual_name_array : public Node
+{
+public:
+	qual_name_array( int, int);
+	virtual void accept(Visitor *);
+};
+class qual_name_array_ident : public qual_name_array
+{
+public:
+	Ident   *ident ;
+	qual_name_array_ident(Ident*, int, int);
+	virtual void accept(Visitor *);
+};
+class qual_name_array_ident_index : public qual_name_array
+{
+public:
+	Ident   *ident ;
+	Arr_index *index;
+	qual_name_array_ident_index( Ident*,Arr_index*,int, int);
+	virtual void accept(Visitor *);
+};
+class qual_name_array_exp_ident : public qual_name_array
+{
+public:
+	Ident   *ident ;
+	Expr  *expr;
+	qual_name_array_exp_ident(Ident*, Expr*,int, int);
+	virtual void accept(Visitor *);
+};
+class qual_name_array_exp_ident_index : public qual_name_array
+{
+public:
+	Ident   *ident ;
+	Expr  *expr;
+	Arr_index *index;
+	qual_name_array_exp_ident_index(Ident*, Expr*,Arr_index*,int, int);
+	virtual void accept(Visitor *);
+};
 
 //*************************************************************
 
@@ -732,6 +829,18 @@ public:
 	virtual void Visit(Or *) = 0;
 	virtual void Visit(And *) = 0;
 	virtual void Visit(For *) = 0;
+	virtual void Visit(Arr_index *)=0;
+	virtual void Visit(Arr_index_1 *)=0;
+	virtual void Visit(Arr_index_2 *)=0;
+	virtual void Visit(Arr_index_3 *)=0;
+	virtual void Visit(qual_name_array *)=0;
+	virtual void Visit(qual_name *)=0;
+	virtual void Visit(qual_name_id *)=0;
+	virtual void Visit(qual_name_id_exp *)=0;
+	virtual void Visit(qual_name_array_ident *)=0;
+	virtual void Visit(qual_name_array_ident_index *)=0;
+	virtual void Visit(qual_name_array_exp_ident *)=0;
+	virtual void Visit(qual_name_array_exp_ident_index *)=0;
 };
 
 

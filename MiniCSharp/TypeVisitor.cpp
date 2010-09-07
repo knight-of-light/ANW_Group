@@ -449,6 +449,58 @@ TypeVisitor::Visit(For *n){
 }
 
 
+void
+TypeVisitor::Visit(Arr_index *n){
+	
+}
+void
+TypeVisitor::Visit(Arr_index_1 *n){
+	
+}
+void
+TypeVisitor::Visit(Arr_index_2 *n){
+	
+}
+void
+TypeVisitor::Visit(Arr_index_3 *n){
+	
+}
+void
+TypeVisitor::Visit(qual_name *n){
+	
+}
+void
+TypeVisitor::Visit(qual_name_id *n){
+	
+}
+void
+TypeVisitor::Visit(qual_name_id_exp *n){
+	
+}
+void
+TypeVisitor::Visit(qual_name_array *n){
+	
+}
+void
+TypeVisitor::Visit(qual_name_array_ident *n){
+	
+}
+void
+TypeVisitor::Visit(qual_name_array_ident_index *n){
+	
+}
+
+void
+TypeVisitor::Visit(qual_name_array_exp_ident *n){
+	
+}
+void
+TypeVisitor::Visit(qual_name_array_exp_ident_index *n){
+	
+}
+
+
+
 
 
 
