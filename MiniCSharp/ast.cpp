@@ -8,6 +8,18 @@ Node::Node(int line, int column)
 	this->father = NULL;
 }
 
+Root::Root(int l, int c):Node(l,c)
+{
+	this->classes = new vector<ClassDef *>;
+}
+
+void
+Root::AddClass(ClassDef *cd)
+{
+	this->classes->push_back(cd);
+	cd->father = this;
+}
+
 ClassDef::ClassDef(Ident *n, Members *fs, int l, int c): Node(l, c)
 {
 	this->name = n;
@@ -34,7 +46,7 @@ Member::Member(int l, int c) : Node(l, c)
 	
 }
 
-Global::Global(Type *et, Variables *vs, int l,int c) : Member(l, c)
+Global::Global(Type *et, Variables *vs, int l, int c) : Member(l, c)
 {
 	this->exprType = et;
 	this->varDecls = vs;
@@ -124,9 +136,39 @@ Arg::Arg(Type *et, Ident *n, int l, int c) : Node(l, c)
 	n->father = this;
 }
 
+Type::Type(int l, int c) : Node(l,c)
+{
+}
+
 Type::Type(int t, int l, int c) : Node(l, c)
 {
 	this->type = t;
+}
+
+NoArrayType::NoArrayType(int t, int l, int c) : Type(l,c)
+{
+	this->type = t;
+	this->name = NULL;
+}
+
+NoArrayType::NoArrayType(Ident *n, int l, int c) : Type(l,c)
+{
+	this->type = 6;
+	this->name = n;
+	n->father = this;
+}
+
+ArrayType::ArrayType(int t, int l, int c) : Type(l,c)
+{
+	this->type = t;
+	this->name = NULL;
+}
+
+ArrayType::ArrayType(int t, Ident *n, int l, int c) : Type(l,c)
+{
+	this->type = t + (6*10); /* 6: Ident type number , 10: Add 10 for Array type number */
+	this->name = n;
+	n->father = this;
 }
 
 Ident::Ident(string n, int l, int c) : Node(l, c)
@@ -491,6 +533,12 @@ Errors::Print()
 
 void
 Node::accept(Visitor *v)
+{
+	
+}
+
+void
+Root::accept(Visitor *v)
 {
 	
 }

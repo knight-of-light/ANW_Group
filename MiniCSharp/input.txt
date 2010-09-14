@@ -7,11 +7,9 @@ class Test
 		
 	}
 	int x2 = 4 + 8;
-	int func(double x1, int d) 
+	int func2(double x1, int d) 
 	{
 		func(7,5.6);
 	}
 
 }
-
-

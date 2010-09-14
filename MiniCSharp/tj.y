@@ -13,11 +13,12 @@
 	extern int col;
 	
 	extern SymTab *symtab;
-	ClassDef *classDef;	
+	Root *file;	
 	extern Deffered *def;
 %}
 
 %union{
+		Root		*tRoot;
 		ClassDef	*tClassDef;
 		Members		*tMembers;
 		Member		*tMember;
@@ -30,6 +31,8 @@
 		Arg			*tArg;
 		
 		Type		*tType;
+		NoArrayType	*tNoArrayType;
+		ArrayType	*tArrayType;
 		Expr		*tExpr;
 		ExprList	*tExprList;
 		
@@ -42,6 +45,7 @@
 		Ident		*tIdent;				
 	}
 	
+%type	<tRoot>			root
 %type	<tClassDef>		class
 %type	<tMembers>		members
 %type	<tMember>		member
@@ -54,6 +58,8 @@
 %type	<tArg>			arg
 
 %type	<tType>			type
+%type	<tNoArrayType>	noarraytype	basictype
+%type	<tArrayType>	arraytype
 %type	<tExpr>			expr	expr_e
 %type	<tExprList>		expr_list	expr_list_e
 
@@ -90,14 +96,22 @@
 
 %%
 root:			  /* empty */
+					{
+						$$ = new Root(lin, col);
+						file = $$;
+					}
 				| root class
+					{
+						$1->AddClass($2);
+						$$ = $1;
+						file = $$;
+					}
 ;
 
 class:			CLASS IDENT '{' members '}' 
 					{
 						$$ = new ClassDef($2, $4, lin, col);						
-						symtab->AddSym($2, 1, -1);	
-						classDef = $$;
+						symtab->AddSym($2, 1, -1);
 										
 					}
 				| CLASS IDENT ':' IDENT '{' members '}'
@@ -106,7 +120,9 @@ class:			CLASS IDENT '{' members '}'
 ;
 
 members:		  /* empty */
-					{$$ = new Members(lin, col);}
+					{
+						$$ = new Members(lin, col);
+					}
 				| members member 
 					{
 						$1->AddMember($2);
@@ -116,7 +132,7 @@ members:		  /* empty */
 member:			  global
 					{$$ = $1;}
 				| constructor
-					{}
+					{/*$$ = $1;*/}
 				| function
 					{$$ = $1;}
 ;
@@ -140,7 +156,7 @@ constructor:	  IDENT '(' args_e ')' '{' statements '}'
 ;
 
 
-function:			  accessmodif type IDENT '('
+function:		  accessmodif type IDENT '('
 					{
 					}				 
 				   args_e ')' '{'statements '}' 
@@ -223,58 +239,68 @@ variable:		  IDENT
 					}
 ;
 
-accessmodif:		  PRIVATE
+accessmodif:	  PRIVATE
 				| STATIC
 				| PRIVATE STATIC
 ;
 
-type:		  noarraytype
+type:			  noarraytype
 					{
+						$$ = $1;
 					}
-				| arr_type
+				| arraytype
 					{
+						$$ = $1;
 					}
 ;
 
 noarraytype:	  IDENT
 					{
+						$$ = new NoArrayType($1, lin, col);
 					}
-				| arraytype
+				| basictype
 					{
+						$$ = $1;
 					}
 ;
 
-arraytype:	  BOOLEAN
+basictype:		  BOOLEAN
 					{
-						//$$ = new Type(3, lin, col);
+						$$ = new NoArrayType(3, lin, col);
 					}
 				| INT
 					{
-						//$$ = new Type(1, lin, col);
+						$$ = new NoArrayType(1, lin, col);
 					}
 				| DOUBLE
 					{
-						//$$ = new Type(2, lin, col);
+						$$ = new NoArrayType(2, lin, col);
 					}
 ;
 
-arr_type:		  IDENT '[' ']'
+arraytype:		  IDENT '[' ']'
 					{
+						$$ = new ArrayType(2, $1, lin, col);
 					}
 				| IDENT '[' ',' ']'
 					{
+						$$ = new ArrayType(3, $1, lin, col);
 					}
 				| IDENT '[' ',' ',' ']'
 					{
+						$$ = new ArrayType(4, $1, lin, col);
 					}
-				| arraytype '[' ']'
+				| basictype '[' ']'
 					{
+						$$ = new ArrayType($1->type*10+2, lin, col);
 					}
-				| arraytype '[' ',' ']'
+				| basictype '[' ',' ']'
 					{
+						$$ = new ArrayType($1->type*10+3, lin, col);
 					}
-				| arraytype '[' ',' ',' ']'
+				| basictype '[' ',' ',' ']'
 					{
+						$$ = new ArrayType($1->type*10+4, lin, col);
 					}
 ;
 
@@ -393,7 +419,7 @@ expr:			  INCREMENT IDENT
 				| expr IS type
 					{
 					}
-				| '(' arraytype ')' expr %prec change_type
+				| '(' basictype ')' expr %prec change_type
 					{
 					}
 				| INTEGER 

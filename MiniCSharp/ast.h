@@ -18,6 +18,7 @@ using std::string;
 #include "hash_table.h"
 
 class Node;
+class Root;
 class ClassDef;
 class Members;
 class Member ;
@@ -90,6 +91,15 @@ public:
 	virtual void accept(Visitor *);
 };
 
+class Root : public Node
+{
+public:
+	vector<ClassDef *>	*classes;
+
+	Root(int, int);
+	void AddClass(ClassDef *);
+	virtual void accept(Visitor *);
+};
 
 class ClassDef : public Node
 {
@@ -187,12 +197,34 @@ public:
 
 class Type : public Node
 {
-public:	
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
+public:
+	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5:object, 6:ident
 	int type;
 
+	Type(int, int);
 	Type(int, int, int);
 	virtual void accept(Visitor *);
+};
+
+class NoArrayType : public Type
+{
+public:
+	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5:object, 6:ident
+	Ident *name;
+
+	NoArrayType(int, int, int);
+	NoArrayType(Ident *, int, int);
+	//virtual void accept(Visitor *);
+};
+
+class ArrayType : public Type
+{
+public:
+	Ident *name;
+
+	ArrayType(int, int, int);
+	ArrayType(int, Ident *, int, int);
+	//virtual void accept(Visitor *);
 };
 
 class Ident : public Node

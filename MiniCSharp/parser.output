@@ -62,21 +62,21 @@ Grammar
    33            | PRIVATE STATIC
 
    34 type: noarraytype
-   35     | arr_type
+   35     | arraytype
 
    36 noarraytype: IDENT
-   37            | arraytype
+   37            | basictype
 
-   38 arraytype: BOOLEAN
+   38 basictype: BOOLEAN
    39          | INT
    40          | DOUBLE
 
-   41 arr_type: IDENT '[' ']'
-   42         | IDENT '[' ',' ']'
-   43         | IDENT '[' ',' ',' ']'
-   44         | arraytype '[' ']'
-   45         | arraytype '[' ',' ']'
-   46         | arraytype '[' ',' ',' ']'
+   41 arraytype: IDENT '[' ']'
+   42          | IDENT '[' ',' ']'
+   43          | IDENT '[' ',' ',' ']'
+   44          | basictype '[' ']'
+   45          | basictype '[' ',' ']'
+   46          | basictype '[' ',' ',' ']'
 
    47 expr: INCREMENT IDENT
    48     | DECREMENT IDENT
@@ -106,7 +106,7 @@ Grammar
    72     | expr AND expr
    73     | expr OR expr
    74     | expr IS type
-   75     | '(' arraytype ')' expr
+   75     | '(' basictype ')' expr
    76     | INTEGER
    77     | REAL
    78     | TRUE
@@ -256,9 +256,9 @@ type (74)
     on left: 34 35, on right: 10 11 15 19 22 74 100 107
 noarraytype (75)
     on left: 36 37, on right: 34
-arraytype (76)
+basictype (76)
     on left: 38 39 40, on right: 37 44 45 46 75
-arr_type (77)
+arraytype (77)
     on left: 41 42 43 44 45 46, on right: 35
 expr (78)
     on left: 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64
@@ -375,8 +375,8 @@ state 8
     accessmodif  go to state 22
     type         go to state 23
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 9
@@ -390,9 +390,9 @@ state 10
 
    12 constructor: IDENT . '(' args_e ')' '{' statements '}'
    36 noarraytype: IDENT .
-   41 arr_type: IDENT . '[' ']'
-   42         | IDENT . '[' ',' ']'
-   43         | IDENT . '[' ',' ',' ']'
+   41 arraytype: IDENT . '[' ']'
+   42          | IDENT . '[' ',' ']'
+   43          | IDENT . '[' ',' ',' ']'
 
     '('  shift, and go to state 28
     '['  shift, and go to state 29
@@ -402,23 +402,23 @@ state 10
 
 state 11
 
-   38 arraytype: BOOLEAN .
+   38 basictype: BOOLEAN .
 
-    $default  reduce using rule 38 (arraytype)
+    $default  reduce using rule 38 (basictype)
 
 
 state 12
 
-   40 arraytype: DOUBLE .
+   40 basictype: DOUBLE .
 
-    $default  reduce using rule 40 (arraytype)
+    $default  reduce using rule 40 (basictype)
 
 
 state 13
 
-   39 arraytype: INT .
+   39 basictype: INT .
 
-    $default  reduce using rule 39 (arraytype)
+    $default  reduce using rule 39 (basictype)
 
 
 state 14
@@ -495,8 +495,8 @@ state 22
 
     type         go to state 34
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 23
@@ -519,10 +519,10 @@ state 24
 
 state 25
 
-   37 noarraytype: arraytype .
-   44 arr_type: arraytype . '[' ']'
-   45         | arraytype . '[' ',' ']'
-   46         | arraytype . '[' ',' ',' ']'
+   37 noarraytype: basictype .
+   44 arraytype: basictype . '[' ']'
+   45          | basictype . '[' ',' ']'
+   46          | basictype . '[' ',' ',' ']'
 
     '['  shift, and go to state 38
 
@@ -531,7 +531,7 @@ state 25
 
 state 26
 
-   35 type: arr_type .
+   35 type: arraytype .
 
     $default  reduce using rule 35 (type)
 
@@ -561,15 +561,15 @@ state 28
     args_e       go to state 43
     type         go to state 44
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 29
 
-   41 arr_type: IDENT '[' . ']'
-   42         | IDENT '[' . ',' ']'
-   43         | IDENT '[' . ',' ',' ']'
+   41 arraytype: IDENT '[' . ']'
+   42          | IDENT '[' . ',' ']'
+   43          | IDENT '[' . ',' ',' ']'
 
     ','  shift, and go to state 45
     ']'  shift, and go to state 46
@@ -593,9 +593,9 @@ state 32
 
    13 constructor: accessmodif IDENT . '(' args_e ')' '{' statements '}'
    36 noarraytype: IDENT .
-   41 arr_type: IDENT . '[' ']'
-   42         | IDENT . '[' ',' ']'
-   43         | IDENT . '[' ',' ',' ']'
+   41 arraytype: IDENT . '[' ']'
+   42          | IDENT . '[' ',' ']'
+   43          | IDENT . '[' ',' ',' ']'
 
     '('  shift, and go to state 48
     '['  shift, and go to state 29
@@ -651,9 +651,9 @@ state 37
 
 state 38
 
-   44 arr_type: arraytype '[' . ']'
-   45         | arraytype '[' . ',' ']'
-   46         | arraytype '[' . ',' ',' ']'
+   44 arraytype: basictype '[' . ']'
+   45          | basictype '[' . ',' ']'
+   46          | basictype '[' . ',' ',' ']'
 
     ','  shift, and go to state 56
     ']'  shift, and go to state 57
@@ -680,16 +680,16 @@ state 39
     accessmodif  go to state 22
     type         go to state 23
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 40
 
    36 noarraytype: IDENT .
-   41 arr_type: IDENT . '[' ']'
-   42         | IDENT . '[' ',' ']'
-   43         | IDENT . '[' ',' ',' ']'
+   41 arraytype: IDENT . '[' ']'
+   42          | IDENT . '[' ',' ']'
+   43          | IDENT . '[' ',' ',' ']'
 
     '['  shift, and go to state 29
 
@@ -729,8 +729,8 @@ state 44
 
 state 45
 
-   42 arr_type: IDENT '[' ',' . ']'
-   43         | IDENT '[' ',' . ',' ']'
+   42 arraytype: IDENT '[' ',' . ']'
+   43          | IDENT '[' ',' . ',' ']'
 
     ','  shift, and go to state 62
     ']'  shift, and go to state 63
@@ -738,9 +738,9 @@ state 45
 
 state 46
 
-   41 arr_type: IDENT '[' ']' .
+   41 arraytype: IDENT '[' ']' .
 
-    $default  reduce using rule 41 (arr_type)
+    $default  reduce using rule 41 (arraytype)
 
 
 state 47
@@ -768,8 +768,8 @@ state 48
     args_e       go to state 65
     type         go to state 44
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 49
@@ -851,8 +851,8 @@ state 55
 
 state 56
 
-   45 arr_type: arraytype '[' ',' . ']'
-   46         | arraytype '[' ',' . ',' ']'
+   45 arraytype: basictype '[' ',' . ']'
+   46          | basictype '[' ',' . ',' ']'
 
     ','  shift, and go to state 89
     ']'  shift, and go to state 90
@@ -860,9 +860,9 @@ state 56
 
 state 57
 
-   44 arr_type: arraytype '[' ']' .
+   44 arraytype: basictype '[' ']' .
 
-    $default  reduce using rule 44 (arr_type)
+    $default  reduce using rule 44 (arraytype)
 
 
 state 58
@@ -884,8 +884,8 @@ state 59
     arg          go to state 91
     type         go to state 44
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 60
@@ -904,16 +904,16 @@ state 61
 
 state 62
 
-   43 arr_type: IDENT '[' ',' ',' . ']'
+   43 arraytype: IDENT '[' ',' ',' . ']'
 
     ']'  shift, and go to state 93
 
 
 state 63
 
-   42 arr_type: IDENT '[' ',' ']' .
+   42 arraytype: IDENT '[' ',' ']' .
 
-    $default  reduce using rule 42 (arr_type)
+    $default  reduce using rule 42 (arraytype)
 
 
 state 64
@@ -932,8 +932,8 @@ state 64
     args_e       go to state 94
     type         go to state 44
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 65
@@ -1125,7 +1125,7 @@ state 81
 state 82
 
    54 expr: '(' . expr ')'
-   75     | '(' . arraytype ')' expr
+   75     | '(' . basictype ')' expr
 
     IDENT      shift, and go to state 69
     INTEGER    shift, and go to state 70
@@ -1145,7 +1145,7 @@ state 82
     INCREMENT  shift, and go to state 81
     '('        shift, and go to state 82
 
-    arraytype        go to state 108
+    basictype        go to state 108
     expr             go to state 109
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -1225,8 +1225,8 @@ state 86
     args_e       go to state 127
     type         go to state 44
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 87
@@ -1248,16 +1248,16 @@ state 88
 
 state 89
 
-   46 arr_type: arraytype '[' ',' ',' . ']'
+   46 arraytype: basictype '[' ',' ',' . ']'
 
     ']'  shift, and go to state 128
 
 
 state 90
 
-   45 arr_type: arraytype '[' ',' ']' .
+   45 arraytype: basictype '[' ',' ']' .
 
-    $default  reduce using rule 45 (arr_type)
+    $default  reduce using rule 45 (arraytype)
 
 
 state 91
@@ -1278,9 +1278,9 @@ state 92
 
 state 93
 
-   43 arr_type: IDENT '[' ',' ',' ']' .
+   43 arraytype: IDENT '[' ',' ',' ']' .
 
-    $default  reduce using rule 43 (arr_type)
+    $default  reduce using rule 43 (arraytype)
 
 
 state 94
@@ -1313,8 +1313,8 @@ state 96
     args_e       go to state 132
     type         go to state 44
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 97
@@ -1333,8 +1333,8 @@ state 97
     args_e       go to state 133
     type         go to state 44
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 98
@@ -1489,7 +1489,7 @@ state 107
 
 state 108
 
-   75 expr: '(' arraytype . ')' expr
+   75 expr: '(' basictype . ')' expr
 
     ')'  shift, and go to state 137
 
@@ -1544,8 +1544,8 @@ state 110
 
     type         go to state 139
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
 
 
 state 111
@@ -1931,9 +1931,9 @@ state 127
 
 state 128
 
-   46 arr_type: arraytype '[' ',' ',' ']' .
+   46 arraytype: basictype '[' ',' ',' ']' .
 
-    $default  reduce using rule 46 (arr_type)
+    $default  reduce using rule 46 (arraytype)
 
 
 state 129
@@ -1967,8 +1967,8 @@ state 129
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -2084,7 +2084,7 @@ state 136
 
 state 137
 
-   75 expr: '(' arraytype ')' . expr
+   75 expr: '(' basictype ')' . expr
 
     IDENT      shift, and go to state 69
     INTEGER    shift, and go to state 70
@@ -2649,9 +2649,9 @@ state 158
 state 159
 
    36 noarraytype: IDENT .
-   41 arr_type: IDENT . '[' ']'
-   42         | IDENT . '[' ',' ']'
-   43         | IDENT . '[' ',' ',' ']'
+   41 arraytype: IDENT . '[' ']'
+   42          | IDENT . '[' ',' ']'
+   43          | IDENT . '[' ',' ',' ']'
    49 expr: IDENT . INCREMENT
    50     | IDENT . DECREMENT
    85 qualifiedname: IDENT .
@@ -2830,8 +2830,8 @@ state 170
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -2907,7 +2907,7 @@ state 176
    72     | expr . AND expr
    73     | expr . OR expr
    74     | expr . IS type
-   75     | '(' arraytype ')' expr .
+   75     | '(' basictype ')' expr .
    86 qualifiedname: expr . '.' IDENT
    89 qualnameorarray: expr . '.' IDENT
    90                | expr . '.' IDENT arrayindex
@@ -2971,9 +2971,9 @@ state 180
 
 state 181
 
-   41 arr_type: IDENT '[' . ']'
-   42         | IDENT '[' . ',' ']'
-   43         | IDENT '[' . ',' ',' ']'
+   41 arraytype: IDENT '[' . ']'
+   42          | IDENT '[' . ',' ']'
+   43          | IDENT '[' . ',' ',' ']'
    82 arrayindex: '[' . expr ']'
    83           | '[' . expr ',' expr ']'
    84           | '[' . expr ',' expr ',' expr ']'
@@ -3062,8 +3062,8 @@ state 184
 
     type         go to state 201
     noarraytype  go to state 24
-    arraytype    go to state 25
-    arr_type     go to state 26
+    basictype    go to state 25
+    arraytype    go to state 26
     variables_e  go to state 202
 
 
@@ -3170,8 +3170,8 @@ state 190
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -3329,8 +3329,8 @@ state 198
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -3471,8 +3471,8 @@ state 204
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -3524,8 +3524,8 @@ state 207
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -3563,8 +3563,8 @@ state 208
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -3639,8 +3639,8 @@ state 212
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -3676,8 +3676,8 @@ state 213
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -3841,8 +3841,8 @@ state 224
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
@@ -3919,8 +3919,8 @@ state 228
 
     type             go to state 166
     noarraytype      go to state 24
-    arraytype        go to state 25
-    arr_type         go to state 26
+    basictype        go to state 25
+    arraytype        go to state 26
     expr             go to state 167
     qualifiedname    go to state 84
     qualnameorarray  go to state 85
