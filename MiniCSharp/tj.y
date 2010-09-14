@@ -139,18 +139,12 @@ member:			  global
 
 global:			  accessmodif type variables ';'
 					{
-					}
-				| type variables ';'
-					{
-						$$ = new Global($1, $2, lin, col);						
-						symtab->AddVars($2, $1);
+						$$ = new Global($2, $3, lin, col);
+						symtab->AddVars($3, $2);
 					}
 ;
 
-constructor:	  IDENT '(' args_e ')' '{' statements '}'
-					{
-					}
-				| accessmodif IDENT '(' args_e ')' '{' statements '}'
+constructor:	  accessmodif IDENT '(' args_e ')' '{' statements '}'
 					{
 					}
 ;
@@ -158,37 +152,24 @@ constructor:	  IDENT '(' args_e ')' '{' statements '}'
 
 function:		  accessmodif type IDENT '('
 					{
+						symtab->AddNewScope();
 					}				 
 				   args_e ')' '{'statements '}' 
 					{
+						$$ = new Function($2, $3, $6, $9, lin, col); 
+						symtab->OutScope();	
+						symtab->AddSym($3, 2, -1, $6, $2->type, $$);
 					}
 				| accessmodif VOID IDENT '(' 
 					 {
+						 symtab->AddNewScope();
 					 }				 
 				   args_e ')' '{'statements '}' 
-					{ 
-					}
-				| type IDENT '('
 					{
-						symtab->AddNewScope();
-					}				 
-				   args_e ')' '{'statements '}' 
-					{ 
-						$$ = new Function($1, $2, $5, $8, lin, col); 
-						symtab->OutScope();	
-						symtab->AddSym($2, 2, -1, $5, $1->type, $$);					
-					}
-				| VOID IDENT '(' 
-					 {
-						symtab->AddNewScope();
-					 }				 
-				   args_e ')' '{'statements '}' 
-					{ 
-						$$ = new Function($2, $5, $8, lin, col); 
+						$$ = new Function($3, $6, $9, lin, col); 
 						symtab->OutScope();
-						symtab->AddSym($2, 2, -1, $5, 4, $$);
-					}
-				
+						symtab->AddSym($3, 2, -1, $6, 4, $$);
+					}				
 ;
 
 arg :			  type IDENT
@@ -239,7 +220,8 @@ variable:		  IDENT
 					}
 ;
 
-accessmodif:	  PRIVATE
+accessmodif:	  /*empty*/
+				| PRIVATE
 				| STATIC
 				| PRIVATE STATIC
 ;

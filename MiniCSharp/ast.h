@@ -200,17 +200,15 @@ class Type : public Node
 public:
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5:object, 6:ident
 	int type;
+	Ident *name;
 
 	Type(int, int);
-	Type(int, int, int);
 	virtual void accept(Visitor *);
 };
 
 class NoArrayType : public Type
 {
 public:
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5:object, 6:ident
-	Ident *name;
 
 	NoArrayType(int, int, int);
 	NoArrayType(Ident *, int, int);
@@ -220,7 +218,10 @@ public:
 class ArrayType : public Type
 {
 public:
-	Ident *name;
+	//	12:	int[]		,	13:	int[,]		,	14:	int[,,]		,
+	//	22:	double[]	,	23:	double[,]	,	24: double[,,]	,
+	//	32:	boolean[]	,	33:	boolean[,]	,	34: boolean[,,]	,
+	//	62:	Ident[]		,	63:	Ident[,]	,	64: Ident[,,]	,
 
 	ArrayType(int, int, int);
 	ArrayType(int, Ident *, int, int);

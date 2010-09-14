@@ -138,17 +138,12 @@ Arg::Arg(Type *et, Ident *n, int l, int c) : Node(l, c)
 
 Type::Type(int l, int c) : Node(l,c)
 {
-}
-
-Type::Type(int t, int l, int c) : Node(l, c)
-{
-	this->type = t;
+	this->name = NULL;
 }
 
 NoArrayType::NoArrayType(int t, int l, int c) : Type(l,c)
 {
 	this->type = t;
-	this->name = NULL;
 }
 
 NoArrayType::NoArrayType(Ident *n, int l, int c) : Type(l,c)
@@ -161,7 +156,6 @@ NoArrayType::NoArrayType(Ident *n, int l, int c) : Type(l,c)
 ArrayType::ArrayType(int t, int l, int c) : Type(l,c)
 {
 	this->type = t;
-	this->name = NULL;
 }
 
 ArrayType::ArrayType(int t, Ident *n, int l, int c) : Type(l,c)
