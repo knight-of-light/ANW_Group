@@ -22,14 +22,16 @@
 		ClassDef	*tClassDef;
 		Members		*tMembers;
 		Member		*tMember;
-		Function	*tFunction;
 		Global		*tGlobal;
+		Constructor	*tConstructor;
+		Function	*tFunction;
 		
 		Variables	*tVariables;
 		Variable	*tVariable;
 		Args		*tArgs;
 		Arg			*tArg;
 		
+		AccessModif	*tAccessModif;
 		Type		*tType;
 		NoArrayType	*tNoArrayType;
 		ArrayType	*tArrayType;
@@ -49,14 +51,16 @@
 %type	<tClassDef>		class
 %type	<tMembers>		members
 %type	<tMember>		member
-%type	<tFunction>		function
 %type	<tGlobal>		global
+%type	<tConstructor>	constructor
+%type	<tFunction>		function
 
 %type	<tVariables>	variables
 %type	<tVariable>		variable
 %type	<tArgs>			args	args_e
 %type	<tArg>			arg
 
+%type	<tAccessModif>	accessmodif
 %type	<tType>			type
 %type	<tNoArrayType>	noarraytype	basictype
 %type	<tArrayType>	arraytype
@@ -116,6 +120,7 @@ class:			CLASS IDENT '{' members '}'
 					}
 				| CLASS IDENT ':' IDENT '{' members '}'
 					{
+						$$ = new ClassDef($2, $4, $6, lin, col);
 					}
 ;
 
@@ -132,20 +137,21 @@ members:		  /* empty */
 member:			  global
 					{$$ = $1;}
 				| constructor
-					{/*$$ = $1;*/}
+					{$$ = $1;}
 				| function
 					{$$ = $1;}
 ;
 
 global:			  accessmodif type variables ';'
 					{
-						$$ = new Global($2, $3, lin, col);
+						$$ = new Global($1, $2, $3, lin, col);
 						symtab->AddVars($3, $2);
 					}
 ;
 
 constructor:	  accessmodif IDENT '(' args_e ')' '{' statements '}'
 					{
+						$$ = new Constructor($1, $2, $4, $7, lin, col);
 					}
 ;
 
@@ -156,7 +162,7 @@ function:		  accessmodif type IDENT '('
 					}				 
 				   args_e ')' '{'statements '}' 
 					{
-						$$ = new Function($2, $3, $6, $9, lin, col); 
+						$$ = new Function($1, $2, $3, $6, $9, lin, col); 
 						symtab->OutScope();	
 						symtab->AddSym($3, 2, -1, $6, $2->type, $$);
 					}
@@ -166,7 +172,7 @@ function:		  accessmodif type IDENT '('
 					 }				 
 				   args_e ')' '{'statements '}' 
 					{
-						$$ = new Function($3, $6, $9, lin, col); 
+						$$ = new Function($1, $3, $6, $9, lin, col); 
 						symtab->OutScope();
 						symtab->AddSym($3, 2, -1, $6, 4, $$);
 					}				
@@ -220,20 +226,28 @@ variable:		  IDENT
 					}
 ;
 
-accessmodif:	  /*empty*/
+accessmodif:	  /* empty */
+					{
+						$$ = new AccessModif(1, lin, col);
+					}
 				| PRIVATE
+					{
+						$$ = new AccessModif(2, lin, col);
+					}
 				| STATIC
+					{
+						$$ = new AccessModif(3, lin, col);
+					}
 				| PRIVATE STATIC
+					{
+						$$ = new AccessModif(4, lin, col);
+					}
 ;
 
 type:			  noarraytype
-					{
-						$$ = $1;
-					}
+					{$$ = $1;}
 				| arraytype
-					{
-						$$ = $1;
-					}
+					{$$ = $1;}
 ;
 
 noarraytype:	  IDENT
@@ -241,9 +255,7 @@ noarraytype:	  IDENT
 						$$ = new NoArrayType($1, lin, col);
 					}
 				| basictype
-					{
-						$$ = $1;
-					}
+					{$$ = $1;}
 ;
 
 basictype:		  BOOLEAN

@@ -23,12 +23,16 @@ class ClassDef;
 class Members;
 class Member ;
 class Global ;
+class Constructor;
 class Function;
 class Variables;
 class Variable ;
 class Args;
 class Arg ;
+class AccessModif;
 class Type;
+class NoArrayType;
+class ArrayType;
 class Ident;
 class Expr;
 class Integer;
@@ -105,9 +109,11 @@ class ClassDef : public Node
 {
 public:
 	Ident	*name;
+	Ident	*supName;
 	Members	*members;
 
 	ClassDef(Ident *, Members *, int, int);
+	ClassDef(Ident *, Ident *, Members *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -132,23 +138,37 @@ public:
 class Global : public Member
 {
 public:
-	Type	*exprType;	
+	AccessModif	*accessModif;
+	Type		*exprType;
 	Variables	*varDecls;
 
-	Global(Type *, Variables *, int , int);
+	Global(AccessModif	*, Type *, Variables *, int , int);
 	virtual void accept(Visitor *);
+};
+
+class Constructor : public Member
+{
+public:
+	AccessModif	*accessModif;
+	Ident		*name;
+	Args		*params;
+	Stats		*insts;
+
+	Constructor(AccessModif *, Ident *, Args *, Stats *, int, int);
+	//virtual void accept(Visitor *);
 };
 
 class Function : public Member
 {
 public:
-	Type	*exprType;
+	AccessModif	*accessModif;
+	Type		*exprType;
 	Ident		*name;
 	Args		*params;
 	Stats		*insts;
 
-	Function(Type *, Ident *, Args *, Stats *, int, int);
-	Function(Ident *, Args *, Stats *, int, int);
+	Function(AccessModif *, Type *, Ident *, Args *, Stats *, int, int);
+	Function(AccessModif *, Ident *, Args *, Stats *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -193,6 +213,16 @@ public:
 
 	Arg(Type *, Ident *, int, int);
 	virtual void accept(Visitor *);
+};
+
+class AccessModif : public Node
+{
+public:
+	// 1: no AccessModif , 2: private , 3: static , 4: private static
+	int acctype;
+
+	AccessModif(int, int, int);
+	//virtual void accept(Visitor *);
 };
 
 class Type : public Node

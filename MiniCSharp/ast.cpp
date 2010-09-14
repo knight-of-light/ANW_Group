@@ -23,9 +23,21 @@ Root::AddClass(ClassDef *cd)
 ClassDef::ClassDef(Ident *n, Members *fs, int l, int c): Node(l, c)
 {
 	this->name = n;
+	this->supName = NULL;
 	this->members = fs;
 	
 	n->father = this;
+	fs->father = this;
+}
+
+ClassDef::ClassDef(Ident *n, Ident *sn, Members *fs, int l, int c) : Node(l, c)
+{
+	this->name = n;
+	this->supName = sn;
+	this->members = fs;
+
+	n->father = this;
+	sn->father = this;
 	fs->father = this;
 }
 
@@ -46,32 +58,50 @@ Member::Member(int l, int c) : Node(l, c)
 	
 }
 
-Global::Global(Type *et, Variables *vs, int l, int c) : Member(l, c)
+Global::Global(AccessModif	*am, Type *et, Variables *vs, int l, int c) : Member(l, c)
 {
+	this->accessModif = am;
 	this->exprType = et;
 	this->varDecls = vs;
+	am->father = this;
 	et->father = this;
 	vs->father = this;
 }
 
-Function::Function(Type *et, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
+Constructor::Constructor(AccessModif * am, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
 {
+	this->accessModif = am;
+	this->name = n;
+	this->params = ps;
+	this->insts = is;
+	am->father = this;
+	n->father = this;
+	ps->father = this;
+	is->father = this;
+}
+
+Function::Function(AccessModif *am, Type *et, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
+{
+	this->accessModif = am;
 	this->exprType = et;
 	this->name = n;
 	this->params = ps;
 	this->insts = is;
+	am->father = this;
 	et->father = this;
 	n->father = this;
 	ps->father = this;
 	is->father = this;
 }
 
-Function::Function(Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
+Function::Function(AccessModif *am, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
 {
+	this->accessModif = am;
 	this->exprType = NULL;
 	this->name = n;
 	this->params = ps;
 	this->insts = is;
+	am->father = this;
 	n->father = this;
 	ps->father = this;
 	is->father = this;
@@ -134,6 +164,11 @@ Arg::Arg(Type *et, Ident *n, int l, int c) : Node(l, c)
 	this->name = n;
 	et->father = this;
 	n->father = this;
+}
+
+AccessModif::AccessModif(int at, int l, int c) : Node(l, c)
+{
+	this->acctype = at;
 }
 
 Type::Type(int l, int c) : Node(l,c)
