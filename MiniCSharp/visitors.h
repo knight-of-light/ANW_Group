@@ -33,8 +33,8 @@ public:
 	virtual void Visit( Incr *);
 	virtual void Visit( Add *);
 	virtual void Visit( Mult *);
-	virtual void Visit( Largser *);
-	virtual void Visit( LargserEq *);
+	virtual void Visit( Larger *);
+	virtual void Visit( LargerEq *);
 	virtual void Visit( Stat *);
 	virtual void Visit( Stats *);
 	virtual void Visit( ExprStat *);
@@ -63,14 +63,14 @@ public:
 	virtual void Visit(ArrayIndex_1 *);
 	virtual void Visit(ArrayIndex_2 *);
 	virtual void Visit(ArrayIndex_3 *);
-	virtual void Visit(qual_name *);
-	virtual void Visit(qual_name_id *);
-	virtual void Visit(qual_name_id_exp *);
-	virtual void Visit(qual_name_array *);
-	virtual void Visit(qual_name_array_ident *);
-	virtual void Visit(qual_name_array_ident_index *);
-	virtual void Visit(qual_name_array_exp_ident *);
-	virtual void Visit(qual_name_array_exp_ident_index *);
+	virtual void Visit(QualName *);
+	virtual void Visit(QualName_ID *);
+	virtual void Visit(QualName_Exp *);
+	virtual void Visit(QualNArray *);
+	virtual void Visit(QualNArray_ID *);
+	virtual void Visit(QualNArray_ID_Index *);
+	virtual void Visit(QualNArray_Exp *);
+	virtual void Visit(QualNArray_Exp_Index *);
 
 	SymTab *symtab;
 	string types [5];

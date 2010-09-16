@@ -272,13 +272,13 @@ TypeVisitor::Visit(Mult *n)
 }
 
 void
-TypeVisitor::Visit(Largser *n)
+TypeVisitor::Visit(Larger *n)
 {
 	
 }
 
 void
-TypeVisitor::Visit(LargserEq *n)
+TypeVisitor::Visit(LargerEq *n)
 {
 	
 }
@@ -466,36 +466,36 @@ TypeVisitor::Visit(ArrayIndex_3 *n){
 	
 }
 void
-TypeVisitor::Visit(qual_name *n){
+TypeVisitor::Visit(QualName *n){
 	
 }
 void
-TypeVisitor::Visit(qual_name_id *n){
+TypeVisitor::Visit(QualName_ID *n){
 	
 }
 void
-TypeVisitor::Visit(qual_name_id_exp *n){
+TypeVisitor::Visit(QualName_Exp *n){
 	
 }
 void
-TypeVisitor::Visit(qual_name_array *n){
+TypeVisitor::Visit(QualNArray *n){
 	
 }
 void
-TypeVisitor::Visit(qual_name_array_ident *n){
+TypeVisitor::Visit(QualNArray_ID *n){
 	
 }
 void
-TypeVisitor::Visit(qual_name_array_ident_index *n){
+TypeVisitor::Visit(QualNArray_ID_Index *n){
 	
 }
 
 void
-TypeVisitor::Visit(qual_name_array_exp_ident *n){
+TypeVisitor::Visit(QualNArray_Exp *n){
 	
 }
 void
-TypeVisitor::Visit(qual_name_array_exp_ident_index *n){
+TypeVisitor::Visit(QualNArray_Exp_Index *n){
 	
 }
 

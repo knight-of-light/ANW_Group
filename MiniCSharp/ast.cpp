@@ -1,5 +1,6 @@
 #include "ast.h"
 
+//*******      Node		*************
 Node::Node(int line, int column)
 {
 	this->line = line;
@@ -7,6 +8,7 @@ Node::Node(int line, int column)
 	this->father = NULL;
 }
 
+//*******     Root		*************
 Root::Root(int l, int c):Node(l,c)
 {
 	this->classes = new vector<ClassDef *>;
@@ -19,6 +21,7 @@ Root::AddClass(ClassDef *cd)
 	cd->father = this;
 }
 
+//*******     ClassDef		*********
 ClassDef::ClassDef(Ident *n, Members *fs, int l, int c): Node(l, c)
 {
 	this->name = n;
@@ -40,6 +43,7 @@ ClassDef::ClassDef(Ident *n, Ident *sn, Members *fs, int l, int c) : Node(l, c)
 	fs->father = this;
 }
 
+//*******     Members		*********
 Members::Members(int l, int c) : Node(l, c)
 {
 	this->members = new vector<Member *>;
@@ -57,6 +61,7 @@ Member::Member(int l, int c) : Node(l, c)
 	
 }
 
+//*******     Global		*********
 Global::Global(AccessModif	*am, Type *et, Variables *vs, int l, int c) : Member(l, c)
 {
 	this->accessModif = am;
@@ -67,6 +72,7 @@ Global::Global(AccessModif	*am, Type *et, Variables *vs, int l, int c) : Member(
 	vs->father = this;
 }
 
+//*******   Constructor		*********
 Constructor::Constructor(AccessModif * am, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
 {
 	this->accessModif = am;
@@ -79,6 +85,7 @@ Constructor::Constructor(AccessModif * am, Ident *n, Args *ps, Stats *is, int l,
 	is->father = this;
 }
 
+//*******     Function		*********
 Function::Function(AccessModif *am, Type *et, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
 {
 	this->accessModif = am;
@@ -106,6 +113,7 @@ Function::Function(AccessModif *am, Ident *n, Args *ps, Stats *is, int l, int c)
 	is->father = this;
 }
 
+//*******     Variables		*********
 Variables::Variables(int l, int c) : Node(l, c)
 {
 	this->varDecls = new vector<Variable *>;
@@ -139,6 +147,7 @@ Variable::Variable(Ident *n, Expr *e, int l, int c) : Node(l, c)
 	e->father = this;
 }
 
+//*******       Args		*********
 Args::Args(int l, int c) : Node(l, c)
 {
 	this->params = new vector<Arg *>;
@@ -165,16 +174,19 @@ Arg::Arg(Type *et, Ident *n, int l, int c) : Node(l, c)
 	n->father = this;
 }
 
+//*******    AccessModif	*********
 AccessModif::AccessModif(int at, int l, int c) : Node(l, c)
 {
 	this->acctype = at;
 }
 
+//*******       Type		*********
 Type::Type(int l, int c) : Node(l,c)
 {
 	this->name = NULL;
 }
 
+//*******    NoArrayType	*********
 NoArrayType::NoArrayType(int t, int l, int c) : Type(l,c)
 {
 	this->type = t;
@@ -187,6 +199,7 @@ NoArrayType::NoArrayType(Ident *n, int l, int c) : Type(l,c)
 	n->father = this;
 }
 
+//*******     ArrayType		*********
 ArrayType::ArrayType(int t, int l, int c) : Type(l,c)
 {
 	this->type = t;
@@ -199,6 +212,7 @@ ArrayType::ArrayType(int t, Ident *n, int l, int c) : Type(l,c)
 	n->father = this;
 }
 
+//*******       Ident		*********
 Ident::Ident(string n, int l, int c) : Node(l, c)
 {
 	this->name = n;
@@ -206,7 +220,7 @@ Ident::Ident(string n, int l, int c) : Node(l, c)
 }
 
 //***********************************************************************
-//					Expr
+//					Expression
 //***********************************************************************
 
 Expr::Expr(int l, int c) : Node(l, c)
@@ -214,6 +228,7 @@ Expr::Expr(int l, int c) : Node(l, c)
 
 }
 
+//*******       Incr		*********
 Incr::Incr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 {
 	this->ident = id;
@@ -221,6 +236,7 @@ Incr::Incr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 	id->father = this;
 }
 
+//*******       Decr		*********
 Decr::Decr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 {
 	this->ident = id;
@@ -228,36 +244,42 @@ Decr::Decr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 	id->father = this;
 }
 
+//*******        Not		*********
 Not::Not(Expr *e, int l, int c) : Expr(l, c)
 {
 	this->expr = e;
 	e->father = this;
 }
 
+//*******      Minus		*********
 Minus::Minus(Expr *e, int l, int c) : Expr(l, c)
 {
 	this->expr = e;
 	e->father = this;
 }
 
+//*******       Plus		*********
 Plus::Plus(Expr *e, int l, int c) : Expr(l, c)
 {
 	this->expr = e;
 	e->father = this;
 }
 
+//*******      Paren		*********
 Paren::Paren(Expr *e, int l, int c) : Expr(l, c)
 {
 	this->expr = e;
 	e->father = this;
 }
 
+//*******     IdentExpr		*********
 IdentExpr::IdentExpr(Ident *id, int l, int c) : Expr(l, c)
 {
 	this->ident = id;
 	id->father = this;
 }
 
+//*******      Assign		*********
 Assign::Assign(Ident *id, Expr *e, int l, int c) : Expr(l, c)
 {
 	this->ident = id;
@@ -266,6 +288,7 @@ Assign::Assign(Ident *id, Expr *e, int l, int c) : Expr(l, c)
 	e->father = this;
 }
 
+//*******       Invoke		*********
 Invoke::Invoke(Ident *id, ExprList *el, int l, int c) : Expr(l, c)
 {
 	this->ident = id;
@@ -274,6 +297,7 @@ Invoke::Invoke(Ident *id, ExprList *el, int l, int c) : Expr(l, c)
 	el->father = this;
 }
 
+//*******      Equal		*********
 Equal::Equal(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -282,6 +306,7 @@ Equal::Equal(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******      NotEq		*********
 NotEq::NotEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -290,6 +315,7 @@ NotEq::NotEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******     Smaller		*********
 Smaller::Smaller(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -298,6 +324,7 @@ Smaller::Smaller(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******     SmallerEq		*********
 SmallerEq::SmallerEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -306,7 +333,8 @@ SmallerEq::SmallerEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
-Largser::Largser(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+//*******     Larger		*********
+Larger::Larger(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
 	this->right = r;
@@ -314,7 +342,8 @@ Largser::Largser(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
-LargserEq::LargserEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+//*******     LargerEq		*********
+LargerEq::LargerEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
 	this->right = r;
@@ -322,6 +351,7 @@ LargserEq::LargserEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******        Add		*********
 Add::Add(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -330,6 +360,7 @@ Add::Add(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******        Sub		*********
 Sub::Sub(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -338,6 +369,7 @@ Sub::Sub(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******        Mult		*********
 Mult::Mult(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -346,6 +378,7 @@ Mult::Mult(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******        Div		*********
 Div::Div(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -354,6 +387,7 @@ Div::Div(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******        Mod		*********
 Mod::Mod(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -362,6 +396,7 @@ Mod::Mod(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******        And		*********
 And::And(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -370,6 +405,7 @@ And::And(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******         Or		*********
 Or::Or(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
@@ -378,37 +414,107 @@ Or::Or(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+//*******      Integer		*********
 Integer::Integer(int v, int l, int c) : Expr(l, c)
 {
 	this->value = v;
 	this->type = 1;
 }
 
+//*******       Real		*********
 Real::Real(int v, int l, int c) : Expr(l, c)
 {
 	this->value = v;
 	this->type = 2;
 }
 
+//*******       True		*********
 True::True(int l, int c) : Expr(l, c)
 {
 	this->type = 3;
 }
 
+//*******      False		*********
 False::False(int l, int c) : Expr(l, c)
 {
 	this->type = 3;
 }
 
+//*******       Null		*********
 Null::Null(int l, int c) : Expr(l, c)
 {
 	this->type = 0;
 }
 
+//*******     ArrayIndex	*********
+ArrayIndex::ArrayIndex(int l, int c) : Node(l, c)
+{
+}
 
+ArrayIndex_1::ArrayIndex_1(Expr *exp1,int l, int c) : ArrayIndex(l, c)
+{
+	this->expr1=exp1;
+}
 
+ArrayIndex_2::ArrayIndex_2(Expr *exp1,Expr *exp2,int l, int c) : ArrayIndex(l, c)
+{
+	this->expr1=exp1;
+	this->expr2=exp2;
+}
 
+ArrayIndex_3::ArrayIndex_3(Expr *exp1,Expr *exp2,Expr *exp3,int l, int c) : ArrayIndex(l, c)
+{
+	this->expr1=exp1;
+	this->expr2=exp2;
+	this->expr3=exp3;
+}
 
+//*******     QualName		*********
+QualName::QualName( int l , int  c ) : Node(l ,c)
+{
+}
+
+QualName_ID::QualName_ID(Ident *ident, int l , int c ) :QualName(l ,c)
+{
+	this->ident=ident;
+}
+
+QualName_Exp::QualName_Exp(Ident *ident ,Expr *expr , int l , int c):QualName(l ,c)
+{
+	this->ident=ident;
+	this->expr=expr;
+}
+
+//*******     QualNArray	*********
+QualNArray::QualNArray( int l, int c ):Node(l  ,c)
+{
+}
+
+QualNArray_ID::QualNArray_ID(Ident* ident, int l, int c ):QualNArray(l ,c)
+{
+	this->ident=ident;
+}
+
+QualNArray_ID_Index::QualNArray_ID_Index( Ident* ident,ArrayIndex* index ,int l , int c ):QualNArray(l ,c)
+{
+	this->ident=ident;
+	this->index=index;
+}
+
+QualNArray_Exp::QualNArray_Exp(Ident* ident, Expr* expr,int l, int c):QualNArray(l ,c)
+{
+	this->ident=ident;
+	this->expr=expr;
+}
+
+QualNArray_Exp_Index::QualNArray_Exp_Index(Ident* ident, Expr* expr,ArrayIndex* index ,int l, int c ):QualNArray(l ,c)
+{
+	this->ident=ident;
+	this->expr=expr;
+	this->index=index;
+}
+
+//*******     ExprList		*********
 ExprList::ExprList(int l, int c) : Node(l, c)
 {
 	this->exprList = new vector<Expr *>;
@@ -428,7 +534,7 @@ ExprList::AddExpr(Expr *e)
 }
 
 //***********************************************************************
-//					Statruction
+//					Statement
 //***********************************************************************
 
 Stat::Stat(int l, int c) : Node(l, c)
@@ -453,20 +559,7 @@ Stats::AddStat(Stat *i)
 	i->father = this;
 }
 
-ExprStat::ExprStat(Expr *e, int l, int c) : Stat(l, c)
-{
-	this->expr = e;
-	e->father = this;
-}
-
-VariablesStat::VariablesStat(Type *et, Variables *vds, int l, int c) : Stat(l, c)
-{
-	this->exprType = et;
-	this->vardecls = vds;
-	et->father = this;
-	vds->father = this;
-}
-
+//*******         If		*********
 If::If(Expr *e, Stat *i, int l, int c) : Stat(l, c)
 {
 	this->expr = e;
@@ -475,12 +568,14 @@ If::If(Expr *e, Stat *i, int l, int c) : Stat(l, c)
 	i->father = this;
 }
 
+//*******      If Else		*********
 IfElse::IfElse(Expr *e, Stat *i_if, Stat *i_else, int l, int c) : If(e, i_if, l, c)
 {
 	this->elseStat = i_else;
 	i_else = this;
 }
 
+//*******      While		*********
 While::While(Expr *e, Stat *i, int l, int c) : Stat(l, c)
 {
 	this->expr = e;
@@ -489,14 +584,7 @@ While::While(Expr *e, Stat *i, int l, int c) : Stat(l, c)
 	i->father = this;
 }
 
-Variables_e::Variables_e(Type *et, Variables *vds, int l,int c) : Node(l, c)
-{
-	this->exprType = et;
-	this->varDecls = vds;
-	et->father = this;
-	vds->father = this;
-}
-
+//*******        For		*********
 For::For(Variables_e *vsd, Expr *e_cond, Expr *e_count, Stat *i, int l, int c) : Stat(l, c)
 {
 	this->varsDecl = vsd;
@@ -509,20 +597,49 @@ For::For(Variables_e *vsd, Expr *e_cond, Expr *e_count, Stat *i, int l, int c) :
 	i->father = this;
 }
 
+//*******      ExprStat		*********
+ExprStat::ExprStat(Expr *e, int l, int c) : Stat(l, c)
+{
+	this->expr = e;
+	e->father = this;
+}
+
+//*******   VariablesStat	*********
+VariablesStat::VariablesStat(Type *et, Variables *vds, int l, int c) : Stat(l, c)
+{
+	this->exprType = et;
+	this->vardecls = vds;
+	et->father = this;
+	vds->father = this;
+}
+
+//*******      Block		*********
 Block::Block(Stats *is, int l, int c) : Stat(l, c)
 {
 	this->insts = is;
 	is->father = this;
 }
 
+//*******      Return		*********
 Return::Return(Expr *e, int l, int c) : Stat(l, c)
 {
 	this->expr = e;
 	e->father = this;
 }
 
+//*******     Variable_e	*********
+Variables_e::Variables_e(Type *et, Variables *vds, int l,int c) : Node(l, c)
+{
+	this->exprType = et;
+	this->varDecls = vds;
+	et->father = this;
+	vds->father = this;
+}
 
-//***********************
+
+//***********************************************************************
+//					Error
+//***********************************************************************
 Error::Error(string message, int line, int column)
 {
 	this->message = message;
@@ -561,18 +678,20 @@ Errors::Print()
 }
 
 
-
+//***********************************************************************
+//					Accept
+//***********************************************************************
 
 void
 Node::accept(Visitor *v)
 {
-	
+
 }
 
 void
 Root::accept(Visitor *v)
 {
-	
+
 }
 
 void
@@ -588,17 +707,23 @@ Members::accept(Visitor *v)
 }
 
 void
-Member ::accept(Visitor *v)
+Member::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Global ::accept(Visitor *v)
+Global::accept(Visitor *v)
 {
 	v->Visit(this);
 }
-
+/*
+void
+Constructor::accept(Visitor *)
+{
+	v->Visit(this);
+}
+*/
 void
 Function::accept(Visitor *v)
 {
@@ -606,13 +731,7 @@ Function::accept(Visitor *v)
 }
 
 void
-Variables::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-Variable ::accept(Visitor *v)
+Arg::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -623,8 +742,15 @@ Args::accept(Visitor *v)
 	v->Visit(this);
 }
 
+
 void
-Arg ::accept(Visitor *v)
+Variables::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+Variable::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -648,25 +774,31 @@ Expr::accept(Visitor *v)
 }
 
 void
-Integer::accept(Visitor *v)
+Incr::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Real::accept(Visitor *v)
+Decr::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-True::accept(Visitor *v)
+Not::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-False::accept(Visitor *v)
+Minus::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+Plus::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -696,25 +828,37 @@ Invoke::accept(Visitor *v)
 }
 
 void
-ExprList::accept(Visitor *v)
+Equal::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Not::accept(Visitor *v)
+NotEq::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Minus::accept(Visitor *v)
+Smaller::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Incr::accept(Visitor *v)
+SmallerEq::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+Larger::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+LargerEq::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -726,19 +870,145 @@ Add::accept(Visitor *v)
 }
 
 void
+Sub::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
 Mult::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-Largser::accept(Visitor *v)
+Div::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-LargserEq::accept(Visitor *v)
+Mod::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+And::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+Or::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+Integer::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+Real::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+True::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+False::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+Null::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+ArrayIndex::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+ArrayIndex_1::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+ArrayIndex_2::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+ArrayIndex_3::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+QualName::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+QualName_ID::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+QualName_Exp::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+QualNArray::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+QualNArray_ID::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+QualNArray_ID_Index::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+QualNArray_Exp::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+QualNArray_Exp_Index::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+ExprList::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -751,18 +1021,6 @@ Stat::accept(Visitor *v)
 
 void
 Stats::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-ExprStat::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-VariablesStat::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -786,11 +1044,22 @@ While::accept(Visitor *v)
 }
 
 void
-Variables_e::accept(Visitor *v)
+For::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
+void
+ExprStat::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+VariablesStat::accept(Visitor *v)
+{
+	v->Visit(this);
+}
 
 void
 Block::accept(Visitor *v)
@@ -804,205 +1073,8 @@ Return::accept(Visitor *v)
 	v->Visit(this);
 }
 
-
-
 void
-Null::accept(Visitor *v)
+Variables_e::accept(Visitor *v)
 {
 	v->Visit(this);
-}
-
-void
-Plus::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-Decr::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-Sub::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-Div::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-Mod::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-Smaller::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-SmallerEq::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-Equal::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-NotEq::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-Or::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-And::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-For::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-ArrayIndex::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-ArrayIndex_1::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-ArrayIndex_2::accept(Visitor *v)
-{
-	v->Visit(this);
-}void
-ArrayIndex_3::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-qual_name::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-qual_name_id::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-qual_name_id_exp::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-qual_name_array::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-qual_name_array_ident::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-qual_name_array_ident_index::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-qual_name_array_exp_ident::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-void
-qual_name_array_exp_ident_index::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-
-//----------------------------------------------------------------------
-//----------------------------------------------------------------------
-//----------------------------------------------------------------------
-//----------------------------------------------------------------------
-//----------------------------------------------------------------------
-
-ArrayIndex::ArrayIndex(int l, int c) : Node(l, c)
-{
-}
-
-ArrayIndex_1::ArrayIndex_1(Expr *exp1,int l, int c) : ArrayIndex(l, c)
-{
-	this->expr1=exp1;
-}
-ArrayIndex_2::ArrayIndex_2(Expr *exp1,Expr *exp2,int l, int c) : ArrayIndex(l, c)
-{
-	this->expr1=exp1;
-	this->expr2=exp2;
-}
-ArrayIndex_3::ArrayIndex_3(Expr *exp1,Expr *exp2,Expr *exp3,int l, int c) : ArrayIndex(l, c)
-{
-	this->expr1=exp1;
-	this->expr2=exp2;
-	this->expr3=exp3;
-}
-qual_name::qual_name( int l , int  c ) : Node(l ,c)
-{
-
-}
-qual_name_id::qual_name_id(Ident *ident, int l , int c ) :qual_name(l ,c)
-{
-	this->ident=ident;
-}
-qual_name_id_exp::qual_name_id_exp(Ident *ident ,Expr *expr , int l , int c):qual_name(l ,c)
-{
-	this->ident=ident;
-	this->expr=expr;
-}
-qual_name_array::qual_name_array( int l, int c ):Node(l  ,c)
-{
-}
-
-qual_name_array_ident::qual_name_array_ident(Ident* ident, int l, int c ):qual_name_array(l ,c)
-{
-	this->ident=ident;
-}
-qual_name_array_ident_index::qual_name_array_ident_index( Ident* ident,ArrayIndex* index ,int l , int c ):qual_name_array(l ,c)
-{
-	this->ident=ident;
-	this->index=index;
-}
-qual_name_array_exp_ident::qual_name_array_exp_ident(Ident* ident, Expr* expr,int l, int c):qual_name_array(l ,c)
-{
-	this->ident=ident;
-	this->expr=expr;
-}
-qual_name_array_exp_ident_index::qual_name_array_exp_ident_index(Ident* ident, Expr* expr,ArrayIndex* index ,int l, int c ):qual_name_array(l ,c)
-{
-	this->ident=ident;
-	this->expr=expr;
-	this->index=index;
 }

@@ -39,8 +39,8 @@
 		ExprList	*tExprList;
 
 		ArrayIndex	*tArrayIndex;
-		qual_name	*tqual_name;
-		qual_name_array	*tqual_name_array;
+		QualName	*tQualName;
+		QualNArray	*tQualNArray;
 		
 		Stats		*tStats;
 		Stat		*tStat;
@@ -72,8 +72,8 @@
 %type	<tExprList>		expr_list	expr_list_e
 
 %type	<tArrayIndex>	arrayindex
-%type	<tqual_name>	qualifiedname
-%type	<tqual_name_array>	qualnameorarray
+%type	<tQualName>		qualifiedname
+%type	<tQualNArray>	qualnameorarray
 
 %type	<tStats>		statements
 %type	<tStat>			statement
@@ -384,11 +384,11 @@ expr:			  INCREMENT IDENT
 					}
 				| expr '>' expr 
 					{
-						$$ = new Largser($1, $3, lin, col);
+						$$ = new Larger($1, $3, lin, col);
 					} 
 				| expr LE expr 
 					{
-						$$ = new LargserEq($1, $3, lin, col);
+						$$ = new LargerEq($1, $3, lin, col);
 					}
 				| expr '+' expr 
 					{
@@ -465,29 +465,29 @@ arrayindex:		  '[' expr ']'
 
 qualifiedname:	  IDENT
 					{
-					$$ = new qual_name_id($1, lin, col);
+					$$ = new QualName_ID($1, lin, col);
 					}
 				| expr '.' IDENT
 					{
-					$$ = new qual_name_id_exp($3, $1, lin, col);
+					$$ = new QualName_Exp($3, $1, lin, col);
 					}
 ;
 
 qualnameorarray:  IDENT
 					{
-					$$ = new qual_name_array_ident($1, lin, col);
+					$$ = new QualNArray_ID($1, lin, col);
 					}
 				| IDENT arrayindex
 					{
-					$$ = new qual_name_array_ident_index($1, $2, lin, col);
+					$$ = new QualNArray_ID_Index($1, $2, lin, col);
 					}
 				| expr '.' IDENT
 					{
-					$$ = new qual_name_array_exp_ident($3, $1, lin, col);
+					$$ = new QualNArray_Exp($3, $1, lin, col);
 					}
 				| expr '.' IDENT arrayindex
 					{
-					$$ = new qual_name_array_exp_ident_index($3, $1, $4, lin, col);
+					$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
 					}
 ;
 
@@ -511,7 +511,7 @@ expr_list_e:	  /* empty */
 					}
 ;
 
-statement:			  IF '(' expr ')' statement %prec IF_PREC
+statement:		  IF '(' expr ')' statement %prec IF_PREC
 					{
 						$$ = new If($3, $5, lin, col);
 					} 
