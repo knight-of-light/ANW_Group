@@ -1,4 +1,3 @@
-
 #include "ast.h"
 
 Node::Node(int line, int column)
@@ -215,49 +214,36 @@ Expr::Expr(int l, int c) : Node(l, c)
 
 }
 
-ExprList::ExprList(int l, int c) : Node(l, c)
+Incr::Incr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 {
-	this->exprList = new vector<Expr *>;
+	this->ident = id;
+	this->isPrev = ip;
+	id->father = this;
 }
 
-ExprList::ExprList(Expr *e, int l, int c) : Node(l, c)
+Decr::Decr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 {
-	this->exprList = new vector<Expr *>;
-	this->AddExpr(e);
+	this->ident = id;
+	this->isPrev = ip;
+	id->father = this;
 }
 
-void
-ExprList::AddExpr(Expr *e)
+Not::Not(Expr *e, int l, int c) : Expr(l, c)
 {
-	this->exprList->push_back(e);
+	this->expr = e;
 	e->father = this;
 }
 
-
-Integer::Integer(int v, int l, int c) : Expr(l, c)
+Minus::Minus(Expr *e, int l, int c) : Expr(l, c)
 {
-	this->value = v;
-	this->type = 1;
+	this->expr = e;
+	e->father = this;
 }
 
-Real::Real(int v, int l, int c) : Expr(l, c)
+Plus::Plus(Expr *e, int l, int c) : Expr(l, c)
 {
-	this->value = v;
-	this->type = 2;
-}
-
-True::True(int l, int c) : Expr(l, c)
-{
-	this->type = 3;
-}
-
-False::False(int l, int c) : Expr(l, c)
-{
-}
-
-Null::Null(int l, int c) : Expr(l, c)
-{
-	this->type = 3;
+	this->expr = e;
+	e->father = this;
 }
 
 Paren::Paren(Expr *e, int l, int c) : Expr(l, c)
@@ -288,36 +274,52 @@ Invoke::Invoke(Ident *id, ExprList *el, int l, int c) : Expr(l, c)
 	el->father = this;
 }
 
-Not::Not(Expr *e, int l, int c) : Expr(l, c)
+Equal::Equal(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
-	this->expr = e;
-	e->father = this;
+	this ->left = f;
+	this->right = r;
+	f->father = this;
+	r->father = this;
 }
 
-Plus::Plus(Expr *e, int l, int c) : Expr(l, c)
+NotEq::NotEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
-	this->expr = e;
-	e->father = this;
+	this ->left = f;
+	this->right = r;
+	f->father = this;
+	r->father = this;
 }
 
-Minus::Minus(Expr *e, int l, int c) : Expr(l, c)
+Smaller::Smaller(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
-	this->expr = e;
-	e->father = this;
+	this ->left = f;
+	this->right = r;
+	f->father = this;
+	r->father = this;
 }
 
-Incr::Incr(Ident *id, bool ip, int l, int c) : Expr(l, c)
+SmallerEq::SmallerEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
-	this->ident = id;
-	this->isPrev = ip;
-	id->father = this;
+	this ->left = f;
+	this->right = r;
+	f->father = this;
+	r->father = this;
 }
 
-Decr::Decr(Ident *id, bool ip, int l, int c) : Expr(l, c)
+Largser::Largser(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
-	this->ident = id;
-	this->isPrev = ip;
-	id->father = this;
+	this ->left = f;
+	this->right = r;
+	f->father = this;
+	r->father = this;
+}
+
+LargserEq::LargserEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+{
+	this ->left = f;
+	this->right = r;
+	f->father = this;
+	r->father = this;
 }
 
 Add::Add(Expr *f, Expr *r, int l, int c) : Expr(l, c)
@@ -360,47 +362,7 @@ Mod::Mod(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
-Smaller::Smaller(Expr *f, Expr *r, int l, int c) : Expr(l, c)
-{
-	this ->left = f;
-	this->right = r;
-	f->father = this;
-	r->father = this;
-}
-
-Largser::Largser(Expr *f, Expr *r, int l, int c) : Expr(l, c)
-{
-	this ->left = f;
-	this->right = r;
-	f->father = this;
-	r->father = this;
-}
-
-SmallerEq::SmallerEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
-{
-	this ->left = f;
-	this->right = r;
-	f->father = this;
-	r->father = this;
-}
-
-LargserEq::LargserEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
-{
-	this ->left = f;
-	this->right = r;
-	f->father = this;
-	r->father = this;
-}
-
-Equal::Equal(Expr *f, Expr *r, int l, int c) : Expr(l, c)
-{
-	this ->left = f;
-	this->right = r;
-	f->father = this;
-	r->father = this;
-}
-
-NotEq::NotEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+And::And(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 {
 	this ->left = f;
 	this->right = r;
@@ -416,12 +378,53 @@ Or::Or(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
-And::And(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+True::True(int l, int c) : Expr(l, c)
 {
-	this ->left = f;
-	this->right = r;
-	f->father = this;
-	r->father = this;
+	this->type = 3;
+}
+
+False::False(int l, int c) : Expr(l, c)
+{
+}
+
+Null::Null(int l, int c) : Expr(l, c)
+{
+	this->type = 3;
+}
+
+
+
+
+
+ExprList::ExprList(int l, int c) : Node(l, c)
+{
+	this->exprList = new vector<Expr *>;
+}
+
+ExprList::ExprList(Expr *e, int l, int c) : Node(l, c)
+{
+	this->exprList = new vector<Expr *>;
+	this->AddExpr(e);
+}
+
+void
+ExprList::AddExpr(Expr *e)
+{
+	this->exprList->push_back(e);
+	e->father = this;
+}
+
+
+Integer::Integer(int v, int l, int c) : Expr(l, c)
+{
+	this->value = v;
+	this->type = 1;
+}
+
+Real::Real(int v, int l, int c) : Expr(l, c)
+{
+	this->value = v;
+	this->type = 2;
 }
 
 //***********************************************************************

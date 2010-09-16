@@ -300,22 +300,22 @@ arraytype:		  IDENT '[' ']'
 
 expr:			  INCREMENT IDENT
 					{
-						// $$ = new Incr($2, true, lin, col);
+						$$ = new Incr($2, true, lin, col);
 						// symtab->IsDeclared($2);
 					} 
 				| DECREMENT IDENT  
 					{
-						// $$ = new Decr($2, true, lin, col);
+						$$ = new Decr($2, true, lin, col);
 						// symtab->IsDeclared($2);
 					} 
 				| IDENT INCREMENT  
 					{
-						// $$ = new Incr($1, false, lin, col);
+						$$ = new Incr($1, false, lin, col);
 						// symtab->IsDeclared($1);
 					} 
 				| IDENT DECREMENT 
 					{
-						// $$ = new Decr($1, false, lin, col);
+						$$ = new Decr($1, false, lin, col);
 						// symtab->IsDeclared($1);
 					}
 				| '!' expr  
@@ -372,7 +372,7 @@ expr:			  INCREMENT IDENT
 					} 
 				| expr SE expr 
 					{
-						$$ = new LargserEq($1, $3, lin, col);
+						$$ = new SmallerEq($1, $3, lin, col);
 					}
 				| expr '>' expr 
 					{
@@ -380,8 +380,8 @@ expr:			  INCREMENT IDENT
 					} 
 				| expr LE expr 
 					{
-						$$ = new SmallerEq($1, $3, lin, col);
-					} 
+						$$ = new LargserEq($1, $3, lin, col);
+					}
 				| expr '+' expr 
 					{
 						$$ = new Add($1, $3, lin, col);

@@ -280,42 +280,50 @@ public:
 	virtual void accept(Visitor *);
 };
 
-class Integer : public Expr
+class Incr  : public Expr
 {
 public:
-	int value;
+	Ident	*ident;
+	bool	isPrev;
 
-	Integer(int, int, int);
+	Incr(Ident *, bool, int, int);
 	virtual void accept(Visitor *);
 };
 
-class Real : public Expr
+class Decr  : public Expr
 {
 public:
-	double value;
+	Ident	*ident;
+	bool	isPrev;
 
-	Real(int, int, int);
+	Decr(Ident *, bool, int, int);
 	virtual void accept(Visitor *);
 };
 
-class True  : public Expr
+class Not  : public Expr
 {
 public:
-	True(int, int);
+	Expr	*expr;
+
+	Not(Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class False  : public Expr
+class Minus  : public Expr
 {
 public:
-	False(int, int);
+	Expr	*expr;
+
+	Minus(Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class Null  : public Expr
+class Plus  : public Expr
 {
 public:
-	Null(int, int);
+	Expr	*expr;
+
+	Plus(Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -357,61 +365,63 @@ public:
 	virtual void accept(Visitor *);
 };
 
-class ExprList : public Node
+class Equal  : public Expr
 {
 public:
-	vector<Expr *>	*exprList;
+	Expr	*left;
+	Expr	*right;
 
-	ExprList(int, int);
-	ExprList(Expr *, int, int);
-	void AddExpr(Expr *);
+	Equal(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class Not  : public Expr
+class NotEq  : public Expr
 {
 public:
-	Expr	*expr;
+	Expr	*left;
+	Expr	*right;
 
-	Not(Expr *, int, int);
+	NotEq(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class Plus  : public Expr
+class Smaller  : public Expr
 {
 public:
-	Expr	*expr;
+	Expr	*left;
+	Expr	*right;
 
-	Plus(Expr *, int, int);
+	Smaller(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class Minus  : public Expr
+class SmallerEq  : public Expr
 {
 public:
-	Expr	*expr;
+	Expr	*left;
+	Expr	*right;
 
-	Minus(Expr *, int, int);
+	SmallerEq(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class Incr  : public Expr
+class Largser  : public Expr
 {
 public:
-	Ident	*ident;
-	bool	isPrev;
+	Expr	*left;
+	Expr	*right;
 
-	Incr(Ident *, bool, int, int);
+	Largser(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
-class Decr  : public Expr
+class LargserEq  : public Expr
 {
 public:
-	Ident	*ident;
-	bool	isPrev;
+	Expr	*left;
+	Expr	*right;
 
-	Decr(Ident *, bool, int, int);
+	LargserEq(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -465,63 +475,13 @@ class Mod  : public Expr
 	virtual void accept(Visitor *);
 };
 
-class Smaller  : public Expr
+class And  : public Expr
 {
 public:
 	Expr	*left;
 	Expr	*right;
 
-	Smaller(Expr *, Expr *, int, int);
-	virtual void accept(Visitor *);
-};
-
-class Largser  : public Expr
-{
-public:
-	Expr	*left;
-	Expr	*right;
-
-	Largser(Expr *, Expr *, int, int);
-	virtual void accept(Visitor *);
-};
-
-class SmallerEq  : public Expr
-{
-public:
-	Expr	*left;
-	Expr	*right;
-
-	SmallerEq(Expr *, Expr *, int, int);
-	virtual void accept(Visitor *);
-};
-
-class LargserEq  : public Expr
-{
-public:
-	Expr	*left;
-	Expr	*right;
-
-	LargserEq(Expr *, Expr *, int, int);
-	virtual void accept(Visitor *);
-};
-
-class Equal  : public Expr
-{
-public:
-	Expr	*left;
-	Expr	*right;
-
-	Equal(Expr *, Expr *, int, int);
-	virtual void accept(Visitor *);
-};
-
-class NotEq  : public Expr
-{
-public:
-	Expr	*left;
-	Expr	*right;
-
-	NotEq(Expr *, Expr *, int, int);
+	And(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -535,13 +495,53 @@ public:
 	virtual void accept(Visitor *);
 };
 
-class And  : public Expr
+class True  : public Expr
 {
 public:
-	Expr	*left;
-	Expr	*right;
+	True(int, int);
+	virtual void accept(Visitor *);
+};
 
-	And(Expr *, Expr *, int, int);
+class False  : public Expr
+{
+public:
+	False(int, int);
+	virtual void accept(Visitor *);
+};
+
+class Null  : public Expr
+{
+public:
+	Null(int, int);
+	virtual void accept(Visitor *);
+};
+
+class Integer : public Expr
+{
+public:
+	int value;
+
+	Integer(int, int, int);
+	virtual void accept(Visitor *);
+};
+
+class Real : public Expr
+{
+public:
+	double value;
+
+	Real(int, int, int);
+	virtual void accept(Visitor *);
+};
+
+class ExprList : public Node
+{
+public:
+	vector<Expr *>	*exprList;
+
+	ExprList(int, int);
+	ExprList(Expr *, int, int);
+	void AddExpr(Expr *);
 	virtual void accept(Visitor *);
 };
 
