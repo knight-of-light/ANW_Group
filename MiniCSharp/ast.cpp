@@ -883,3 +883,120 @@ For::accept(Visitor *v)
 {
 	v->Visit(this);
 }
+void
+Arr_index::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+Arr_index_1::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+Arr_index_2::accept(Visitor *v)
+{
+	v->Visit(this);
+}void
+Arr_index_3::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+qual_name::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+qual_name_id::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+qual_name_id_exp::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+qual_name_array::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+qual_name_array_ident::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+qual_name_array_ident_index::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+qual_name_array_exp_ident::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+void
+qual_name_array_exp_ident_index::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+
+Arr_index::Arr_index( int l, int c) : Node(l, c)
+{
+	
+}
+Arr_index_1::Arr_index_1( Expr *exp1,int l, int c) : Arr_index(l, c)
+{
+	this->expr1=exp1;
+}
+Arr_index_2::Arr_index_2( Expr *exp1,Expr *exp2,int l, int c) : Arr_index(l, c)
+{
+	this->expr1=exp1;
+	this->expr2=exp2;
+}
+Arr_index_3::Arr_index_3( Expr *exp1,Expr *exp2,Expr *exp3,int l, int c) : Arr_index(l, c)
+{
+	this->expr1=exp1;
+	this->expr2=exp2;
+	this->expr3=exp3;
+}
+qual_name::qual_name( int l , int  c ) : Node(l ,c)
+{
+
+}
+qual_name_id::qual_name_id(Ident *ident, int l , int c ) :qual_name(l ,c)
+{
+	this->ident=ident;
+}
+qual_name_id_exp::qual_name_id_exp(Ident *ident ,Expr *expr , int l , int c):qual_name(l ,c)
+{
+	this->ident=ident;
+	this->expr=expr;
+}
+qual_name_array::qual_name_array( int l, int c ):Node(l  ,c)
+{
+}
+
+qual_name_array_ident::qual_name_array_ident(Ident* ident, int l, int c ):qual_name_array(l ,c)
+{
+	this->ident=ident;
+}
+qual_name_array_ident_index::qual_name_array_ident_index( Ident* ident,Arr_index* index ,int l , int c ):qual_name_array(l ,c)
+{
+	this->ident=ident;
+	this->index=index;
+}
+qual_name_array_exp_ident::qual_name_array_exp_ident(Ident* ident, Expr* expr,int l, int c):qual_name_array(l ,c)
+{
+	this->ident=ident;
+	this->expr=expr;
+}
+qual_name_array_exp_ident_index::qual_name_array_exp_ident_index(Ident* ident, Expr* expr,Arr_index* index ,int l, int c ):qual_name_array(l ,c)
+{
+	this->ident=ident;
+	this->expr=expr;
+	this->index=index;
+}

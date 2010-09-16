@@ -443,34 +443,43 @@ expr:			  INCREMENT IDENT
 
 arrayindex:		  '[' expr ']'
 					{
+					$$ = new Arr_index_1($2,lin, col);
 					}
 				| '[' expr ',' expr ']'
 					{
+					$$ = new Arr_index_2($2,$4,lin, col);
 					}
 				| '[' expr ',' expr ',' expr ']'
 					{
+					$$ = new Arr_index_3($2,$4,$6,lin, col);
 					}
 ;
 
-qualifiedname:		  IDENT
+qual_name:		  IDENT
 					{
+					$$ = new qual_name_id($1,lin, col);
 					}
 				| expr '.' IDENT
 					{
+					$$ = new qual_name_id_exp($3,$1,lin, col);
 					}
 ;
 
-qualnameorarray:		  IDENT
+q_name_arr:		  IDENT
 					{
+					$$ = new qual_name_array_ident($1,lin, col);
 					}
 				| IDENT arrayindex
 					{
+					$$ = new qual_name_array_ident_index($1,$2,lin, col);
 					}
 				| expr '.' IDENT
 					{
+					$$ = new qual_name_array_exp_ident($3,$1,lin, col);
 					}
 				| expr '.' IDENT arrayindex
 					{
+					$$ = new qual_name_array_exp_ident_index($3,$1,$4,lin, col);
 					}
 ;
 

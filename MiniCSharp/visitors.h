@@ -59,6 +59,18 @@ public:
 	virtual void Visit(Or *);
 	virtual void Visit(And *);
 	virtual void Visit(For *);
+	virtual void Visit(Arr_index *);
+	virtual void Visit(Arr_index_1 *);
+	virtual void Visit(Arr_index_2 *);
+	virtual void Visit(Arr_index_3 *);
+	virtual void Visit(qual_name *);
+	virtual void Visit(qual_name_id *);
+	virtual void Visit(qual_name_id_exp *);
+	virtual void Visit(qual_name_array *);
+	virtual void Visit(qual_name_array_ident *);
+	virtual void Visit(qual_name_array_ident_index *);
+	virtual void Visit(qual_name_array_exp_ident *);
+	virtual void Visit(qual_name_array_exp_ident_index *);
 
 	SymTab *symtab;
 	string types [5];
