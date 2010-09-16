@@ -59,10 +59,10 @@ public:
 	virtual void Visit(Or *);
 	virtual void Visit(And *);
 	virtual void Visit(For *);
-	virtual void Visit(Arr_index *);
-	virtual void Visit(Arr_index_1 *);
-	virtual void Visit(Arr_index_2 *);
-	virtual void Visit(Arr_index_3 *);
+	virtual void Visit(ArrayIndex *);
+	virtual void Visit(ArrayIndex_1 *);
+	virtual void Visit(ArrayIndex_2 *);
+	virtual void Visit(ArrayIndex_3 *);
 	virtual void Visit(qual_name *);
 	virtual void Visit(qual_name_id *);
 	virtual void Visit(qual_name_id_exp *);

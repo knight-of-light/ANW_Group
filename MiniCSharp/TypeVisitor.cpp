@@ -450,19 +450,19 @@ TypeVisitor::Visit(For *n){
 
 
 void
-TypeVisitor::Visit(Arr_index *n){
+TypeVisitor::Visit(ArrayIndex *n){
 	
 }
 void
-TypeVisitor::Visit(Arr_index_1 *n){
+TypeVisitor::Visit(ArrayIndex_1 *n){
 	
 }
 void
-TypeVisitor::Visit(Arr_index_2 *n){
+TypeVisitor::Visit(ArrayIndex_2 *n){
 	
 }
 void
-TypeVisitor::Visit(Arr_index_3 *n){
+TypeVisitor::Visit(ArrayIndex_3 *n){
 	
 }
 void

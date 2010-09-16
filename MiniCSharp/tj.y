@@ -37,6 +37,10 @@
 		ArrayType	*tArrayType;
 		Expr		*tExpr;
 		ExprList	*tExprList;
+
+		ArrayIndex	*tArrayIndex;
+		qual_name	*tqual_name;
+		qual_name_array	*tqual_name_array;
 		
 		Stats		*tStats;
 		Stat		*tStat;
@@ -67,6 +71,10 @@
 %type	<tExpr>			expr	expr_e
 %type	<tExprList>		expr_list	expr_list_e
 
+%type	<tArrayIndex>	arrayindex
+%type	<tqual_name>	qualifiedname
+%type	<tqual_name_array>	qualnameorarray
+
 %type	<tStats>		statements
 %type	<tStat>			statement
 %type	<tVariables_e>	variables_e
@@ -75,7 +83,7 @@
 %token	<tInteger>		INTEGER 
 %token	<tReal>			REAL
 
-%token CLASS BOOLEAN DOUBLE INT IS
+%token CLASS BOOLEAN DOUBLE INT IS OBJECT
 %token IF ELSE WHILE FOR 
 %token FALSE TRUE EXTENDS
 %token INSTANCEOF NEW 
@@ -420,7 +428,7 @@ expr:			  INCREMENT IDENT
 					{
 						$$ = $1;
 					} 
-				| REAL 
+				| REAL
 					{
 						$$ = $1;
 					} 
@@ -435,63 +443,63 @@ expr:			  INCREMENT IDENT
 				| THIS
 					{
 					}
-				| NUL 
+				| NUL
 					{
 						$$ = new Null(lin, col);
-					}			
+					}
 ;
 
 arrayindex:		  '[' expr ']'
 					{
-					$$ = new Arr_index_1($2,lin, col);
+						$$ = new ArrayIndex_1($2, lin, col);
 					}
 				| '[' expr ',' expr ']'
 					{
-					$$ = new Arr_index_2($2,$4,lin, col);
+						$$ = new ArrayIndex_2($2, $4, lin, col);
 					}
 				| '[' expr ',' expr ',' expr ']'
 					{
-					$$ = new Arr_index_3($2,$4,$6,lin, col);
+						$$ = new ArrayIndex_3($2, $4, $6, lin, col);
 					}
 ;
 
-qual_name:		  IDENT
+qualifiedname:	  IDENT
 					{
-					$$ = new qual_name_id($1,lin, col);
+					$$ = new qual_name_id($1, lin, col);
 					}
 				| expr '.' IDENT
 					{
-					$$ = new qual_name_id_exp($3,$1,lin, col);
+					$$ = new qual_name_id_exp($3, $1, lin, col);
 					}
 ;
 
-q_name_arr:		  IDENT
+qualnameorarray:  IDENT
 					{
-					$$ = new qual_name_array_ident($1,lin, col);
+					$$ = new qual_name_array_ident($1, lin, col);
 					}
 				| IDENT arrayindex
 					{
-					$$ = new qual_name_array_ident_index($1,$2,lin, col);
+					$$ = new qual_name_array_ident_index($1, $2, lin, col);
 					}
 				| expr '.' IDENT
 					{
-					$$ = new qual_name_array_exp_ident($3,$1,lin, col);
+					$$ = new qual_name_array_exp_ident($3, $1, lin, col);
 					}
 				| expr '.' IDENT arrayindex
 					{
-					$$ = new qual_name_array_exp_ident_index($3,$1,$4,lin, col);
+					$$ = new qual_name_array_exp_ident_index($3, $1, $4, lin, col);
 					}
 ;
 
 expr_list:		  expr  
 					{
 						$$ = new ExprList($1, lin, col);
-					} 
+					}
 				| expr_list ',' expr 
 					{
 						$1->AddExpr($3);
 						$$ = $1;
-					} 
+					}
 ;
 expr_list_e:	  /* empty */
 					{
@@ -500,7 +508,7 @@ expr_list_e:	  /* empty */
 				| expr_list
 					{
 						$$ = $1;
-					} 
+					}
 ;
 
 statement:			  IF '(' expr ')' statement %prec IF_PREC

@@ -378,6 +378,18 @@ Or::Or(Expr *f, Expr *r, int l, int c) : Expr(l, c)
 	r->father = this;
 }
 
+Integer::Integer(int v, int l, int c) : Expr(l, c)
+{
+	this->value = v;
+	this->type = 1;
+}
+
+Real::Real(int v, int l, int c) : Expr(l, c)
+{
+	this->value = v;
+	this->type = 2;
+}
+
 True::True(int l, int c) : Expr(l, c)
 {
 	this->type = 3;
@@ -385,11 +397,12 @@ True::True(int l, int c) : Expr(l, c)
 
 False::False(int l, int c) : Expr(l, c)
 {
+	this->type = 3;
 }
 
 Null::Null(int l, int c) : Expr(l, c)
 {
-	this->type = 3;
+	this->type = 0;
 }
 
 
@@ -412,19 +425,6 @@ ExprList::AddExpr(Expr *e)
 {
 	this->exprList->push_back(e);
 	e->father = this;
-}
-
-
-Integer::Integer(int v, int l, int c) : Expr(l, c)
-{
-	this->value = v;
-	this->type = 1;
-}
-
-Real::Real(int v, int l, int c) : Expr(l, c)
-{
-	this->value = v;
-	this->type = 2;
 }
 
 //***********************************************************************
@@ -884,21 +884,21 @@ For::accept(Visitor *v)
 	v->Visit(this);
 }
 void
-Arr_index::accept(Visitor *v)
+ArrayIndex::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 void
-Arr_index_1::accept(Visitor *v)
+ArrayIndex_1::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 void
-Arr_index_2::accept(Visitor *v)
+ArrayIndex_2::accept(Visitor *v)
 {
 	v->Visit(this);
 }void
-Arr_index_3::accept(Visitor *v)
+ArrayIndex_3::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -944,20 +944,26 @@ qual_name_array_exp_ident_index::accept(Visitor *v)
 }
 
 
-Arr_index::Arr_index( int l, int c) : Node(l, c)
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+
+ArrayIndex::ArrayIndex(int l, int c) : Node(l, c)
 {
-	
 }
-Arr_index_1::Arr_index_1( Expr *exp1,int l, int c) : Arr_index(l, c)
+
+ArrayIndex_1::ArrayIndex_1(Expr *exp1,int l, int c) : ArrayIndex(l, c)
 {
 	this->expr1=exp1;
 }
-Arr_index_2::Arr_index_2( Expr *exp1,Expr *exp2,int l, int c) : Arr_index(l, c)
+ArrayIndex_2::ArrayIndex_2(Expr *exp1,Expr *exp2,int l, int c) : ArrayIndex(l, c)
 {
 	this->expr1=exp1;
 	this->expr2=exp2;
 }
-Arr_index_3::Arr_index_3( Expr *exp1,Expr *exp2,Expr *exp3,int l, int c) : Arr_index(l, c)
+ArrayIndex_3::ArrayIndex_3(Expr *exp1,Expr *exp2,Expr *exp3,int l, int c) : ArrayIndex(l, c)
 {
 	this->expr1=exp1;
 	this->expr2=exp2;
@@ -984,7 +990,7 @@ qual_name_array_ident::qual_name_array_ident(Ident* ident, int l, int c ):qual_n
 {
 	this->ident=ident;
 }
-qual_name_array_ident_index::qual_name_array_ident_index( Ident* ident,Arr_index* index ,int l , int c ):qual_name_array(l ,c)
+qual_name_array_ident_index::qual_name_array_ident_index( Ident* ident,ArrayIndex* index ,int l , int c ):qual_name_array(l ,c)
 {
 	this->ident=ident;
 	this->index=index;
@@ -994,7 +1000,7 @@ qual_name_array_exp_ident::qual_name_array_exp_ident(Ident* ident, Expr* expr,in
 	this->ident=ident;
 	this->expr=expr;
 }
-qual_name_array_exp_ident_index::qual_name_array_exp_ident_index(Ident* ident, Expr* expr,Arr_index* index ,int l, int c ):qual_name_array(l ,c)
+qual_name_array_exp_ident_index::qual_name_array_exp_ident_index(Ident* ident, Expr* expr,ArrayIndex* index ,int l, int c ):qual_name_array(l ,c)
 {
 	this->ident=ident;
 	this->expr=expr;

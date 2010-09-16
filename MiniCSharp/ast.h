@@ -73,6 +73,22 @@ class Equal;
 class NotEq;
 class Or;
 class And;
+
+class ArrayIndex;
+class ArrayIndex_1;
+class ArrayIndex_2;
+class ArrayIndex_3;
+
+class qual_name;
+class qual_name_id;
+class qual_name_id_exp;
+
+class qual_name_array;
+class qual_name_array_ident;
+class qual_name_array_ident_index;
+class qual_name_array_exp_ident;
+class qual_name_array_exp_ident_index;
+
 class For;
 
 class Sym;
@@ -83,18 +99,7 @@ class Deffered;
 class Errors;
 
 class Visitor;
-class Arr_index;
-class qual_name;
-class qual_name_id;
-class qual_name_array_ident_index;
-class qual_name_array_ident;
-class qual_name_id_exp;
-class qual_name_array_exp_ident;
-class qual_name_array_exp_ident_index;
-class qual_name_array ;
-class Arr_index_1;
-class Arr_index_2;
-class Arr_index_3;
+
 
 class Node
 {
@@ -507,6 +512,24 @@ public:
 	virtual void accept(Visitor *);
 };
 
+class Integer : public Expr
+{
+public:
+	int value;
+
+	Integer(int, int, int);
+	virtual void accept(Visitor *);
+};
+
+class Real : public Expr
+{
+public:
+	double value;
+
+	Real(int, int, int);
+	virtual void accept(Visitor *);
+};
+
 class True  : public Expr
 {
 public:
@@ -525,24 +548,6 @@ class Null  : public Expr
 {
 public:
 	Null(int, int);
-	virtual void accept(Visitor *);
-};
-
-class Integer : public Expr
-{
-public:
-	int value;
-
-	Integer(int, int, int);
-	virtual void accept(Visitor *);
-};
-
-class Real : public Expr
-{
-public:
-	double value;
-
-	Real(int, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -662,39 +667,51 @@ public:
 	Return(Expr *, int, int);
 	virtual void accept(Visitor *);
 };
-class Arr_index : public Node
+
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+
+class ArrayIndex : public Node
 {
 public:
-	Arr_index( int, int);
+	ArrayIndex( int, int);
 	virtual void accept(Visitor *);
 };
-class Arr_index_1 :public Arr_index
+
+class ArrayIndex_1 :public ArrayIndex
 {
 public:
 	Expr	*expr1;
-	Arr_index_1(Expr *, int, int);
+	ArrayIndex_1(Expr *, int, int);
 	virtual void accept(Visitor *);
 };
-class Arr_index_2 : public Arr_index
+
+class ArrayIndex_2 : public ArrayIndex
 {
 public:
 	Expr	*expr1,  *expr2  ;
-	Arr_index_2(Expr *,Expr *, int, int);
+	ArrayIndex_2(Expr *,Expr *, int, int);
 	virtual void accept(Visitor *);
 };
-class Arr_index_3 : public Arr_index
+
+class ArrayIndex_3 : public ArrayIndex
 {
 public:
 	Expr	*expr1,  *expr2 ,*expr3 ;
-	Arr_index_3(Expr *,Expr *,Expr *, int, int);
+	ArrayIndex_3(Expr *,Expr *,Expr *, int, int);
 	virtual void accept(Visitor *);
 };
+
 class qual_name : public Node
 {
 public:
 	qual_name( int, int);
 	virtual void accept(Visitor *);
 };
+
 class qual_name_id : public qual_name
 {
 public:
@@ -702,6 +719,7 @@ public:
 	qual_name_id(Ident *, int, int);
 	virtual void accept(Visitor *);
 };
+
 class qual_name_id_exp : public qual_name
 {
 public:
@@ -710,12 +728,14 @@ public:
 	qual_name_id_exp(Ident *,Expr * , int, int);
 	virtual void accept(Visitor *);
 };
+
 class qual_name_array : public Node
 {
 public:
 	qual_name_array( int, int);
 	virtual void accept(Visitor *);
 };
+
 class qual_name_array_ident : public qual_name_array
 {
 public:
@@ -723,14 +743,16 @@ public:
 	qual_name_array_ident(Ident*, int, int);
 	virtual void accept(Visitor *);
 };
+
 class qual_name_array_ident_index : public qual_name_array
 {
 public:
 	Ident   *ident ;
-	Arr_index *index;
-	qual_name_array_ident_index( Ident*,Arr_index*,int, int);
+	ArrayIndex *index;
+	qual_name_array_ident_index( Ident*,ArrayIndex*,int, int);
 	virtual void accept(Visitor *);
 };
+
 class qual_name_array_exp_ident : public qual_name_array
 {
 public:
@@ -739,13 +761,14 @@ public:
 	qual_name_array_exp_ident(Ident*, Expr*,int, int);
 	virtual void accept(Visitor *);
 };
+
 class qual_name_array_exp_ident_index : public qual_name_array
 {
 public:
 	Ident   *ident ;
 	Expr  *expr;
-	Arr_index *index;
-	qual_name_array_exp_ident_index(Ident*, Expr*,Arr_index*,int, int);
+	ArrayIndex *index;
+	qual_name_array_exp_ident_index(Ident*, Expr*,ArrayIndex*,int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -892,10 +915,10 @@ public:
 	virtual void Visit(Or *) = 0;
 	virtual void Visit(And *) = 0;
 	virtual void Visit(For *) = 0;
-	virtual void Visit(Arr_index *)=0;
-	virtual void Visit(Arr_index_1 *)=0;
-	virtual void Visit(Arr_index_2 *)=0;
-	virtual void Visit(Arr_index_3 *)=0;
+	virtual void Visit(ArrayIndex *)=0;
+	virtual void Visit(ArrayIndex_1 *)=0;
+	virtual void Visit(ArrayIndex_2 *)=0;
+	virtual void Visit(ArrayIndex_3 *)=0;
 	virtual void Visit(qual_name_array *)=0;
 	virtual void Visit(qual_name *)=0;
 	virtual void Visit(qual_name_id *)=0;

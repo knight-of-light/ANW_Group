@@ -49,6 +49,10 @@ REAL3	(0|[1-9][0-9]*)([eE][-+]?(0|[1-9][0-9]*))
 						col += yyleng;
 						return INT;
 					}
+"object"			{
+						col += yyleng;
+						return OBJECT;
+					}
 "if"				{
 						col += yyleng;
 						return IF;

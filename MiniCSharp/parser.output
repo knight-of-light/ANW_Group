@@ -1,5 +1,6 @@
 Terminals which are not used
 
+   OBJECT
    EXTENDS
    INSTANCEOF
 
@@ -177,100 +178,101 @@ BOOLEAN (262) 33
 DOUBLE (263) 35
 INT (264) 34
 IS (265) 69
-IF (266) 90 91
-ELSE (267) 91
-WHILE (268) 92
-FOR (269) 93
-FALSE (270) 74
-TRUE (271) 73
-EXTENDS (272)
-INSTANCEOF (273)
-NEW (274) 54 55
-THIS (275) 75
-NUL (276) 76
-PRIVATE (277) 26 28
-STATIC (278) 27 28
-VOID (279) 15
-RETURN (280) 98
-IF_PREC (281)
-OR (282) 68
-AND (283) 67
-NE (284) 57
-EQ (285) 56
-SE (286) 59
-LE (287) 61
-UNARY_OP (288)
-DECREMENT (289) 43 45
-INCREMENT (290) 42 44
-change_type (291)
+OBJECT (266)
+IF (267) 90 91
+ELSE (268) 91
+WHILE (269) 92
+FOR (270) 93
+FALSE (271) 74
+TRUE (272) 73
+EXTENDS (273)
+INSTANCEOF (274)
+NEW (275) 54 55
+THIS (276) 75
+NUL (277) 76
+PRIVATE (278) 26 28
+STATIC (279) 27 28
+VOID (280) 15
+RETURN (281) 98
+IF_PREC (282)
+OR (283) 68
+AND (284) 67
+NE (285) 57
+EQ (286) 56
+SE (287) 59
+LE (288) 61
+UNARY_OP (289)
+DECREMENT (290) 43 45
+INCREMENT (291) 42 44
+change_type (292)
 
 
 Nonterminals, with rules where they appear
 
-$accept (56)
+$accept (57)
     on left: 0
-root (57)
+root (58)
     on left: 1 2, on right: 0 2
-class (58)
+class (59)
     on left: 3 4, on right: 2
-members (59)
+members (60)
     on left: 5 6, on right: 3 4 6
-member (60)
+member (61)
     on left: 7 8 9, on right: 6
-global (61)
+global (62)
     on left: 10, on right: 7
-constructor (62)
+constructor (63)
     on left: 11, on right: 8
-function (63)
+function (64)
     on left: 13 15, on right: 9
-@1 (64)
+@1 (65)
     on left: 12, on right: 13
-@2 (65)
+@2 (66)
     on left: 14, on right: 15
-arg (66)
+arg (67)
     on left: 16, on right: 17 18
-args (67)
+args (68)
     on left: 17 18, on right: 18 20
-args_e (68)
+args_e (69)
     on left: 19 20, on right: 11 13 15
-variables (69)
+variables (70)
     on left: 21 22, on right: 10 22 95 102
-variable (70)
+variable (71)
     on left: 23 24, on right: 21 22
-accessmodif (71)
+accessmodif (72)
     on left: 25 26 27 28, on right: 10 11 13 15
-type (72)
+type (73)
     on left: 29 30, on right: 10 13 16 69 95 102
-noarraytype (73)
+noarraytype (74)
     on left: 31 32, on right: 29
-basictype (74)
+basictype (75)
     on left: 33 34 35, on right: 32 39 40 41 70
-arraytype (75)
+arraytype (76)
     on left: 36 37 38 39 40 41, on right: 30
-expr (76)
+expr (77)
     on left: 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59
     60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76,
     on right: 24 46 47 48 49 51 56 57 58 59 60 61 62 63 64 65 66 67
     68 69 70 77 78 79 81 84 85 86 87 90 91 92 94 104
-arrayindex (77)
+arrayindex (78)
     on left: 77 78 79, on right: 53 55 83 85
-qualifiedname (78)
+qualifiedname (79)
     on left: 80 81, on right: 52 53
-qualnameorarray (79)
+qualnameorarray (80)
     on left: 82 83 84 85, on right: 50 51
-expr_list (80)
+expr_list (81)
     on left: 86 87, on right: 87 89
-expr_list_e (81)
+expr_list_e (82)
     on left: 88 89, on right: 52 53 54
-statement (82)
+statement (83)
     on left: 90 91 92 93 94 95 97 98, on right: 90 91 92 93 100
-@3 (83)
+@3 (84)
     on left: 96, on right: 97
-statements (84)
+statements (85)
     on left: 99 100, on right: 11 13 15 97 100
-variables_e (85)
+variables_e (86)
     on left: 101 102, on right: 93
-expr_e (86)
+expr_e (87)
     on left: 103 104, on right: 93 98
 
 
