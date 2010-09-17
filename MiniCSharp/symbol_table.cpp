@@ -19,8 +19,8 @@ Sym::Sym(string n, int kind, int type,
 	this->returnType = returnType;
 	this->argTypes = new vector<int>;
 
-	for(int i = 0; i < ps->params->size(); i++)
-		this->argTypes->push_back(ps->params->at(i)->exprType->type);
+	for(int i = 0; i < ps->args->size(); i++)
+		this->argTypes->push_back(ps->args->at(i)->type->type);
 }
 
 
@@ -161,9 +161,9 @@ bool
 SymTab::AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth)
 {
 	string key = id->name;
-	for(int i = 0; i < ps->params->size(); i++)
+	for(int i = 0; i < ps->args->size(); i++)
 	{
-		int t = ps->params->at(i)->exprType->type;
+		int t = ps->args->at(i)->type->type;
 		
 		key += "@" + types[t];
 	}
@@ -185,8 +185,8 @@ SymTab::AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function
 void 
 SymTab::AddVars(Variables *v, Type *et)
 {
-	for(int i = 0; i < v->varDecls->size(); i++)
-		this->AddSym(v->varDecls->at(i)->name, 3, et->type);
+	for(int i = 0; i < v->variables->size(); i++)
+		this->AddSym(v->variables->at(i)->name, 3, et->type);
 }
 
 

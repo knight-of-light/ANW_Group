@@ -19,7 +19,7 @@
 
 %union{
 		Root		*tRoot;
-		ClassDef	*tClassDef;
+		Class		*tClass;
 		Members		*tMembers;
 		Member		*tMember;
 		Global		*tGlobal;
@@ -52,7 +52,7 @@
 	}
 	
 %type	<tRoot>			root
-%type	<tClassDef>		class
+%type	<tClass>		class
 %type	<tMembers>		members
 %type	<tMember>		member
 %type	<tGlobal>		global
@@ -120,7 +120,7 @@ root:			  /* empty */
 					}
 ;
 
-class:			CLASS IDENT '{' members '}' 
+class:		  CLASS IDENT '{' members '}'
 					{
 						$$ = new ClassDef($2, $4, lin, col);						
 						symtab->AddSym($2, 1, -1);
@@ -128,7 +128,7 @@ class:			CLASS IDENT '{' members '}'
 					}
 				| CLASS IDENT ':' IDENT '{' members '}'
 					{
-						$$ = new ClassDef($2, $4, $6, lin, col);
+						$$ = new ClassInher($2, $4, $6, lin, col);
 					}
 ;
 
@@ -168,7 +168,7 @@ function:		  accessmodif type IDENT '('
 					{
 						symtab->AddNewScope();
 					}				 
-				   args_e ')' '{'statements '}' 
+				   args_e ')' '{' statements '}' 
 					{
 						$$ = new Function($1, $2, $3, $6, $9, lin, col); 
 						symtab->OutScope();	
@@ -178,7 +178,7 @@ function:		  accessmodif type IDENT '('
 					 {
 						 symtab->AddNewScope();
 					 }				 
-				   args_e ')' '{'statements '}' 
+				   args_e ')' '{' statements '}' 
 					{
 						$$ = new Function($1, $3, $6, $9, lin, col); 
 						symtab->OutScope();
@@ -266,7 +266,11 @@ noarraytype:	  IDENT
 					{$$ = $1;}
 ;
 
-basictype:		  BOOLEAN
+basictype:		  OBJECT
+					{
+						$$ = new NoArrayType(5, lin, col);
+					}
+				| BOOLEAN
 					{
 						$$ = new NoArrayType(3, lin, col);
 					}
@@ -282,27 +286,27 @@ basictype:		  BOOLEAN
 
 arraytype:		  IDENT '[' ']'
 					{
-						$$ = new ArrayType(2, $1, lin, col);
+						$$ = new ArrayType(1, $1, lin, col);
 					}
 				| IDENT '[' ',' ']'
 					{
-						$$ = new ArrayType(3, $1, lin, col);
+						$$ = new ArrayType(2, $1, lin, col);
 					}
 				| IDENT '[' ',' ',' ']'
 					{
-						$$ = new ArrayType(4, $1, lin, col);
+						$$ = new ArrayType(3, $1, lin, col);
 					}
 				| basictype '[' ']'
 					{
-						$$ = new ArrayType($1->type*10+2, lin, col);
+						$$ = new ArrayType($1->type, 1, lin, col);
 					}
 				| basictype '[' ',' ']'
 					{
-						$$ = new ArrayType($1->type*10+3, lin, col);
+						$$ = new ArrayType($1->type, 2, lin, col);
 					}
 				| basictype '[' ',' ',' ']'
 					{
-						$$ = new ArrayType($1->type*10+4, lin, col);
+						$$ = new ArrayType($1->type, 3, lin, col);
 					}
 ;
 
@@ -344,27 +348,30 @@ expr:			  INCREMENT IDENT
 					} 
 				| qualnameorarray 
 					{
-						// $$ = new IdentExpr($1, lin, col);
+						$$ = new QualNArrExp($1, lin, col);
 						// symtab->IsDeclared($1, def);
 					}  
 				| qualnameorarray '=' expr  
 					{
-						// $$ = new Assign($1, $3, lin, col);
+						$$ = new Assign($1, $3, lin, col);
 						// symtab->IsDeclared($1);
 					} 
 				| qualifiedname '(' expr_list_e ')'	 
 					{
-						// $$ = new Invoke($1, $3, lin, col);
+						$$ = new Invoke($1, $3, lin, col);
 						// //symtab->IsDeclared($1, $3);
 					}
 				| qualifiedname '(' expr_list_e ')' arrayindex
 					{
+						$$ = new InvokeArr($1, $3, $5, lin, col);
 					}
 				| NEW IDENT '(' expr_list_e ')'
 					{
+						$$ = new NewObject($2, $4, lin, col);
 					}
 				| NEW IDENT arrayindex
 					{
+						$$ = new NewArr($2, $3, lin, col);
 					}
 				| expr EQ expr 
 					{
@@ -420,6 +427,7 @@ expr:			  INCREMENT IDENT
 					}
 				| expr IS type
 					{
+						$$ = new Is($1, $3, lin, col);
 					}
 				| '(' basictype ')' expr %prec change_type
 					{
@@ -442,6 +450,7 @@ expr:			  INCREMENT IDENT
 					}
 				| THIS
 					{
+						$$ = new This(lin, col);
 					}
 				| NUL
 					{
@@ -465,29 +474,29 @@ arrayindex:		  '[' expr ']'
 
 qualifiedname:	  IDENT
 					{
-					$$ = new QualName_ID($1, lin, col);
+						$$ = new QualName_ID($1, lin, col);
 					}
 				| expr '.' IDENT
 					{
-					$$ = new QualName_Exp($3, $1, lin, col);
+						$$ = new QualName_Exp($3, $1, lin, col);
 					}
 ;
 
 qualnameorarray:  IDENT
 					{
-					$$ = new QualNArray_ID($1, lin, col);
+						$$ = new QualName_ID($1, lin, col);
 					}
 				| IDENT arrayindex
 					{
-					$$ = new QualNArray_ID_Index($1, $2, lin, col);
+						$$ = new QualNArray_ID_Index($1, $2, lin, col);
 					}
 				| expr '.' IDENT
 					{
-					$$ = new QualNArray_Exp($3, $1, lin, col);
+						$$ = new QualName_Exp($3, $1, lin, col);
 					}
 				| expr '.' IDENT arrayindex
 					{
-					$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
+						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
 					}
 ;
 
@@ -534,8 +543,8 @@ statement:		  IF '(' expr ')' statement %prec IF_PREC
 				| type variables ';'
 					{
 						$$ = new VariablesStat($1, $2, lin, col);
-						for(int i = 0; i < $2->varDecls->size(); i++)
-							symtab->AddSym($2->varDecls->at(i)->name, 3, $1->type);
+						for(int i = 0; i < $2->variables->size(); i++)
+							symtab->AddSym($2->variables->at(i)->name, 3, $1->type);
 					} 
 				|   '{'
 						{

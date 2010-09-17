@@ -7,7 +7,7 @@
 class TypeVisitor : public Visitor
 {
 public:	
-	virtual void Visit( ClassDef *);
+	//virtual void Visit( ClassDef *);
 	virtual void Visit( Members *);
 	virtual void Visit( Member  *);
 	virtual void Visit( Global  *);
@@ -24,7 +24,7 @@ public:
 	virtual void Visit( True *);
 	virtual void Visit( False *);
 	virtual void Visit( Paren  *);
-	virtual void Visit( IdentExpr *);
+	virtual void Visit( QualNArrExp *);
 	virtual void Visit( Assign *);
 	virtual void Visit( Invoke *);
 	virtual void Visit( ExprList *);
@@ -67,9 +67,7 @@ public:
 	virtual void Visit(QualName_ID *);
 	virtual void Visit(QualName_Exp *);
 	virtual void Visit(QualNArray *);
-	virtual void Visit(QualNArray_ID *);
 	virtual void Visit(QualNArray_ID_Index *);
-	virtual void Visit(QualNArray_Exp *);
 	virtual void Visit(QualNArray_Exp_Index *);
 
 	SymTab *symtab;

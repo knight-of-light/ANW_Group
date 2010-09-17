@@ -9,137 +9,172 @@ Node::Node(int line, int column)
 }
 
 //*******     Root		*************
-Root::Root(int l, int c):Node(l,c)
+Root::Root(int l, int c) : Node(l,c)
 {
-	this->classes = new vector<ClassDef *>;
+	this->classes = new vector<Class *>;
 }
 
 void
-Root::AddClass(ClassDef *cd)
+Root::AddClass(Class *cd)
 {
 	this->classes->push_back(cd);
 	cd->father = this;
 }
 
-//*******     ClassDef		*********
-ClassDef::ClassDef(Ident *n, Members *fs, int l, int c): Node(l, c)
+//*******       Class		*********
+Class::Class(int l, int c) : Node(l,c)
 {
-	this->name = n;
-	this->supName = NULL;
-	this->members = fs;
-	
-	n->father = this;
-	fs->father = this;
 }
 
-ClassDef::ClassDef(Ident *n, Ident *sn, Members *fs, int l, int c) : Node(l, c)
+ClassDef::ClassDef(Ident *n, Members *ms, int l, int c): Class(l,c)
 {
 	this->name = n;
-	this->supName = sn;
-	this->members = fs;
+	this->members = ms;
+	
+	n->father = this;
+	ms->father = this;
+}
+
+ClassInher::ClassInher(Ident *n, Ident *b, Members *ms, int l, int c) : Class(l,c)
+{
+	this->name = n;
+	this->base = b;
+	this->members = ms;
 
 	n->father = this;
-	sn->father = this;
-	fs->father = this;
+	b->father = this;
+	ms->father = this;
 }
 
 //*******     Members		*********
-Members::Members(int l, int c) : Node(l, c)
+Members::Members(int l, int c) : Node(l,c)
 {
 	this->members = new vector<Member *>;
 }
 
 void
-Members::AddMember(Member *f)
+Members::AddMember(Member *m)
 {
-	this->members->push_back(f);
-	f->father = this;
+	this->members->push_back(m);
+	m->father = this;
 }
 
-Member::Member(int l, int c) : Node(l, c)
+Member::Member(int l, int c) : Node(l,c)
 {
 	
 }
 
 //*******     Global		*********
-Global::Global(AccessModif	*am, Type *et, Variables *vs, int l, int c) : Member(l, c)
+Global::Global(AccessModif	*am, Type *ty, Variables *vs, int l, int c) : Member(l,c)
 {
 	this->accessModif = am;
-	this->exprType = et;
-	this->varDecls = vs;
+	this->type = ty;
+	this->variables = vs;
+
 	am->father = this;
-	et->father = this;
+	ty->father = this;
 	vs->father = this;
 }
 
 //*******   Constructor		*********
-Constructor::Constructor(AccessModif * am, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
+Constructor::Constructor(AccessModif *am, Ident *n, Args *as, Stats *ss, int l, int c) : Member(l,c)
 {
 	this->accessModif = am;
 	this->name = n;
-	this->params = ps;
-	this->insts = is;
+	this->args = as;
+	this->stats = ss;
+
 	am->father = this;
 	n->father = this;
-	ps->father = this;
-	is->father = this;
+	as->father = this;
+	ss->father = this;
 }
 
 //*******     Function		*********
-Function::Function(AccessModif *am, Type *et, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
+Function::Function(AccessModif *am, Type *ty, Ident *n, Args *as, Stats *ss, int l, int c) : Member(l,c)
 {
 	this->accessModif = am;
-	this->exprType = et;
+	this->type = ty;
 	this->name = n;
-	this->params = ps;
-	this->insts = is;
+	this->args = as;
+	this->stats = ss;
+
 	am->father = this;
-	et->father = this;
+	ty->father = this;
 	n->father = this;
-	ps->father = this;
-	is->father = this;
+	as->father = this;
+	ss->father = this;
 }
 
-Function::Function(AccessModif *am, Ident *n, Args *ps, Stats *is, int l, int c) : Member(l, c)
+Function::Function(AccessModif *am, Ident *n, Args *as, Stats *ss, int l, int c) : Member(l,c)
 {
 	this->accessModif = am;
-	this->exprType = NULL;
+	this->type = NULL;	/* +++++++++++++++=== we shuld enter value like 0 to match void ====++++++++++++++++++++++++++++++++++++++++++++ */
 	this->name = n;
-	this->params = ps;
-	this->insts = is;
+	this->args = as;
+	this->stats = ss;
+
 	am->father = this;
 	n->father = this;
-	ps->father = this;
-	is->father = this;
+	as->father = this;
+	ss->father = this;
 }
 
-//*******     Variables		*********
-Variables::Variables(int l, int c) : Node(l, c)
+//*******       Args		*********
+Args::Args(int l, int c) : Node(l,c)
 {
-	this->varDecls = new vector<Variable *>;
+	this->args = new vector<Arg *>;
 }
 
-Variables::Variables(Variable *vd, int l, int c) : Node(l, c)
+Args::Args(Arg *ar, int l, int c) : Node(l,c)
 {
-	this->varDecls = new vector<Variable *>;
-	this->AddVariable(vd);
+	this->args = new vector<Arg *>;
+	this->AddArg(ar);
 }
 
 void
-Variables::AddVariable(Variable *vd)
+Args::AddArg(Arg *ar)
 {
-	this->varDecls->push_back(vd);
-	vd->father = this;
+	this->args->push_back(ar);
+	ar->father = this;
 }
 
-Variable::Variable(Ident *n, int l, int c) : Node(l, c)
+Arg::Arg(Type *ty, Ident *n, int l, int c) : Node(l,c)
+{
+	this->type = ty;
+	this->name = n;
+
+	ty->father = this;
+	n->father = this;
+}
+
+//*******     Variables		*********
+Variables::Variables(int l, int c) : Node(l,c)
+{
+	this->variables = new vector<Variable *>;
+}
+
+Variables::Variables(Variable *va, int l, int c) : Node(l,c)
+{
+	this->variables = new vector<Variable *>;
+	this->AddVariable(va);
+}
+
+void
+Variables::AddVariable(Variable *va)
+{
+	this->variables->push_back(va);
+	va->father = this;
+}
+
+Variable::Variable(Ident *n, int l, int c) : Node(l,c)
 {
 	this->name = n;	
 	n->father = this;
 	this->expr = NULL;
 }
 
-Variable::Variable(Ident *n, Expr *e, int l, int c) : Node(l, c)
+Variable::Variable(Ident *n, Expr *e, int l, int c) : Node(l,c)
 {
 	this->name = n;
 	this->expr = e;
@@ -147,35 +182,8 @@ Variable::Variable(Ident *n, Expr *e, int l, int c) : Node(l, c)
 	e->father = this;
 }
 
-//*******       Args		*********
-Args::Args(int l, int c) : Node(l, c)
-{
-	this->params = new vector<Arg *>;
-}
-
-Args::Args(Arg *p, int l, int c) : Node(l, c)
-{
-	this->params = new vector<Arg *>;
-	this->AddArg(p);
-}
-
-void
-Args::AddArg(Arg *p)
-{
-	this->params->push_back(p);
-	p->father = this;
-}
-
-Arg::Arg(Type *et, Ident *n, int l, int c) : Node(l, c)
-{
-	this->exprType = et;
-	this->name = n;
-	et->father = this;
-	n->father = this;
-}
-
 //*******    AccessModif	*********
-AccessModif::AccessModif(int at, int l, int c) : Node(l, c)
+AccessModif::AccessModif(int at, int l, int c) : Node(l,c)
 {
 	this->acctype = at;
 }
@@ -200,14 +208,16 @@ NoArrayType::NoArrayType(Ident *n, int l, int c) : Type(l,c)
 }
 
 //*******     ArrayType		*********
-ArrayType::ArrayType(int t, int l, int c) : Type(l,c)
+ArrayType::ArrayType(int t, int at, int l, int c) : Type(l,c)
 {
 	this->type = t;
+	this->arrayType = at;
 }
 
-ArrayType::ArrayType(int t, Ident *n, int l, int c) : Type(l,c)
+ArrayType::ArrayType(int at, Ident *n, int l, int c) : Type(l,c)
 {
-	this->type = t + (6*10); /* 6: Ident type number , 10: Add 10 for Array type number */
+	this->type = 6;
+	this->arrayType = at;
 	this->name = n;
 	n->father = this;
 }
@@ -272,255 +282,326 @@ Paren::Paren(Expr *e, int l, int c) : Expr(l, c)
 	e->father = this;
 }
 
-//*******     IdentExpr		*********
-IdentExpr::IdentExpr(Ident *id, int l, int c) : Expr(l, c)
+//*******     QualNArrExp		*********
+QualNArrExp::QualNArrExp(QualNArray *qna, int l, int c) : Expr(l,c)
 {
-	this->ident = id;
-	id->father = this;
+	this->qualNArray = qna;
+	qna->father = this;
 }
 
 //*******      Assign		*********
-Assign::Assign(Ident *id, Expr *e, int l, int c) : Expr(l, c)
+Assign::Assign(QualNArray *qna, Expr *e, int l, int c) : Expr(l,c)
 {
-	this->ident = id;
+	this->qualNArray = qna;
 	this->expr = e;
-	id->father = this;
+	qna->father = this;
 	e->father = this;
 }
 
 //*******       Invoke		*********
-Invoke::Invoke(Ident *id, ExprList *el, int l, int c) : Expr(l, c)
+Invoke::Invoke(QualName *qn, ExprList *el, int l, int c) : Expr(l,c)
+{
+	this->qualName = qn;
+	this->exprList = el;
+	qn->father = this;
+	el->father = this;
+}
+
+//*******     InvokeArr		*********
+InvokeArr::InvokeArr(QualName *qn, ExprList *el, ArrayIndex *ai, int l, int c) : Expr(l,c)
+{
+	this->qualName = qn;
+	this->exprList = el;
+	this->arrayIndex = ai;
+
+	qn->father = this;
+	el->father = this;
+	ai->father = this;
+}
+
+//*******     NewObject		*********
+NewObject::NewObject(Ident *id, ExprList *el, int l, int c) : Expr(l,c)
 {
 	this->ident = id;
 	this->exprList = el;
+
 	id->father = this;
 	el->father = this;
 }
 
-//*******      Equal		*********
-Equal::Equal(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+//*******      NewArr		*********
+NewArr::NewArr(Ident *id, ArrayIndex *ai, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this->ident = id;
+	this->arrayIndex = ai;
+
+	id->father = this;
+	ai->father = this;
+}
+
+//*******      Equal		*********
+Equal::Equal(Expr *m, Expr *r, int l, int c) : Expr(l,c)
+{
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******      NotEq		*********
-NotEq::NotEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+NotEq::NotEq(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******     Smaller		*********
-Smaller::Smaller(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+Smaller::Smaller(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******     SmallerEq		*********
-SmallerEq::SmallerEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+SmallerEq::SmallerEq(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******     Larger		*********
-Larger::Larger(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+Larger::Larger(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******     LargerEq		*********
-LargerEq::LargerEq(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+LargerEq::LargerEq(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******        Add		*********
-Add::Add(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+Add::Add(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******        Sub		*********
-Sub::Sub(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+Sub::Sub(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******        Mult		*********
-Mult::Mult(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+Mult::Mult(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******        Div		*********
-Div::Div(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+Div::Div(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******        Mod		*********
-Mod::Mod(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+Mod::Mod(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******        And		*********
-And::And(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+And::And(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
 //*******         Or		*********
-Or::Or(Expr *f, Expr *r, int l, int c) : Expr(l, c)
+Or::Or(Expr *m, Expr *r, int l, int c) : Expr(l,c)
 {
-	this ->left = f;
+	this ->left = m;
 	this->right = r;
-	f->father = this;
+
+	m->father = this;
 	r->father = this;
 }
 
+//*******         Is		*********
+Is::Is(Expr *e, Type *ty, int l, int c) : Expr(l,c)
+{
+	this->expr = e;
+	this->typ = ty;
+
+	e->father = this;
+	ty->father = this;
+}
+
 //*******      Integer		*********
-Integer::Integer(int v, int l, int c) : Expr(l, c)
+Integer::Integer(int v, int l, int c) : Expr(l,c)
 {
 	this->value = v;
 	this->type = 1;
 }
 
 //*******       Real		*********
-Real::Real(int v, int l, int c) : Expr(l, c)
+Real::Real(double v, int l, int c) : Expr(l,c)
 {
 	this->value = v;
 	this->type = 2;
 }
 
 //*******       True		*********
-True::True(int l, int c) : Expr(l, c)
+True::True(int l, int c) : Expr(l,c)
 {
 	this->type = 3;
 }
 
 //*******      False		*********
-False::False(int l, int c) : Expr(l, c)
+False::False(int l, int c) : Expr(l,c)
 {
 	this->type = 3;
 }
 
+//*******       This		*********
+This::This(int l, int c) : Expr(l,c)
+{
+}
+
 //*******       Null		*********
-Null::Null(int l, int c) : Expr(l, c)
+Null::Null(int l, int c) : Expr(l,c)
 {
 	this->type = 0;
 }
 
 //*******     ArrayIndex	*********
-ArrayIndex::ArrayIndex(int l, int c) : Node(l, c)
+ArrayIndex::ArrayIndex(int l, int c) : Node(l,c)
 {
 }
 
-ArrayIndex_1::ArrayIndex_1(Expr *exp1,int l, int c) : ArrayIndex(l, c)
+ArrayIndex_1::ArrayIndex_1(Expr *exp1, int l, int c) : ArrayIndex(l,c)
 {
 	this->expr1=exp1;
+	exp1->father = this;
 }
 
-ArrayIndex_2::ArrayIndex_2(Expr *exp1,Expr *exp2,int l, int c) : ArrayIndex(l, c)
+ArrayIndex_2::ArrayIndex_2(Expr *exp1, Expr *exp2, int l, int c) : ArrayIndex(l,c)
 {
 	this->expr1=exp1;
 	this->expr2=exp2;
+
+	expr1->father = this;
+	expr2->father = this;
 }
 
-ArrayIndex_3::ArrayIndex_3(Expr *exp1,Expr *exp2,Expr *exp3,int l, int c) : ArrayIndex(l, c)
+ArrayIndex_3::ArrayIndex_3(Expr *exp1, Expr *exp2, Expr *exp3, int l, int c) : ArrayIndex(l,c)
 {
 	this->expr1=exp1;
 	this->expr2=exp2;
 	this->expr3=exp3;
+
+	expr1->father = this;
+	expr2->father = this;
+	expr3->father = this;
 }
 
-//*******     QualName		*********
-QualName::QualName( int l , int  c ) : Node(l ,c)
+//*******   QualNameOrArr	*********
+QualNArray::QualNArray(int l, int c):Node(l ,c)
 {
+	this->ident = NULL;
 }
 
-QualName_ID::QualName_ID(Ident *ident, int l , int c ) :QualName(l ,c)
-{
-	this->ident=ident;
-}
-
-QualName_Exp::QualName_Exp(Ident *ident ,Expr *expr , int l , int c):QualName(l ,c)
-{
-	this->ident=ident;
-	this->expr=expr;
-}
-
-//*******     QualNArray	*********
-QualNArray::QualNArray( int l, int c ):Node(l  ,c)
-{
-}
-
-QualNArray_ID::QualNArray_ID(Ident* ident, int l, int c ):QualNArray(l ,c)
-{
-	this->ident=ident;
-}
-
-QualNArray_ID_Index::QualNArray_ID_Index( Ident* ident,ArrayIndex* index ,int l , int c ):QualNArray(l ,c)
+QualNArray_ID_Index::QualNArray_ID_Index(Ident *ident, ArrayIndex *index, int l, int c) : QualNArray(l,c)
 {
 	this->ident=ident;
 	this->index=index;
+
+	ident->father = this;
+	index->father = this;
 }
 
-QualNArray_Exp::QualNArray_Exp(Ident* ident, Expr* expr,int l, int c):QualNArray(l ,c)
-{
-	this->ident=ident;
-	this->expr=expr;
-}
-
-QualNArray_Exp_Index::QualNArray_Exp_Index(Ident* ident, Expr* expr,ArrayIndex* index ,int l, int c ):QualNArray(l ,c)
+QualNArray_Exp_Index::QualNArray_Exp_Index(Ident* ident, Expr* expr,ArrayIndex* index ,int l, int c ):QualNArray(l,c)
 {
 	this->ident=ident;
 	this->expr=expr;
 	this->index=index;
+
+	ident->father = this;
+	expr->father = this;
+	index->father = this;
+}
+
+//*******   QualifiedName	*********
+QualName::QualName(int l , int  c) : QualNArray(l,c)
+{
+	this->ident = NULL;
+}
+
+QualName_ID::QualName_ID(Ident *ident, int l, int c) : QualName(l,c)
+{
+	this->ident = ident;
+
+	ident->father = this;
+}
+
+QualName_Exp::QualName_Exp(Ident *ident, Expr *expr, int l, int c) : QualName(l,c)
+{
+	this->ident=ident;
+	this->expr=expr;
+
+	ident->father = this;
+	expr->father = this;
 }
 
 //*******     ExprList		*********
-ExprList::ExprList(int l, int c) : Node(l, c)
+ExprList::ExprList(int l, int c) : Node(l,c)
 {
 	this->exprList = new vector<Expr *>;
 }
 
-ExprList::ExprList(Expr *e, int l, int c) : Node(l, c)
+ExprList::ExprList(Expr *e, int l, int c) : Node(l,c)
 {
 	this->exprList = new vector<Expr *>;
 	this->AddExpr(e);
@@ -537,103 +618,106 @@ ExprList::AddExpr(Expr *e)
 //					Statement
 //***********************************************************************
 
-Stat::Stat(int l, int c) : Node(l, c)
+Stat::Stat(int l, int c) : Node(l,c)
 {
 }
 
-Stats::Stats(int l, int c) : Node(l, c)
+Stats::Stats(int l, int c) : Node(l,c)
 {
-	this->insts = new vector<Stat *>;
+	this->stats = new vector<Stat *>;
 }
 
-Stats::Stats(Stat *i, int l, int c) : Node(l, c)
+Stats::Stats(Stat *i, int l, int c) : Node(l,c)
 {
-	this->insts = new vector<Stat *>;
+	this->stats = new vector<Stat *>;
 	this->AddStat(i);
 }
 
 void
 Stats::AddStat(Stat *i)
 {
-	this->insts->push_back(i);
+	this->stats->push_back(i);
 	i->father = this;
 }
 
 //*******         If		*********
-If::If(Expr *e, Stat *i, int l, int c) : Stat(l, c)
+If::If(Expr *e, Stat *s, int l, int c) : Stat(l,c)
 {
 	this->expr = e;
-	this->inst = i;
+	this->stat = s;
+
 	e->father = this;
-	i->father = this;
+	s->father = this;
 }
 
 //*******      If Else		*********
-IfElse::IfElse(Expr *e, Stat *i_if, Stat *i_else, int l, int c) : If(e, i_if, l, c)
+IfElse::IfElse(Expr *e, Stat *s_if, Stat *s_else, int l, int c) : If(e, s_if, l, c)
 {
-	this->elseStat = i_else;
-	i_else = this;
+	this->elseStat = s_else;
+	s_else = this;
 }
 
 //*******      While		*********
-While::While(Expr *e, Stat *i, int l, int c) : Stat(l, c)
+While::While(Expr *e, Stat *s, int l, int c) : Stat(l,c)
 {
 	this->expr = e;
-	this->inst = i;
+	this->stat = s;
+
 	e->father = this;
-	i->father = this;
+	s->father = this;
 }
 
 //*******        For		*********
-For::For(Variables_e *vsd, Expr *e_cond, Expr *e_count, Stat *i, int l, int c) : Stat(l, c)
+For::For(Variables_e *vse, Expr *e_cond, Expr *e_count, Stat *s, int l, int c) : Stat(l,c)
 {
-	this->varsDecl = vsd;
+	this->variables_e = vse;
 	this->exprCond = e_cond;
 	this->exprCount = e_count;
-	this->inst = i;
-	vsd->father = this;
+	this->stat = s;
+
+	vse->father = this;
 	e_cond->father = this;
 	e_count->father = this;
-	i->father = this;
+	s->father = this;
 }
 
 //*******      ExprStat		*********
-ExprStat::ExprStat(Expr *e, int l, int c) : Stat(l, c)
+ExprStat::ExprStat(Expr *e, int l, int c) : Stat(l,c)
 {
 	this->expr = e;
 	e->father = this;
 }
 
 //*******   VariablesStat	*********
-VariablesStat::VariablesStat(Type *et, Variables *vds, int l, int c) : Stat(l, c)
+VariablesStat::VariablesStat(Type *ty, Variables *vs, int l, int c) : Stat(l,c)
 {
-	this->exprType = et;
-	this->vardecls = vds;
-	et->father = this;
-	vds->father = this;
+	this->type = ty;
+	this->variables = vs;
+	ty->father = this;
+	vs->father = this;
 }
 
 //*******      Block		*********
-Block::Block(Stats *is, int l, int c) : Stat(l, c)
+Block::Block(Stats *ss, int l, int c) : Stat(l,c)
 {
-	this->insts = is;
-	is->father = this;
+	this->stats = ss;
+	ss->father = this;
 }
 
 //*******      Return		*********
-Return::Return(Expr *e, int l, int c) : Stat(l, c)
+Return::Return(Expr *e, int l, int c) : Stat(l,c)
 {
 	this->expr = e;
 	e->father = this;
 }
 
 //*******     Variable_e	*********
-Variables_e::Variables_e(Type *et, Variables *vds, int l,int c) : Node(l, c)
+Variables_e::Variables_e(Type *ty, Variables *vs, int l,int c) : Node(l,c)
 {
-	this->exprType = et;
-	this->varDecls = vds;
-	et->father = this;
-	vds->father = this;
+	this->type = ty;
+	this->variables = vs;
+	ty->father = this;
+	vs->father = this;
 }
 
 
@@ -694,11 +778,11 @@ Root::accept(Visitor *v)
 
 }
 
-void
-ClassDef::accept(Visitor *v)
-{
-	v->Visit(this);
-}
+//void
+//ClassDef::accept(Visitor *v)
+//{
+//	v->Visit(this);
+//}
 
 void
 Members::accept(Visitor *v)
@@ -810,7 +894,7 @@ Paren ::accept(Visitor *v)
 }
 
 void
-IdentExpr::accept(Visitor *v)
+QualNArrExp::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -984,19 +1068,7 @@ QualNArray::accept(Visitor *v)
 }
 
 void
-QualNArray_ID::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
 QualNArray_ID_Index::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-QualNArray_Exp::accept(Visitor *v)
 {
 	v->Visit(this);
 }

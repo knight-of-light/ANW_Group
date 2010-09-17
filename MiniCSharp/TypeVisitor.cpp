@@ -1,16 +1,16 @@
 #include "visitors.h"
 
 // The code inside the functions of this visitor is not complete yyou must complete it
-void 
-TypeVisitor::Visit(ClassDef *n) 
-{
-	types[0] = "null";
-	types[1] = "int";
-	types[2] = "double";
-	types[3] = "boolean";
-	types[4] = "void";
-	n->members->accept(this);
-}
+//void 
+//TypeVisitor::Visit(ClassDef *n) 
+//{
+//	types[0] = "null";
+//	types[1] = "int";
+//	types[2] = "double";
+//	types[3] = "boolean";
+//	types[4] = "void";
+//	n->members->accept(this);
+//}
 
 void
 TypeVisitor::Visit(Members *n)
@@ -28,20 +28,20 @@ TypeVisitor::Visit(Member  *n)
 void
 TypeVisitor::Visit(Global  *n)
 {
-	n->varDecls->accept(this);		
+	n->variables->accept(this);		
 }
 
 void
 TypeVisitor::Visit(Function *n)
 {
-	n->insts->accept(this);
+	n->stats->accept(this);
 }
 
 void
 TypeVisitor::Visit(Variables *n)
 {
-	for(int i = 0; i < n->varDecls->size(); i++)
-		n->varDecls->at(i)->accept(this);
+	for(int i = 0; i < n->variables->size(); i++)
+		n->variables->at(i)->accept(this);
 }
 
 void
@@ -145,16 +145,16 @@ TypeVisitor::Visit(Paren  *n)
 }
 
 void
-TypeVisitor::Visit(IdentExpr *n)
+TypeVisitor::Visit(QualNArrExp *n)
 {
-	n->type = n->ident->symbol->type;
+	n->type = n->qualNArray->ident->symbol->type;
 }
 
 void
 TypeVisitor::Visit(Assign *n)
 {
 			n->expr->accept(this);
-			int left = n->ident->symbol->type;// Getting the type from the symbol table
+			int left = n->qualNArray->ident->symbol->type;// Getting the type from the symbol table
 			int right = n->expr->type;
 			
 			bool mismatch = false;
@@ -182,7 +182,7 @@ TypeVisitor::Visit(Assign *n)
 			}
 			if(mismatch)
 				symtab->errors->AddError("Type mismatch between \'" + types[left] + "\' and \'" + types[right] + "\'",
-				 n->ident->line,							
+				 n->qualNArray->ident->line,							
 				 n->column);
 }
 
@@ -191,7 +191,7 @@ void
 TypeVisitor::Visit(Invoke *n)
 {
 	n->exprList->accept(this);
-	this->symtab->IsDeclared(n->ident, n->exprList);
+	this->symtab->IsDeclared(n->qualName->ident, n->exprList);
 }
 
 void
@@ -292,8 +292,8 @@ TypeVisitor::Visit(Stat *n)
 void
 TypeVisitor::Visit(Stats *n)
 {
-	for(int i = 0; i < n->insts->size(); i++)
-		n->insts->at(i)->accept(this);
+	for(int i = 0; i < n->stats->size(); i++)
+		n->stats->at(i)->accept(this);
 }
 
 void
@@ -305,7 +305,7 @@ TypeVisitor::Visit(ExprStat *n)
 void
 TypeVisitor::Visit(VariablesStat *n)
 {
-	n->vardecls->accept(this);
+	n->variables->accept(this);
 }
 
 void
@@ -335,7 +335,7 @@ TypeVisitor::Visit(Block *n)
 void
 TypeVisitor::Visit(Variables_e *n)
 {
-	n->varDecls->accept(this);	
+	n->variables->accept(this);	
 }
 
 void
@@ -467,7 +467,7 @@ TypeVisitor::Visit(ArrayIndex_3 *n){
 }
 void
 TypeVisitor::Visit(QualName *n){
-	
+
 }
 void
 TypeVisitor::Visit(QualName_ID *n){
@@ -482,25 +482,10 @@ TypeVisitor::Visit(QualNArray *n){
 	
 }
 void
-TypeVisitor::Visit(QualNArray_ID *n){
-	
-}
-void
 TypeVisitor::Visit(QualNArray_ID_Index *n){
-	
-}
-
-void
-TypeVisitor::Visit(QualNArray_Exp *n){
 	
 }
 void
 TypeVisitor::Visit(QualNArray_Exp_Index *n){
 	
 }
-
-
-
-
-
-

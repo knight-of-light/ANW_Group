@@ -19,7 +19,9 @@ using std::string;
 
 class Node;
 class Root;
+class Class;
 class ClassDef;
+class ClassInher;
 class Members;
 class Member;
 class Global;
@@ -42,9 +44,13 @@ class Not;
 class Minus;
 class Plus;
 class Paren;
-class IdentExpr;
+class QualNArrExp;
 class Assign;
 class Invoke;
+class InvokeArr;
+
+class NewObject;
+class NewArr;
 
 class Equal;
 class NotEq;
@@ -62,12 +68,14 @@ class Mod;
 class And;
 class Or;
 
+class Is;
+
 class Integer;
 class Real;
 
 class True;
 class False;
-
+class This;
 class Null;
 
 class ArrayIndex;
@@ -75,16 +83,13 @@ class ArrayIndex_1;
 class ArrayIndex_2;
 class ArrayIndex_3;
 
+class QualNArray;
+class QualNArray_ID_Index;
+class QualNArray_Exp_Index;
+
 class QualName;
 class QualName_ID;
 class QualName_Exp;
-
-class QualNArray;
-class QualNArray_ID;
-class QualNArray_ID_Index;
-class QualNArray_Exp;
-class QualNArray_Exp_Index;
-
 
 class ExprList;
 class Stat;
@@ -124,24 +129,39 @@ public:
 class Root : public Node
 {
 public:
-	vector<ClassDef *>	*classes;
+	vector<Class *>	*classes;
 
 	Root(int, int);
-	void AddClass(ClassDef *);
+	void AddClass(Class *);
 	virtual void accept(Visitor *);
 };
 
-//*******     ClassDef		*********
-class ClassDef : public Node
+//*******       Class		*********
+
+class Class : public Node
+{
+public:
+	Class(int, int);
+	//virtual void accept(Visitor *);
+};
+
+class ClassDef : public Class		// Class without Inheritance
 {
 public:
 	Ident	*name;
-	Ident	*supName;
 	Members	*members;
 
 	ClassDef(Ident *, Members *, int, int);
-	ClassDef(Ident *, Ident *, Members *, int, int);
-	virtual void accept(Visitor *);
+};
+
+class ClassInher : public Class	// Class with Inheritance
+{
+public:
+	Ident	*name;
+	Ident	*base;
+	Members	*members;
+
+	ClassInher(Ident *, Ident *, Members *, int, int);
 };
 
 //*******     Members		*********
@@ -167,8 +187,8 @@ class Global : public Member
 {
 public:
 	AccessModif	*accessModif;
-	Type		*exprType;
-	Variables	*varDecls;
+	Type		*type;
+	Variables	*variables;
 
 	Global(AccessModif	*, Type *, Variables *, int , int);
 	virtual void accept(Visitor *);
@@ -180,8 +200,8 @@ class Constructor : public Member
 public:
 	AccessModif	*accessModif;
 	Ident		*name;
-	Args		*params;
-	Stats		*insts;
+	Args		*args;
+	Stats		*stats;
 
 	Constructor(AccessModif *, Ident *, Args *, Stats *, int, int);
 	//virtual void accept(Visitor *);
@@ -192,13 +212,35 @@ class Function : public Member
 {
 public:
 	AccessModif	*accessModif;
-	Type		*exprType;
+	Type		*type;
 	Ident		*name;
-	Args		*params;
-	Stats		*insts;
+	Args		*args;
+	Stats		*stats;
 
 	Function(AccessModif *, Type *, Ident *, Args *, Stats *, int, int);
 	Function(AccessModif *, Ident *, Args *, Stats *, int, int);
+	virtual void accept(Visitor *);
+};
+
+//*******       Args		*********
+class Args : public Node
+{
+public:
+	vector<Arg *>	 *args;
+
+	Args(int, int);
+	Args(Arg *, int, int);
+	void AddArg(Arg *);
+	virtual void accept(Visitor *);
+};
+
+class Arg : public Node
+{
+public:
+	Type	*type;
+	Ident	*name;
+
+	Arg(Type *, Ident *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -206,10 +248,10 @@ public:
 class Variables	: public Node
 {
 public:
-	vector<Variable *>	*varDecls;
+	vector<Variable *>	*variables;
 
 	Variables(int, int);
-	Variables(Variable *, int , int );
+	Variables(Variable *, int, int);
 	void AddVariable(Variable *);
 	virtual void accept(Visitor *);
 };
@@ -222,28 +264,6 @@ public:
 
 	Variable(Ident *, int, int);
 	Variable(Ident *, Expr *, int, int);
-	virtual void accept(Visitor *);
-};
-
-//*******       Args		*********
-class Args : public Node
-{
-public:
-	vector<Arg *>	 *params;
-
-	Args(int, int);
-	Args(Arg *, int, int);
-	void AddArg(Arg *);
-	virtual void accept(Visitor *);
-};
-
-class Arg : public Node
-{
-public:
-	Type	*exprType;
-	Ident		*name;
-
-	Arg(Type *, Ident *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -284,12 +304,12 @@ public:
 class ArrayType : public Type
 {
 public:
-	//	12:	int[]		,	13:	int[,]		,	14:	int[,,]		,
-	//	22:	double[]	,	23:	double[,]	,	24: double[,,]	,
-	//	32:	boolean[]	,	33:	boolean[,]	,	34: boolean[,,]	,
-	//	62:	Ident[]		,	63:	Ident[,]	,	64: Ident[,,]	,
+	// 1: a single Array []
+	// 2: Matrix of bilateral [,]
+	// 3: Matrix trilogy [,,]
+	int arrayType;
 
-	ArrayType(int, int, int);
+	ArrayType(int, int, int, int);
 	ArrayType(int, Ident *, int, int);
 	//virtual void accept(Visitor *);
 };
@@ -300,7 +320,7 @@ class Ident : public Node
 public:
 	string	name;
 	Sym *symbol;
-	Ident(string , int , int);
+	Ident(string, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -312,7 +332,7 @@ class Expr : public Node
 {
 public:
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
-	int type ;
+	int type;
 	Expr(int, int);
 	virtual void accept(Visitor *);
 };
@@ -379,13 +399,13 @@ public:
 	virtual void accept(Visitor *);
 };
 
-//*******     IdentExpr		*********
-class IdentExpr  : public Expr
+//*******     QualNArrExp		*********
+class QualNArrExp  : public Expr
 {
 public:
-	Ident	*ident;
+	QualNArray	*qualNArray;
 
-	IdentExpr(Ident *, int, int);
+	QualNArrExp(QualNArray *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -393,10 +413,10 @@ public:
 class Assign  : public Expr
 {
 public:
-	Ident	*ident;
-	Expr	*expr;
+	QualNArray	*qualNArray;
+	Expr		*expr;
 
-	Assign(Ident *, Expr *, int, int);
+	Assign(QualNArray *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -404,11 +424,42 @@ public:
 class Invoke  : public Expr
 {
 public:
+	QualName	*qualName;
+	ExprList	*exprList;
+
+	Invoke(QualName *, ExprList *, int, int);
+	virtual void accept(Visitor *);
+};
+
+//*******     InvokeArr		*********
+class InvokeArr : public Expr
+{
+public:
+	QualName	*qualName;
+	ExprList	*exprList;
+	ArrayIndex	*arrayIndex;
+
+	InvokeArr(QualName *, ExprList *, ArrayIndex *, int, int);
+};
+
+//*******     NewObject		*********
+class NewObject : public Expr
+{
+public:
 	Ident		*ident;
 	ExprList	*exprList;
 
-	Invoke(Ident *, ExprList *, int, int);
-	virtual void accept(Visitor *);
+	NewObject(Ident *, ExprList *, int, int);
+};
+
+//*******      NewArr		*********
+class NewArr : public Expr
+{
+public:
+	Ident		*ident;
+	ArrayIndex	*arrayIndex;
+
+	NewArr(Ident *, ArrayIndex *, int, int);
 };
 
 //*******      Equal		*********
@@ -544,7 +595,7 @@ public:
 };
 
 //*******         Or		*********
-class Or  : public Expr
+class Or : public Expr
 {
 public:
 	Expr	*left;
@@ -552,6 +603,16 @@ public:
 
 	Or(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
+};
+
+//*******         Is		*********
+class Is : public Expr
+{
+public:
+	Expr	*expr;
+	Type	*typ;
+
+	Is(Expr *, Type *, int, int);
 };
 
 //*******      Integer		*********
@@ -570,12 +631,12 @@ class Real : public Expr
 public:
 	double value;
 
-	Real(int, int, int);
+	Real(double, int, int);
 	virtual void accept(Visitor *);
 };
 
 //*******       True		*********
-class True  : public Expr
+class True : public Expr
 {
 public:
 	True(int, int);
@@ -583,15 +644,22 @@ public:
 };
 
 //*******      False		*********
-class False  : public Expr
+class False : public Expr
 {
 public:
 	False(int, int);
 	virtual void accept(Visitor *);
 };
 
+//*******       This		*********
+class This : public Expr
+{
+public:
+	This(int, int);
+};
+
 //*******       Null		*********
-class Null  : public Expr
+class Null : public Expr
 {
 public:
 	Null(int, int);
@@ -610,6 +678,7 @@ class ArrayIndex_1 :public ArrayIndex
 {
 public:
 	Expr	*expr1;
+
 	ArrayIndex_1(Expr *, int, int);
 	virtual void accept(Visitor *);
 };
@@ -617,7 +686,9 @@ public:
 class ArrayIndex_2 : public ArrayIndex
 {
 public:
-	Expr	*expr1,  *expr2  ;
+	Expr	*expr1;
+	Expr	*expr2;
+
 	ArrayIndex_2(Expr *,Expr *, int, int);
 	virtual void accept(Visitor *);
 };
@@ -625,15 +696,50 @@ public:
 class ArrayIndex_3 : public ArrayIndex
 {
 public:
-	Expr	*expr1,  *expr2 ,*expr3 ;
-	ArrayIndex_3(Expr *,Expr *,Expr *, int, int);
+	Expr	*expr1;
+	Expr	*expr2;
+	Expr	*expr3;
+
+	ArrayIndex_3(Expr *, Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
-//*******     QualName		*********
-class QualName : public Node
+//*******   QualNameOrArr	*********
+class QualNArray : public Node
 {
 public:
+	Ident   *ident;
+
+	QualNArray(int, int);
+	virtual void accept(Visitor *);
+};
+
+class QualNArray_ID_Index : public QualNArray
+{
+public:
+	ArrayIndex	*index;
+
+	QualNArray_ID_Index(Ident *, ArrayIndex *, int, int);
+	virtual void accept(Visitor *);
+};
+
+class QualNArray_Exp_Index : public QualNArray
+{
+public:
+	Expr  *expr;
+	ArrayIndex *index;
+
+	QualNArray_Exp_Index(Ident*, Expr*,ArrayIndex*,int, int);
+	virtual void accept(Visitor *);
+};
+
+//*******   QualifiedName	*********
+
+class QualName : public QualNArray
+{
+public:
+	Ident   *ident ;
+
 	QualName( int, int);
 	virtual void accept(Visitor *);
 };
@@ -641,7 +747,6 @@ public:
 class QualName_ID : public QualName
 {
 public:
-	Ident   *ident ;
 	QualName_ID(Ident *, int, int);
 	virtual void accept(Visitor *);
 };
@@ -649,53 +754,9 @@ public:
 class QualName_Exp : public QualName
 {
 public:
-	Ident   *ident ;
 	Expr	*expr;
+
 	QualName_Exp(Ident *,Expr * , int, int);
-	virtual void accept(Visitor *);
-};
-
-//*******     QualNArray	*********
-class QualNArray : public Node
-{
-public:
-	QualNArray( int, int);
-	virtual void accept(Visitor *);
-};
-
-class QualNArray_ID : public QualNArray
-{
-public:
-	Ident   *ident ;
-	QualNArray_ID(Ident*, int, int);
-	virtual void accept(Visitor *);
-};
-
-class QualNArray_ID_Index : public QualNArray
-{
-public:
-	Ident   *ident ;
-	ArrayIndex *index;
-	QualNArray_ID_Index( Ident*,ArrayIndex*,int, int);
-	virtual void accept(Visitor *);
-};
-
-class QualNArray_Exp : public QualNArray
-{
-public:
-	Ident   *ident ;
-	Expr  *expr;
-	QualNArray_Exp(Ident*, Expr*,int, int);
-	virtual void accept(Visitor *);
-};
-
-class QualNArray_Exp_Index : public QualNArray
-{
-public:
-	Ident   *ident ;
-	Expr  *expr;
-	ArrayIndex *index;
-	QualNArray_Exp_Index(Ident*, Expr*,ArrayIndex*,int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -725,7 +786,7 @@ public:
 class Stats : public Node
 {
 public:
-	vector<Stat	*>	*insts;
+	vector<Stat	*>	*stats;
 
 	Stats(int, int);
 	Stats(Stat *, int, int);
@@ -738,7 +799,7 @@ class If : public Stat
 {
 public:
 	Expr	*expr;
-	Stat	*inst;
+	Stat	*stat;
 	
 	If(Expr *, Stat *, int, int);
 	virtual void accept(Visitor *);
@@ -759,7 +820,7 @@ class While : public Stat
 {
 public:
 	Expr	*expr;
-	Stat	*inst;
+	Stat	*stat;
 	
 	While(Expr *, Stat *, int, int);
 	virtual void accept(Visitor *);
@@ -769,10 +830,10 @@ public:
 class For : public Stat
 {
 public:
-	Variables_e	*varsDecl;
-	Expr	*exprCond;
-	Expr	*exprCount;
-	Stat	*inst;
+	Variables_e	*variables_e;
+	Expr		*exprCond;
+	Expr		*exprCount;
+	Stat		*stat;
 	
 	For(Variables_e *, Expr *, Expr *, Stat *, int , int );
 	virtual void accept(Visitor *);
@@ -791,8 +852,8 @@ public:
 class VariablesStat : public Stat
 {
 public:
-	Type	*exprType;
-	Variables	*vardecls;
+	Type		*type;
+	Variables	*variables;
 	VariablesStat(Type *, Variables *, int, int);
 	virtual void accept(Visitor *);
 };
@@ -801,7 +862,7 @@ public:
 class Block : public Stat
 {
 public:
-	Stats *insts;
+	Stats *stats;
 
 	Block(Stats *, int , int );
 	virtual void accept(Visitor *);
@@ -820,8 +881,8 @@ public:
 class Variables_e : public Node
 {
 public:
-	Type	*exprType;
-	Variables	*varDecls;
+	Type	*type;
+	Variables	*variables;
 	Variables_e(Type *, Variables *, int, int);
 	virtual void accept(Visitor *);
 };
@@ -929,7 +990,7 @@ public:
 class Visitor
 {
 public:
-	virtual void Visit(ClassDef *) = 0;
+	//virtual void Visit(ClassDef *) = 0;
 	virtual void Visit(Members *) = 0;
 	virtual void Visit(Member  *) = 0;
 	virtual void Visit(Global  *) = 0;
@@ -948,7 +1009,7 @@ public:
 	virtual void Visit(Minus *) = 0;
 	virtual void Visit(Plus *) = 0;
 	virtual void Visit(Paren  *) = 0;
-	virtual void Visit(IdentExpr *) = 0;
+	virtual void Visit(QualNArrExp *) = 0;
 	virtual void Visit(Assign *) = 0;
 	virtual void Visit(Invoke *) = 0;
 	virtual void Visit(Equal *) = 0;
@@ -978,9 +1039,7 @@ public:
 	virtual void Visit(QualName_ID *)=0;
 	virtual void Visit(QualName_Exp *)=0;
 	virtual void Visit(QualNArray *)=0;
-	virtual void Visit(QualNArray_ID *)=0;
 	virtual void Visit(QualNArray_ID_Index *)=0;
-	virtual void Visit(QualNArray_Exp *)=0;
 	virtual void Visit(QualNArray_Exp_Index *)=0;
 
 	virtual void Visit(ExprList *) = 0;
