@@ -122,7 +122,7 @@ root:			  /* empty */
 
 class:		  CLASS IDENT '{' members '}'
 					{
-						$$ = new ClassDef($2, $4, lin, col);						
+						$$ = new Class($2, $4, lin, col);						
 						symtab->AddSym($2, 1, -1);
 										
 					}
@@ -598,9 +598,3 @@ int yyerror(const char *s)
 	printf("parser error at line %d and column %d \n", lin, col);
 	return 0;
 }
-
-
-
-
-
-

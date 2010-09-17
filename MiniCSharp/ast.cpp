@@ -22,11 +22,8 @@ Root::AddClass(Class *cd)
 }
 
 //*******       Class		*********
-Class::Class(int l, int c) : Node(l,c)
-{
-}
 
-ClassDef::ClassDef(Ident *n, Members *ms, int l, int c): Class(l,c)
+Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 {
 	this->name = n;
 	this->members = ms;
@@ -35,15 +32,10 @@ ClassDef::ClassDef(Ident *n, Members *ms, int l, int c): Class(l,c)
 	ms->father = this;
 }
 
-ClassInher::ClassInher(Ident *n, Ident *b, Members *ms, int l, int c) : Class(l,c)
+ClassInher::ClassInher(Ident *n, Ident *b, Members *ms, int l, int c) : Class(n,ms,l,c)
 {
-	this->name = n;
 	this->base = b;
-	this->members = ms;
-
-	n->father = this;
 	b->father = this;
-	ms->father = this;
 }
 
 //*******     Members		*********
@@ -775,14 +767,21 @@ Node::accept(Visitor *v)
 void
 Root::accept(Visitor *v)
 {
-
+	v->Visit(this);
 }
 
-//void
-//ClassDef::accept(Visitor *v)
-//{
-//	v->Visit(this);
-//}
+void
+Class::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+ClassInher::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
 
 void
 Members::accept(Visitor *v)
@@ -801,13 +800,13 @@ Global::accept(Visitor *v)
 {
 	v->Visit(this);
 }
-/*
+
 void
-Constructor::accept(Visitor *)
+Constructor::accept(Visitor *v)
 {
 	v->Visit(this);
 }
-*/
+
 void
 Function::accept(Visitor *v)
 {
@@ -826,7 +825,6 @@ Args::accept(Visitor *v)
 	v->Visit(this);
 }
 
-
 void
 Variables::accept(Visitor *v)
 {
@@ -840,7 +838,25 @@ Variable::accept(Visitor *v)
 }
 
 void
+AccessModif::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
 Type::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+NoArrayType::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+ArrayType::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -907,6 +923,24 @@ Assign::accept(Visitor *v)
 
 void
 Invoke::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+InvokeArr::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+NewObject::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+NewArr::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -990,6 +1024,12 @@ Or::accept(Visitor *v)
 }
 
 void
+Is::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
 Integer::accept(Visitor *v)
 {
 	v->Visit(this);
@@ -1009,6 +1049,12 @@ True::accept(Visitor *v)
 
 void
 False::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+This::accept(Visitor *v)
 {
 	v->Visit(this);
 }

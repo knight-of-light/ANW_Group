@@ -137,31 +137,23 @@ public:
 };
 
 //*******       Class		*********
-
-class Class : public Node
-{
-public:
-	Class(int, int);
-	//virtual void accept(Visitor *);
-};
-
-class ClassDef : public Class		// Class without Inheritance
+class Class : public Node		// Class without Inheritance
 {
 public:
 	Ident	*name;
 	Members	*members;
 
-	ClassDef(Ident *, Members *, int, int);
+	Class(Ident *, Members *, int, int);
+	virtual void accept(Visitor *);
 };
 
 class ClassInher : public Class	// Class with Inheritance
 {
 public:
-	Ident	*name;
 	Ident	*base;
-	Members	*members;
 
 	ClassInher(Ident *, Ident *, Members *, int, int);
+	virtual void accept(Visitor *);
 };
 
 //*******     Members		*********
@@ -204,7 +196,7 @@ public:
 	Stats		*stats;
 
 	Constructor(AccessModif *, Ident *, Args *, Stats *, int, int);
-	//virtual void accept(Visitor *);
+	virtual void accept(Visitor *);
 };
 
 //*******     Function		*********
@@ -275,7 +267,7 @@ public:
 	int acctype;
 
 	AccessModif(int, int, int);
-	//virtual void accept(Visitor *);
+	virtual void accept(Visitor *);
 };
 
 //*******       Type		*********
@@ -297,7 +289,7 @@ public:
 
 	NoArrayType(int, int, int);
 	NoArrayType(Ident *, int, int);
-	//virtual void accept(Visitor *);
+	virtual void accept(Visitor *);
 };
 
 //*******     ArrayType		*********
@@ -311,7 +303,7 @@ public:
 
 	ArrayType(int, int, int, int);
 	ArrayType(int, Ident *, int, int);
-	//virtual void accept(Visitor *);
+	virtual void accept(Visitor *);
 };
 
 //*******       Ident		*********
@@ -440,6 +432,7 @@ public:
 	ArrayIndex	*arrayIndex;
 
 	InvokeArr(QualName *, ExprList *, ArrayIndex *, int, int);
+	virtual void accept(Visitor *);
 };
 
 //*******     NewObject		*********
@@ -450,6 +443,7 @@ public:
 	ExprList	*exprList;
 
 	NewObject(Ident *, ExprList *, int, int);
+	virtual void accept(Visitor *);
 };
 
 //*******      NewArr		*********
@@ -460,6 +454,7 @@ public:
 	ArrayIndex	*arrayIndex;
 
 	NewArr(Ident *, ArrayIndex *, int, int);
+	virtual void accept(Visitor *);
 };
 
 //*******      Equal		*********
@@ -613,6 +608,7 @@ public:
 	Type	*typ;
 
 	Is(Expr *, Type *, int, int);
+	virtual void accept(Visitor *);
 };
 
 //*******      Integer		*********
@@ -656,6 +652,7 @@ class This : public Expr
 {
 public:
 	This(int, int);
+	virtual void accept(Visitor *);
 };
 
 //*******       Null		*********
@@ -990,16 +987,22 @@ public:
 class Visitor
 {
 public:
-	//virtual void Visit(ClassDef *) = 0;
+	virtual void Visit(Root *) = 0;
+	virtual void Visit(Class *) = 0;
+	virtual void Visit(ClassInher *) = 0;
 	virtual void Visit(Members *) = 0;
 	virtual void Visit(Member  *) = 0;
 	virtual void Visit(Global  *) = 0;
+	virtual void Visit(Constructor *) = 0;
 	virtual void Visit(Function *) = 0;
 	virtual void Visit(Args *) = 0;
 	virtual void Visit(Arg  *) = 0;
 	virtual void Visit(Variables *) = 0;
 	virtual void Visit(Variable  *) = 0;
+	virtual void Visit(AccessModif *) = 0;
 	virtual void Visit(Type *) = 0;
+	virtual void Visit(NoArrayType *) = 0;
+	virtual void Visit(ArrayType *) = 0;
 	virtual void Visit(Ident *) = 0;
 
 	virtual void Visit(Expr *) = 0;
@@ -1012,6 +1015,9 @@ public:
 	virtual void Visit(QualNArrExp *) = 0;
 	virtual void Visit(Assign *) = 0;
 	virtual void Visit(Invoke *) = 0;
+	virtual void Visit(InvokeArr *) = 0;
+	virtual void Visit(NewObject *) = 0;
+	virtual void Visit(NewArr *) = 0;
 	virtual void Visit(Equal *) = 0;
 	virtual void Visit(NotEq *) = 0;
 	virtual void Visit(Smaller *) = 0;
@@ -1025,10 +1031,12 @@ public:
 	virtual void Visit(Mod *) = 0;
 	virtual void Visit(And *) = 0;
 	virtual void Visit(Or *) = 0;
+	virtual void Visit(Is *) = 0;
 	virtual void Visit(Integer *) = 0;
 	virtual void Visit(Real *) = 0;
 	virtual void Visit(True *) = 0;
 	virtual void Visit(False *) = 0;
+	virtual void Visit(This *) = 0;
 	virtual void Visit(Null *) = 0;
 
 	virtual void Visit(ArrayIndex *)=0;
