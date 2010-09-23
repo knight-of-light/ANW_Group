@@ -84,7 +84,7 @@
 %left '+' '-'
 %left '*'  '/'  '%'
 %left '!' INCREMENT DECREMENT UNARY_OP
-%nonassoc change_type
+%nonassoc CAST
 %left '.'
 %left '(' 
 
@@ -282,18 +282,18 @@ expression:			  INCREMENT IDENT
 					{
 						// $$ = new Incr($2, true, lin, col);
 						// symtab->IsDeclared($2);
-					} 
+					}
 				| DECREMENT IDENT  
 					{
 						// $$ = new Decr($2, true, lin, col);
 						// symtab->IsDeclared($2);
 					} 
-				| IDENT INCREMENT  
+				| qualnameorarray INCREMENT  
 					{
 						// $$ = new Incr($1, false, lin, col);
 						// symtab->IsDeclared($1);
 					} 
-				| IDENT DECREMENT 
+				| qualnameorarray DECREMENT 
 					{
 						// $$ = new Decr($1, false, lin, col);
 						// symtab->IsDeclared($1);
@@ -393,7 +393,7 @@ expression:			  INCREMENT IDENT
 				| expression IS type
 					{
 					}
-				| '(' arraytype ')' expression %prec change_type
+				| '(' arraytype ')' expression %prec CAST
 					{
 					}
 				| INTEGER 
