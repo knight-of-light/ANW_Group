@@ -31,15 +31,20 @@ Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 {
 	this->name = n;
 	this->members = ms;
-	
 	n->father = this;
 	ms->father = this;
+	this->Parents=new vector<Ident  *>;
 }
-
+void
+Class::AddParent(Ident * cl) 
+{
+	
+}
 ClassInher::ClassInher(Ident *n, Ident *b, Members *ms, int l, int c) : Class(n,ms,l,c)
 {
 	this->base = b;
 	b->father = this;
+	this->Parents=new vector<Ident  *>;
 }
 
 //*******     Members		*********

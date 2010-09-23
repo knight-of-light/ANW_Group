@@ -146,7 +146,8 @@ class Class : public Node		// Class without Inheritance
 public:
 	Ident	*name;
 	Members	*members;
-
+	vector<Ident *>	*Parents;
+	void AddParent(Ident * );
 	Class(Ident *, Members *, int, int);
 	virtual void accept(Visitor *);
 };
@@ -155,7 +156,7 @@ class ClassInher : public Class	// Class with Inheritance
 {
 public:
 	Ident	*base;
-
+	vector<Ident *>	*Parents;
 	ClassInher(Ident *, Ident *, Members *, int, int);
 	virtual void accept(Visitor *);
 };
@@ -936,6 +937,7 @@ public:
 	bool IsDeclared(Ident *id );
 	bool IsDeclared(Ident *id, ExprList *el);
 	bool IsDeclared(Ident *id, Deffered *def);
+	bool IsDeclared(Ident *id , int kind  ,int type );
 	bool AddSym(Ident *id, int kind, int type);
 	bool AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth);	
 

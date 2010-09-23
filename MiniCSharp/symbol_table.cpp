@@ -89,22 +89,40 @@ SymTab::IsDeclared(Ident *id )
 {
 	if(id->symbol!= NULL)
 	{
-	string key =kinds[1]+id->name;
-	Sym *sym = this->Lookup(key);
-	if(sym != NULL)
-	{
-		id->symbol = sym;
-		return true;
-	}
-	}
-	else
-	{
-		this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
-		return false;
-	}
+		string key =kinds[id->symbol->kind]+id->name;
+		Sym *sym = this->Lookup(key);
+		if(sym != NULL)
+		{
+			id->symbol = sym;
+			return true;
+		}
+		}
+		else
+		{
+			this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
+			return false;
+		}
 
 }
+bool
+SymTab::IsDeclared(Ident *id , int kind  ,int type )
+{
 
+		string key =kinds[kind]+id->name;
+		Sym *sym = this->Lookup(key);
+		if(sym != NULL)
+		{
+			id->symbol = sym;
+			return true;
+		}
+	
+		else
+		{
+			this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
+			return false;
+		}
+
+}
 /*
 	SymTab::IsDeclared(Ident *id, ExprList *el)
 	this function is for the case of invoking 

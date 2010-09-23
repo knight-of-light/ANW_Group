@@ -132,7 +132,7 @@ classes:			/**/
 
 class:		  CLASS IDENT '{'
 			{					
-						symtab->AddSym($2, 1, -1);
+						symtab->AddSym($2, 0, -1);
 						symtab->AddNewScope();
 			}
 					 members '}'
@@ -143,17 +143,17 @@ class:		  CLASS IDENT '{'
 			}
 				| CLASS IDENT ':' IDENT '{'
 				{
-						symtab->AddSym($2, 1, -1);
+						symtab->AddSym($2, 0, -1);
+						symtab->IsDeclared($4  ,0 ,-1);
 						symtab->AddNewScope();
 				}
-				
-						 members '}'
+				 members '}'
 					{
 							$$ = new ClassInher($2, $4, $7, lin, col);
+							$$->AddParent($4);
 							symtab->OutScope();		
 					}
 ;
-
 members:		  /* empty */
 					{
 						$$ = new Members(lin, col);
@@ -189,7 +189,6 @@ constructor:	  accessmodif IDENT '(' args_e ')' '{' statements '}'
 
 function:		  accessmodif type IDENT '('
 					{
-						symtab->AddSym($3, 1, -1);
 						symtab->AddNewScope();
 					}				 
 				   args_e ')' '{' statements '}' 
