@@ -7,15 +7,19 @@ Node::Node(int line, int column)
 	this->column = column;
 	this->father = NULL;
 }
-
 //*******     Root		*************
 Root::Root(int l, int c) : Node(l,c)
+{
+}
+
+//*******     Root		*************
+Classes::Classes(int l, int c) : Root(l,c)
 {
 	this->classes = new vector<Class *>;
 }
 
 void
-Root::AddClass(Class *cd)
+Classes::AddClass(Class *cd)
 {
 	this->classes->push_back(cd);
 	cd->father = this;
@@ -764,6 +768,11 @@ Node::accept(Visitor *v)
 
 }
 
+void
+Classes::accept(Visitor *v)
+{
+	v->Visit(this);
+}
 void
 Root::accept(Visitor *v)
 {

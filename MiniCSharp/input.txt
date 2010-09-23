@@ -1,15 +1,20 @@
 class Test
 {	
-	int func(int s, double e) 
-	{
-		int x;
-		x = 7.8 + 5;
-		
-	}
-	int x2 = 4 + 8;
-	int func2(double x1, int d) 
-	{
-		func(7,5.6);
-	}
+int yy;
 
+bool yy;
+}
+class Test
+{
+int yy;
+double jj(){
+}
+double jj(){
+}
+double yy;
+}
+class Test
+{
+double jj(){
+}
 }

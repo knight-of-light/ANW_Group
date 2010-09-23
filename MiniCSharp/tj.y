@@ -19,6 +19,7 @@
 
 %union{
 		Root		*tRoot;
+		Classes		*tClasses;
 		Class		*tClass;
 		Members		*tMembers;
 		Member		*tMember;
@@ -50,8 +51,8 @@
 		Real		*tReal;		
 		Ident		*tIdent;				
 	}
-	
 %type	<tRoot>			root
+%type	<tClasses>			classes
 %type	<tClass>		class
 %type	<tMembers>		members
 %type	<tMember>		member
@@ -107,28 +108,49 @@
 %left '(' 
 
 %%
-root:			  /* empty */
+root:			
+		classes
 					{
 						$$ = new Root(lin, col);
-						file = $$;
-					}
-				| root class
-					{
-						$1->AddClass($2);
-						$$ = $1;
+						symtab->OutScope();
 						file = $$;
 					}
 ;
 
-class:		  CLASS IDENT '{' members '}'
+classes:			/**/
 					{
-						$$ = new Class($2, $4, lin, col);						
-						symtab->AddSym($2, 1, -1);
-										
+						$$ = new Classes(lin, col);
+						symtab->AddNewScope();
 					}
-				| CLASS IDENT ':' IDENT '{' members '}'
+				
+				| classes class
 					{
-						$$ = new ClassInher($2, $4, $6, lin, col);
+						$1->AddClass($2);
+						$$ = $1;
+					}
+;
+
+class:		  CLASS IDENT '{'
+			{					
+						symtab->AddSym($2, 1, -1);
+						symtab->AddNewScope();
+			}
+					 members '}'
+			{
+						$$ = new Class($2, $5, lin, col);	
+						symtab->OutScope();		
+										
+			}
+				| CLASS IDENT ':' IDENT '{'
+				{
+						symtab->AddSym($2, 1, -1);
+						symtab->AddNewScope();
+				}
+				
+						 members '}'
+					{
+							$$ = new ClassInher($2, $4, $7, lin, col);
+							symtab->OutScope();		
 					}
 ;
 
@@ -160,12 +182,14 @@ global:			  accessmodif type variables ';'
 constructor:	  accessmodif IDENT '(' args_e ')' '{' statements '}'
 					{
 						$$ = new Constructor($1, $2, $4, $7, lin, col);
+						symtab->AddSym($2, 1, -1);
 					}
 ;
 
 
 function:		  accessmodif type IDENT '('
 					{
+						symtab->AddSym($3, 1, -1);
 						symtab->AddNewScope();
 					}				 
 				   args_e ')' '{' statements '}' 
@@ -176,6 +200,7 @@ function:		  accessmodif type IDENT '('
 					}
 				| accessmodif VOID IDENT '(' 
 					 {
+						 symtab->AddSym($3, 1, -1);
 						 symtab->AddNewScope();
 					 }				 
 				   args_e ')' '{' statements '}' 
@@ -261,6 +286,7 @@ type:			  noarraytype
 noarraytype:	  IDENT
 					{
 						$$ = new NoArrayType($1, lin, col);
+						 symtab->IsDeclared($1 );
 					}
 				| basictype
 					{$$ = $1;}
@@ -287,18 +313,22 @@ basictype:		  OBJECT
 arraytype:		  IDENT '[' ']'
 					{
 						$$ = new ArrayType(1, $1, lin, col);
+						 symtab->IsDeclared($1 );
 					}
 				| IDENT '[' ',' ']'
 					{
 						$$ = new ArrayType(2, $1, lin, col);
+							 symtab->IsDeclared($1 );
 					}
 				| IDENT '[' ',' ',' ']'
 					{
 						$$ = new ArrayType(3, $1, lin, col);
+							 symtab->IsDeclared($1 );
 					}
 				| basictype '[' ']'
 					{
 						$$ = new ArrayType($1->type, 1, lin, col);
+						
 					}
 				| basictype '[' ',' ']'
 					{
@@ -313,22 +343,22 @@ arraytype:		  IDENT '[' ']'
 expr:			  INCREMENT IDENT
 					{
 						$$ = new Incr($2, true, lin, col);
-						// symtab->IsDeclared($2);
+						 symtab->IsDeclared($2 );
 					} 
 				| DECREMENT IDENT  
 					{
 						$$ = new Decr($2, true, lin, col);
-						// symtab->IsDeclared($2);
+						 symtab->IsDeclared($2);
 					} 
 				| IDENT INCREMENT  
 					{
 						$$ = new Incr($1, false, lin, col);
-						// symtab->IsDeclared($1);
+						 symtab->IsDeclared($1);
 					} 
 				| IDENT DECREMENT 
 					{
 						$$ = new Decr($1, false, lin, col);
-						// symtab->IsDeclared($1);
+						 symtab->IsDeclared($1);
 					}
 				| '!' expr  
 					{
@@ -348,18 +378,14 @@ expr:			  INCREMENT IDENT
 					} 
 				| qualnameorarray 
 					{
-						$$ = new QualNArrExp($1, lin, col);
-						// symtab->IsDeclared($1, def);
 					}  
 				| qualnameorarray '=' expr  
 					{
 						$$ = new Assign($1, $3, lin, col);
-						// symtab->IsDeclared($1);
 					} 
 				| qualifiedname '(' expr_list_e ')'	 
 					{
 						$$ = new Invoke($1, $3, lin, col);
-						// //symtab->IsDeclared($1, $3);
 					}
 				| qualifiedname '(' expr_list_e ')' arrayindex
 					{
@@ -368,10 +394,12 @@ expr:			  INCREMENT IDENT
 				| NEW IDENT '(' expr_list_e ')'
 					{
 						$$ = new NewObject($2, $4, lin, col);
+						symtab->AddSym($2, 1, -1);
 					}
 				| NEW IDENT arrayindex
 					{
 						$$ = new NewArr($2, $3, lin, col);
+						symtab->AddSym($2, 1, -1);
 					}
 				| expr EQ expr 
 					{
@@ -475,28 +503,35 @@ arrayindex:		  '[' expr ']'
 qualifiedname:	  IDENT
 					{
 						$$ = new QualName_ID($1, lin, col);
+						 symtab->IsDeclared($1);
+						
 					}
 				| expr '.' IDENT
 					{
 						$$ = new QualName_Exp($3, $1, lin, col);
+						symtab->IsDeclared($3);
 					}
 ;
 
 qualnameorarray:  IDENT
 					{
 						$$ = new QualName_ID($1, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| IDENT arrayindex
 					{
 						$$ = new QualNArray_ID_Index($1, $2, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| expr '.' IDENT
 					{
 						$$ = new QualName_Exp($3, $1, lin, col);
+						symtab->IsDeclared($3);
 					}
 				| expr '.' IDENT arrayindex
 					{
 						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
+						symtab->IsDeclared($3);
 					}
 ;
 

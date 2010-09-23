@@ -7,15 +7,20 @@
 class TypeVisitor : public Visitor
 {
 public:	
-	//virtual void Visit( ClassDef *);
-	virtual void Visit( Members *);
-	virtual void Visit( Member  *);
+	virtual void Visit(Root *) ;
+	virtual void Visit(Classes *) ;
+	virtual void Visit(Class *) ;
+	virtual void Visit(ClassInher *);
+	virtual void Visit(Members *) ;
+	virtual void Visit(Member  *) ;
 	virtual void Visit( Global  *);
+	virtual void Visit(Constructor *);
 	virtual void Visit( Function *);
 	virtual void Visit( Variables *);
 	virtual void Visit( Variable  *);
 	virtual void Visit( Args *);
 	virtual void Visit( Arg  *);
+	virtual void Visit(AccessModif *) ;
 	virtual void Visit( Type *);
 	virtual void Visit( Ident *);
 	virtual void Visit( Expr *);
@@ -45,7 +50,6 @@ public:
 	virtual void Visit( Block *);
 	virtual void Visit( Return *);
 	virtual void Visit(Variables_e *);
-
 	virtual void Visit(Null *);
 	virtual void Visit(Plus *);
 	virtual void Visit(Decr *);
@@ -69,7 +73,6 @@ public:
 	virtual void Visit(QualNArray *);
 	virtual void Visit(QualNArray_ID_Index *);
 	virtual void Visit(QualNArray_Exp_Index *);
-
 	SymTab *symtab;
 	string types [5];
 };
