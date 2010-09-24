@@ -1,15 +1,47 @@
-class Test
-{	
-	int func(int s, double e) 
+/********** .l, .y Test File **********/
+class A
+{
+/**********members Global**********/			
+
+	static double c = 0.12 ;
+	static int [] d = null ;
+
+/***********members Constructor***********/		
+
+	e (bool f,int g)
 	{
-		int x;
-		x = 7.8 + 5;
-		
+		if (g>=1)
+		{
+		for (int x=1; x<10; x++)//note: int Must to write it here
+			 x=1;
+		}
+		else 
+			return true;
 	}
-	int x2 = 4 + 8;
-	int func2(double x1, int d) 
+
+/***********members Function***********/
+
+	private void h (int i,int c)
 	{
-		func(7,5.6);
+		int m=1;
+		m++;
+		if (m!=0)
+			--m;
+		while (m>10)
+		m++;
 	}
+	
+	bool t (int i)
+	{
+		h(5,5.9);
+		if (i==0.1)
+		{ 
+			return true;
+		}
+	}
+	//h(); Error
+}
+class B:A
+{
 
 }
