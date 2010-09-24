@@ -54,7 +54,7 @@
 %type	<tParam>	args
 
 %type	<tExprType>	type
-%type	<tExpr>		expression	expr_e
+%type	<tExpr>		expr	expression	expr_e
 %type	<tExprList>	expr_list	expr_list_e
 
 %type	<tInsts>	statements
@@ -71,6 +71,8 @@
 %token INSTANCEOF NEW 
 %token THIS NUL PRIVATE STATIC 
 %token VOID RETURN 
+
+%nonassoc EXPRESSION
 
 %nonassoc IF_PREC
 %nonassoc ELSE
@@ -278,12 +280,20 @@ arr_type:		  IDENT '[' ']'
 					}
 ;
 
-expression:			  INCREMENT IDENT
+expression:		  expr %prec EXPRESSION
+					{
+					}
+				| qualnameorarray %prec EXPRESSION
+					{
+					}
+;
+
+expr:			  INCREMENT qualnameorarray
 					{
 						// $$ = new Incr($2, true, lin, col);
 						// symtab->IsDeclared($2);
 					}
-				| DECREMENT IDENT  
+				| DECREMENT qualnameorarray  
 					{
 						// $$ = new Decr($2, true, lin, col);
 						// symtab->IsDeclared($2);
@@ -313,12 +323,7 @@ expression:			  INCREMENT IDENT
 				| '(' expression ')' 
 					{
 						$$ = new Paren($2, lin, col);
-					} 
-				| qualnameorarray 
-					{
-						// $$ = new IdentExpr($1, lin, col);
-						// symtab->IsDeclared($1, def);
-					}  
+					}
 				| qualnameorarray '=' expression  
 					{
 						// $$ = new Assign($1, $3, lin, col);
@@ -338,59 +343,101 @@ expression:			  INCREMENT IDENT
 				| NEW IDENT arrayindex
 					{
 					}
-				| expression EQ expression 
+				| expr EQ expression 
 					{
 						$$ = new Equal($1, $3, lin, col);
-					} 
-				| expression NE expression 
+					}
+				| qualnameorarray EQ expression 
+					{
+					}
+				| expr NE expression 
 					{
 						$$ = new NotEq($1, $3, lin, col);
-					} 
-				| expression '<' expression 
+					}
+				| qualnameorarray NE expression 
+					{
+					}
+				| expr '<' expression 
 					{
 						$$ = new Smaller($1, $3, lin, col);
-					} 
-				| expression SE expression 
+					}
+				| qualnameorarray '<' expression 
+					{
+					}
+				| expr SE expression 
 					{
 						$$ = new LargerEq($1, $3, lin, col);
 					}
-				| expression '>' expression 
+				| qualnameorarray SE expression 
+					{
+					}
+				| expr '>' expression 
 					{
 						$$ = new Larger($1, $3, lin, col);
-					} 
-				| expression LE expression 
+					}
+				| qualnameorarray '>' expression 
+					{
+					}
+				| expr LE expression 
 					{
 						$$ = new SmallerEq($1, $3, lin, col);
-					} 
-				| expression '+' expression 
+					}
+				| qualnameorarray LE expression 
+					{
+					}
+				| expr '+' expression 
 					{
 						$$ = new Add($1, $3, lin, col);
-					} 
-				| expression '-' expression 
+					}
+				| qualnameorarray '+' expression 
+					{
+					}
+				| expr '-' expression 
 					{
 						$$ = new Sub($1, $3, lin, col);
-					} 
-				| expression '*' expression 
+					}
+				| qualnameorarray '-' expression 
+					{
+					}
+				| expr '*' expression 
 					{
 						$$ = new Mult($1, $3, lin, col);
-					} 
-				| expression '/' expression 
+					}
+				| qualnameorarray '*' expression 
+					{
+					}
+				| expr '/' expression 
 					{
 						$$ = new Div($1, $3, lin, col);
-					} 
-				| expression '%' expression 
+					}
+				| qualnameorarray '/' expression 
+					{
+					}
+				| expr '%' expression 
 					{
 						$$ = new Mod($1, $3, lin, col);
-					} 
-				| expression AND expression 
+					}
+				| qualnameorarray '%' expression 
+					{
+					}
+				| expr AND expression 
 					{
 						$$ = new And($1, $3, lin, col);
-					} 
-				| expression OR expression 
+					}
+				| qualnameorarray AND expression 
+					{
+					}
+				| expr OR expression 
 					{
 						$$ = new Or($1, $3, lin, col);
 					}
-				| expression IS type
+				| qualnameorarray OR expression 
+					{
+					}
+				| expr IS type
+					{
+					}
+				| qualnameorarray IS type
 					{
 					}
 				| '(' arraytype ')' expression %prec CAST
@@ -435,7 +482,10 @@ arrayindex:		  '[' expression ']'
 qualifiedname:		  IDENT
 					{
 					}
-				| expression '.' IDENT
+				| expr '.' IDENT
+					{
+					}
+				| qualnameorarray '.' IDENT
 					{
 					}
 ;
@@ -446,10 +496,16 @@ qualnameorarray:		  IDENT
 				| IDENT arrayindex
 					{
 					}
-				| expression '.' IDENT
+				| expr '.' IDENT
 					{
 					}
-				| expression '.' IDENT arrayindex
+				| qualnameorarray '.' IDENT
+					{
+					}
+				| expr '.' IDENT arrayindex
+					{
+					}
+				| qualnameorarray '.' IDENT arrayindex
 					{
 					}
 ;
