@@ -2,6 +2,7 @@
 
 Sym::Sym(string name, int kind, int type)
 {
+
 	this->name = name;
 	this->kind = kind;
 	this->type = type;
@@ -49,6 +50,9 @@ SymTab::SymTab(Errors *errors)
 	types[2] = "double";
 	types[3] = "BOOL";
 	types[4] = "void";
+	kinds[0] = "c";//class
+	kinds[1] = "f";//function
+	kinds[2] = "v";//variable
 }
 
 void
@@ -81,21 +85,44 @@ SymTab::Lookup(std::string name)
 }
 
 bool
-SymTab::IsDeclared(Ident *id)
+SymTab::IsDeclared(Ident *id )
 {
-	Sym *sym = this->Lookup(id->name);
-	if(sym != NULL)
+	if(id->symbol!= NULL)
 	{
-		id->symbol = sym;
-		return true;
-	}
-	else
-	{
-		this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
-		return false;
-	}
-}
+		string key =kinds[id->symbol->kind]+id->name;
+		Sym *sym = this->Lookup(key);
+		if(sym != NULL)
+		{
+			id->symbol = sym;
+			return true;
+		}
+		}
+		else
+		{
+			this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
+			return false;
+		}
 
+}
+bool
+SymTab::IsDeclared(Ident *id , int kind  ,int type )
+{
+
+		string key =kinds[kind]+id->name;
+		Sym *sym = this->Lookup(key);
+		if(sym != NULL)
+		{
+			id->symbol = sym;
+			return true;
+		}
+	
+		else
+		{
+			this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
+			return false;
+		}
+
+}
 /*
 	SymTab::IsDeclared(Ident *id, ExprList *el)
 	this function is for the case of invoking 
@@ -104,7 +131,7 @@ SymTab::IsDeclared(Ident *id)
 bool
 SymTab::IsDeclared(Ident *id, ExprList *el)
 {
-	string key = id->name;
+	string key=id->name;
 	for(int i = 0 ; i < el->exprList->size(); i++)
 	{
 		int t = el->exprList->at(i)->type;
@@ -124,9 +151,10 @@ SymTab::IsDeclared(Ident *id, ExprList *el)
 }
 
 bool
-SymTab::IsDeclared(Ident *id, Deffered *def)
+SymTab::IsDeclared(Ident *id, Deffered *def )
 {
-	Sym *sym = this->Lookup(id->name);
+	string key=id->name;
+	Sym *sym = this->Lookup(key);
 	if(sym != NULL)
 	{
 		id->symbol = sym;
@@ -142,11 +170,11 @@ SymTab::IsDeclared(Ident *id, Deffered *def)
 bool
 SymTab::AddSym(Ident *id, int kind, int type)
 {
-	string key = id->name;
+	string key =kinds[kind]+id->name;
 	if(this->Lookup(key) == NULL)
 	{
-		Sym *sym = new Sym(id->name, kind, type);
-		this->current->hashTab->AddKey(id->name, sym);
+		Sym *sym = new Sym(key, kind, type);
+		this->current->hashTab->AddKey(key, sym);
 		id->symbol = sym;
 		return true;
 	}

@@ -8,7 +8,7 @@ class A
 
 /***********members Constructor***********/		
 
-	e (bool f,int g)
+	void e (bool f,int g)
 	{
 		if (g>=1)
 		{

@@ -13,12 +13,13 @@
 	extern int col;
 	
 	extern SymTab *symtab;
-	Root *file;	
+	File *file;	
 	extern Deffered *def;
 %}
 
 %union{
 		Root		*tRoot;
+		File		*tFile;
 		Class		*tClass;
 		Members		*tMembers;
 		Member		*tMember;
@@ -50,7 +51,7 @@
 		Real		*tReal;		
 		Ident		*tIdent;				
 	}
-	
+%type	<tFile>		file
 %type	<tRoot>			root
 %type	<tClass>		class
 %type	<tMembers>		members
@@ -108,31 +109,51 @@
 %left '(' 
 
 %%
-root:			  /* empty */
+file:			root
 					{
-						$$ = new Root(lin, col);
+						$$ = new File(lin, col);
+						symtab->OutScope();
 						file = $$;
 					}
+;
+
+root:			/* empty */
+					{
+						$$ = new Root(lin, col);
+						symtab->AddNewScope();
+					}
+				
 				| root class
 					{
 						$1->AddClass($2);
 						$$ = $1;
-						file = $$;
 					}
 ;
 
-class:		  CLASS IDENT '{' members '}'
-					{
-						$$ = new Class($2, $4, lin, col);						
-						symtab->AddSym($2, 1, -1);
+class:		  CLASS IDENT '{'
+			{					
+						symtab->AddSym($2, 0, -1);
+						symtab->AddNewScope();
+			}
+					 members '}'
+			{
+						$$ = new Class($2, $5, lin, col);	
+						symtab->OutScope();		
 										
-					}
-				| CLASS IDENT ':' IDENT '{' members '}'
+			}
+				| CLASS IDENT ':' IDENT '{'
+				{
+						symtab->AddSym($2, 0, -1);
+						symtab->IsDeclared($4  ,0 ,-1);
+						symtab->AddNewScope();
+				}
+				 members '}'
 					{
-						$$ = new ClassInher($2, $4, $6, lin, col);
+							$$ = new ClassInher($2, $4, $7, lin, col);
+							$$->AddParent($4);
+							symtab->OutScope();		
 					}
 ;
-
 members:		  /* empty */
 					{
 						$$ = new Members(lin, col);
@@ -161,6 +182,7 @@ global:			  accessmodif type variables ';'
 constructor:	  accessmodif IDENT '(' args_e ')' '{' statements '}'
 					{
 						$$ = new Constructor($1, $2, $4, $7, lin, col);
+						symtab->AddSym($2, 1, -1);
 					}
 ;
 
@@ -177,6 +199,7 @@ function:		  accessmodif type IDENT '('
 					}
 				| accessmodif VOID IDENT '(' 
 					 {
+						 symtab->AddSym($3, 1, -1);
 						 symtab->AddNewScope();
 					 }				 
 				   args_e ')' '{' statements '}' 
@@ -262,6 +285,7 @@ type:			  noarraytype
 noarraytype:	  IDENT
 					{
 						$$ = new NoArrayType($1, lin, col);
+						 symtab->IsDeclared($1 );
 					}
 				| basictype
 					{$$ = $1;}
@@ -288,18 +312,22 @@ basictype:		  OBJECT
 arraytype:		  IDENT '[' ']'
 					{
 						$$ = new ArrayType(1, $1, lin, col);
+						 symtab->IsDeclared($1 );
 					}
 				| IDENT '[' ',' ']'
 					{
 						$$ = new ArrayType(2, $1, lin, col);
+							 symtab->IsDeclared($1 );
 					}
 				| IDENT '[' ',' ',' ']'
 					{
 						$$ = new ArrayType(3, $1, lin, col);
+							 symtab->IsDeclared($1 );
 					}
 				| basictype '[' ']'
 					{
 						$$ = new ArrayType($1->type, 1, lin, col);
+						
 					}
 				| basictype '[' ',' ']'
 					{
@@ -322,7 +350,6 @@ expression:		  expr %prec EXPRESSION
 expr:			  INCREMENT qualnameorarray
 					{
 						// $$ = new Incr($2, true, lin, col);
-						// symtab->IsDeclared($2);
 					}
 				| DECREMENT qualnameorarray  
 					{
@@ -364,12 +391,10 @@ expr:			  INCREMENT qualnameorarray
 				| qualnameorarray '=' expression  
 					{
 						$$ = new Assign($1, $3, lin, col);
-						// symtab->IsDeclared($1);
 					} 
 				| qualifiedname '(' expr_list_e ')'	 
 					{
 						$$ = new Invoke($1, $3, lin, col);
-						// //symtab->IsDeclared($1, $3);
 					}
 				| qualifiedname '(' expr_list_e ')' arrayindex
 					{
@@ -378,10 +403,12 @@ expr:			  INCREMENT qualnameorarray
 				| NEW IDENT '(' expr_list_e ')'
 					{
 						$$ = new NewObject($2, $4, lin, col);
+						symtab->AddSym($2, 1, -1);
 					}
 				| NEW IDENT arrayindex
 					{
 						$$ = new NewArr($2, $3, lin, col);
+						symtab->AddSym($2, 1, -1);
 					}
 				| expr EQ expression 
 					{
@@ -530,10 +557,13 @@ arrayindex:		  '[' expression ']'
 qualifiedname:	  IDENT
 					{
 						$$ = new QualName_ID($1, lin, col);
+						 symtab->IsDeclared($1);
+						
 					}
 				| expr '.' IDENT
 					{
 						$$ = new QualName_Exp($3, $1, lin, col);
+						symtab->IsDeclared($3);
 					}
 				| qualnameorarray '.' IDENT
 					{
@@ -543,14 +573,17 @@ qualifiedname:	  IDENT
 qualnameorarray:  IDENT
 					{
 						$$ = new QualName_ID($1, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| IDENT arrayindex
 					{
 						$$ = new QualNArray_ID_Index($1, $2, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| expr '.' IDENT
 					{
 						$$ = new QualName_Exp($3, $1, lin, col);
+						symtab->IsDeclared($3);
 					}
 				| qualnameorarray '.' IDENT
 					{
@@ -558,6 +591,7 @@ qualnameorarray:  IDENT
 				| expr '.' IDENT arrayindex
 					{
 						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
+						symtab->IsDeclared($3);
 					}
 				| qualnameorarray '.' IDENT arrayindex
 					{

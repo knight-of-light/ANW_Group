@@ -7,9 +7,13 @@ Node::Node(int line, int column)
 	this->column = column;
 	this->father = NULL;
 }
+//*******     File		*************
+File::File(int l, int c) : Node(l,c)
+{
+}
 
 //*******     Root		*************
-Root::Root(int l, int c) : Node(l,c)
+Root::Root(int l, int c) : File(l,c)
 {
 	this->classes = new vector<Class *>;
 }
@@ -27,15 +31,20 @@ Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 {
 	this->name = n;
 	this->members = ms;
-	
 	n->father = this;
 	ms->father = this;
+	this->Parents=new vector<Ident  *>;
 }
-
+void
+Class::AddParent(Ident * cl) 
+{
+	
+}
 ClassInher::ClassInher(Ident *n, Ident *b, Members *ms, int l, int c) : Class(n,ms,l,c)
 {
 	this->base = b;
 	b->father = this;
+	this->Parents=new vector<Ident  *>;
 }
 
 //*******     Members		*********
@@ -764,6 +773,11 @@ Node::accept(Visitor *v)
 
 }
 
+void
+File::accept(Visitor *v)
+{
+	v->Visit(this);
+}
 void
 Root::accept(Visitor *v)
 {

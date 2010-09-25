@@ -489,3 +489,27 @@ void
 TypeVisitor::Visit(QualNArray_Exp_Index *n){
 	
 }
+void
+TypeVisitor::Visit(AccessModif *n){
+	
+}
+void
+TypeVisitor::Visit(Constructor *n){
+	
+}
+void
+TypeVisitor::Visit(ClassInher *n){
+	
+}
+void
+TypeVisitor::Visit(Class *n){
+	
+}
+void
+TypeVisitor::Visit(File *n){
+	
+}
+void
+TypeVisitor::Visit(Root *n){
+	
+}

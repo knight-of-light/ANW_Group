@@ -10,7 +10,7 @@ extern int yyerror(const char *);
 extern int yydebug;
 extern int yyparse();
 
-extern Root *file;
+extern File *file;
 
 extern int lineno;
 extern int columnno;
@@ -34,9 +34,9 @@ int main(int argsc, char **argsv)
 	
 	yydebug = 0;
     yyparse();
-	//cout << "Syntactical analysis was done successfully! " << endl;
+	cout << "Syntactical analysis was done successfully! " << endl;
 	
-	/*def->CheckAll(symtab);
+	def->CheckAll(symtab);
 
 	if(errors->messages->size() > 0)
 	{
@@ -46,9 +46,9 @@ int main(int argsc, char **argsv)
 	{
 		TypeVisitor *tv = new TypeVisitor;
 		tv->symtab = symtab;
-		classDef->accept(tv);
+		file->accept(tv);
 		errors->Print();
-	}*/
+	}
 	
 	
     return 0;
