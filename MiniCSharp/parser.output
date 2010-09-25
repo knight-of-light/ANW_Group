@@ -1,9 +1,3 @@
-Terminals which are not used
-
-   EXTENDS
-   INSTANCEOF
-
-
 Grammar
 
     0 $accept: root $end
@@ -45,7 +39,7 @@ Grammar
    22          | variables ',' variable
 
    23 variable: IDENT
-   24         | IDENT '=' expr
+   24         | IDENT '=' expression
 
    25 accessmodif: /* empty */
    26            | PRIVATE
@@ -59,7 +53,7 @@ Grammar
    32            | basictype
 
    33 basictype: OBJECT
-   34          | BOOLEAN
+   34          | BOOL
    35          | INT
    36          | DOUBLE
 
@@ -70,210 +64,245 @@ Grammar
    41          | basictype '[' ',' ']'
    42          | basictype '[' ',' ',' ']'
 
-   43 expr: INCREMENT IDENT
-   44     | DECREMENT IDENT
-   45     | IDENT INCREMENT
-   46     | IDENT DECREMENT
-   47     | '!' expr
-   48     | '-' expr
-   49     | '+' expr
-   50     | '(' expr ')'
-   51     | qualnameorarray
-   52     | qualnameorarray '=' expr
-   53     | qualifiedname '(' expr_list_e ')'
-   54     | qualifiedname '(' expr_list_e ')' arrayindex
-   55     | NEW IDENT '(' expr_list_e ')'
-   56     | NEW IDENT arrayindex
-   57     | expr EQ expr
-   58     | expr NE expr
-   59     | expr '<' expr
-   60     | expr SE expr
-   61     | expr '>' expr
-   62     | expr LE expr
-   63     | expr '+' expr
-   64     | expr '-' expr
-   65     | expr '*' expr
-   66     | expr '/' expr
-   67     | expr '%' expr
-   68     | expr AND expr
-   69     | expr OR expr
-   70     | expr IS type
-   71     | '(' basictype ')' expr
-   72     | INTEGER
-   73     | REAL
-   74     | TRUE
-   75     | FALSE
-   76     | THIS
-   77     | NUL
+   43 expression: expr
+   44           | qualnameorarray
 
-   78 arrayindex: '[' expr ']'
-   79           | '[' expr ',' expr ']'
-   80           | '[' expr ',' expr ',' expr ']'
+   45 expr: INCREMENT qualnameorarray
+   46     | DECREMENT qualnameorarray
+   47     | qualnameorarray INCREMENT
+   48     | qualnameorarray DECREMENT
+   49     | '!' expression
+   50     | '-' expression
+   51     | '+' expression
+   52     | '(' expr ')'
+   53     | '(' IDENT ')'
+   54     | '(' qnora_without_id ')'
+   55     | qualnameorarray '=' expression
+   56     | qualifiedname '(' expr_list_e ')'
+   57     | qualifiedname '(' expr_list_e ')' arrayindex
+   58     | NEW IDENT '(' expr_list_e ')'
+   59     | NEW IDENT arrayindex
+   60     | expr EQ expression
+   61     | qualnameorarray EQ expression
+   62     | expr NE expression
+   63     | qualnameorarray NE expression
+   64     | expr '<' expression
+   65     | qualnameorarray '<' expression
+   66     | expr SE expression
+   67     | qualnameorarray SE expression
+   68     | expr '>' expression
+   69     | qualnameorarray '>' expression
+   70     | expr LE expression
+   71     | qualnameorarray LE expression
+   72     | expr '+' expression
+   73     | qualnameorarray '+' expression
+   74     | expr '-' expression
+   75     | qualnameorarray '-' expression
+   76     | expr '*' expression
+   77     | qualnameorarray '*' expression
+   78     | expr '/' expression
+   79     | qualnameorarray '/' expression
+   80     | expr '%' expression
+   81     | qualnameorarray '%' expression
+   82     | expr AND expression
+   83     | qualnameorarray AND expression
+   84     | expr OR expression
+   85     | qualnameorarray OR expression
+   86     | expr IS type
+   87     | qualnameorarray IS type
+   88     | '(' basictype ')' expression
+   89     | '(' IDENT ')' expression
+   90     | INTEGER
+   91     | REAL
+   92     | TRUE
+   93     | FALSE
+   94     | THIS
+   95     | NUL
 
-   81 qualifiedname: IDENT
-   82              | expr '.' IDENT
+   96 arrayindex: '[' expression ']'
+   97           | '[' expression ',' expression ']'
+   98           | '[' expression ',' expression ',' expression ']'
 
-   83 qualnameorarray: IDENT
-   84                | IDENT arrayindex
-   85                | expr '.' IDENT
-   86                | expr '.' IDENT arrayindex
+   99 qualifiedname: IDENT
+  100              | expr '.' IDENT
+  101              | qualnameorarray '.' IDENT
 
-   87 expr_list: expr
-   88          | expr_list ',' expr
+  102 qualnameorarray: IDENT
+  103                | IDENT arrayindex
+  104                | expr '.' IDENT
+  105                | qualnameorarray '.' IDENT
+  106                | expr '.' IDENT arrayindex
+  107                | qualnameorarray '.' IDENT arrayindex
 
-   89 expr_list_e: /* empty */
-   90            | expr_list
+  108 qnora_without_id: IDENT arrayindex
+  109                 | expr '.' IDENT
+  110                 | qualnameorarray '.' IDENT
+  111                 | expr '.' IDENT arrayindex
+  112                 | qualnameorarray '.' IDENT arrayindex
 
-   91 statement: IF '(' expr ')' statement
-   92          | IF '(' expr ')' statement ELSE statement
-   93          | WHILE '(' expr ')' statement
-   94          | FOR '(' variables_e ';' expr_e ';' expr_e ')' statement
-   95          | expr ';'
-   96          | type variables ';'
+  113 expr_list: expression
+  114          | expr_list ',' expression
 
-   97 @3: /* empty */
+  115 expr_list_e: /* empty */
+  116            | expr_list
 
-   98 statement: '{' @3 statements '}'
-   99          | RETURN expr_e ';'
+  117 statement: IF '(' expression ')' statement
+  118          | IF '(' expression ')' statement ELSE statement
+  119          | WHILE '(' expression ')' statement
+  120          | FOR '(' variables_e ';' expr_e ';' expr_e ')' statement
+  121          | expression ';'
+  122          | type variables ';'
 
-  100 statements: /* empty */
-  101           | statements statement
+  123 @3: /* empty */
 
-  102 variables_e: /* empty */
-  103            | type variables
+  124 statement: '{' @3 statements '}'
+  125          | RETURN expr_e ';'
 
-  104 expr_e: /* empty */
-  105       | expr
+  126 statements: /* empty */
+  127           | statements statement
+
+  128 variables_e: /* empty */
+  129            | type variables
+
+  130 expr_e: /* empty */
+  131       | expression
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'!' (33) 47
-'%' (37) 67
-'(' (40) 11 13 15 50 53 54 55 71 91 92 93 94
-')' (41) 11 13 15 50 53 54 55 71 91 92 93 94
-'*' (42) 65
-'+' (43) 49 63
-',' (44) 18 22 38 39 41 42 79 80 88
-'-' (45) 48 64
-'.' (46) 82 85 86
-'/' (47) 66
+'!' (33) 49
+'%' (37) 80 81
+'(' (40) 11 13 15 52 53 54 56 57 58 88 89 117 118 119 120
+')' (41) 11 13 15 52 53 54 56 57 58 88 89 117 118 119 120
+'*' (42) 76 77
+'+' (43) 51 72 73
+',' (44) 18 22 38 39 41 42 97 98 114
+'-' (45) 50 74 75
+'.' (46) 100 101 104 105 106 107 109 110 111 112
+'/' (47) 78 79
 ':' (58) 4
-';' (59) 10 94 95 96 99
-'<' (60) 59
-'=' (61) 24 52
-'>' (62) 61
-'[' (91) 37 38 39 40 41 42 78 79 80
-']' (93) 37 38 39 40 41 42 78 79 80
-'{' (123) 3 4 11 13 15 98
-'}' (125) 3 4 11 13 15 98
+';' (59) 10 120 121 122 125
+'<' (60) 64 65
+'=' (61) 24 55
+'>' (62) 68 69
+'[' (91) 37 38 39 40 41 42 96 97 98
+']' (93) 37 38 39 40 41 42 96 97 98
+'{' (123) 3 4 11 13 15 124
+'}' (125) 3 4 11 13 15 124
 error (256)
-IDENT (258) 3 4 11 13 15 16 23 24 31 37 38 39 43 44 45 46 55 56 81
-    82 83 84 85 86
-INTEGER (259) 72
-REAL (260) 73
+IDENT (258) 3 4 11 13 15 16 23 24 31 37 38 39 53 58 59 89 99 100 101
+    102 103 104 105 106 107 108 109 110 111 112
+INTEGER (259) 90
+REAL (260) 91
 CLASS (261) 3 4
-BOOLEAN (262) 34
+BOOL (262) 34
 DOUBLE (263) 36
 INT (264) 35
-IS (265) 70
+IS (265) 86 87
 OBJECT (266) 33
-IF (267) 91 92
-ELSE (268) 92
-WHILE (269) 93
-FOR (270) 94
-FALSE (271) 75
-TRUE (272) 74
-EXTENDS (273)
-INSTANCEOF (274)
-NEW (275) 55 56
-THIS (276) 76
-NUL (277) 77
-PRIVATE (278) 26 28
-STATIC (279) 27 28
-VOID (280) 15
-RETURN (281) 99
-IF_PREC (282)
-OR (283) 69
-AND (284) 68
-NE (285) 58
-EQ (286) 57
-SE (287) 60
-LE (288) 62
+IF (267) 117 118
+ELSE (268) 118
+WHILE (269) 119
+FOR (270) 120
+FALSE (271) 93
+TRUE (272) 92
+NEW (273) 58 59
+THIS (274) 94
+NUL (275) 95
+PRIVATE (276) 26 28
+STATIC (277) 27 28
+VOID (278) 15
+RETURN (279) 125
+EXPRESSION (280)
+IF_PREC (281)
+OR (282) 84 85
+AND (283) 82 83
+NE (284) 62 63
+EQ (285) 60 61
+SE (286) 66 67
+LE (287) 70 71
+CAST (288)
 UNARY_OP (289)
-DECREMENT (290) 44 46
-INCREMENT (291) 43 45
-change_type (292)
+DECREMENT (290) 46 48
+INCREMENT (291) 45 47
 
 
 Nonterminals, with rules where they appear
 
-$accept (57)
+$accept (56)
     on left: 0
-root (58)
+root (57)
     on left: 1 2, on right: 0 2
-class (59)
+class (58)
     on left: 3 4, on right: 2
-members (60)
+members (59)
     on left: 5 6, on right: 3 4 6
-member (61)
+member (60)
     on left: 7 8 9, on right: 6
-global (62)
+global (61)
     on left: 10, on right: 7
-constructor (63)
+constructor (62)
     on left: 11, on right: 8
-function (64)
+function (63)
     on left: 13 15, on right: 9
-@1 (65)
+@1 (64)
     on left: 12, on right: 13
-@2 (66)
+@2 (65)
     on left: 14, on right: 15
-arg (67)
+arg (66)
     on left: 16, on right: 17 18
-args (68)
+args (67)
     on left: 17 18, on right: 18 20
-args_e (69)
+args_e (68)
     on left: 19 20, on right: 11 13 15
-variables (70)
-    on left: 21 22, on right: 10 22 96 103
-variable (71)
+variables (69)
+    on left: 21 22, on right: 10 22 122 129
+variable (70)
     on left: 23 24, on right: 21 22
-accessmodif (72)
+accessmodif (71)
     on left: 25 26 27 28, on right: 10 11 13 15
-type (73)
-    on left: 29 30, on right: 10 13 16 70 96 103
-noarraytype (74)
+type (72)
+    on left: 29 30, on right: 10 13 16 86 87 122 129
+noarraytype (73)
     on left: 31 32, on right: 29
-basictype (75)
-    on left: 33 34 35 36, on right: 32 40 41 42 71
-arraytype (76)
+basictype (74)
+    on left: 33 34 35 36, on right: 32 40 41 42 88
+arraytype (75)
     on left: 37 38 39 40 41 42, on right: 30
+expression (76)
+    on left: 43 44, on right: 24 49 50 51 55 60 61 62 63 64 65 66 67
+    68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 88 89 96
+    97 98 113 114 117 118 119 121 131
 expr (77)
-    on left: 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60
-    61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77,
-    on right: 24 47 48 49 50 52 57 58 59 60 61 62 63 64 65 66 67 68
-    69 70 71 78 79 80 82 85 86 87 88 91 92 93 95 105
+    on left: 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62
+    63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83
+    84 85 86 87 88 89 90 91 92 93 94 95, on right: 43 52 60 62 64 66
+    68 70 72 74 76 78 80 82 84 86 100 104 106 109 111
 arrayindex (78)
-    on left: 78 79 80, on right: 54 56 84 86
+    on left: 96 97 98, on right: 57 59 103 106 107 108 111 112
 qualifiedname (79)
-    on left: 81 82, on right: 53 54
+    on left: 99 100 101, on right: 56 57
 qualnameorarray (80)
-    on left: 83 84 85 86, on right: 51 52
-expr_list (81)
-    on left: 87 88, on right: 88 90
-expr_list_e (82)
-    on left: 89 90, on right: 53 54 55
-statement (83)
-    on left: 91 92 93 94 95 96 98 99, on right: 91 92 93 94 101
-@3 (84)
-    on left: 97, on right: 98
-statements (85)
-    on left: 100 101, on right: 11 13 15 98 101
-variables_e (86)
-    on left: 102 103, on right: 94
-expr_e (87)
-    on left: 104 105, on right: 94 99
+    on left: 102 103 104 105 106 107, on right: 44 45 46 47 48 55 61
+    63 65 67 69 71 73 75 77 79 81 83 85 87 101 105 107 110 112
+qnora_without_id (81)
+    on left: 108 109 110 111 112, on right: 54
+expr_list (82)
+    on left: 113 114, on right: 114 116
+expr_list_e (83)
+    on left: 115 116, on right: 56 57 58
+statement (84)
+    on left: 117 118 119 120 121 122 124 125, on right: 117 118 119
+    120 127
+@3 (85)
+    on left: 123, on right: 124
+statements (86)
+    on left: 126 127, on right: 11 13 15 124 127
+variables_e (87)
+    on left: 128 129, on right: 120
+expr_e (88)
+    on left: 130 131, on right: 120 125
 
 
 state 0
@@ -427,12 +456,12 @@ state 17
    13 function: accessmodif . type IDENT '(' @1 args_e ')' '{' statements '}'
    15         | accessmodif . VOID IDENT '(' @2 args_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 20
-    BOOLEAN  shift, and go to state 21
-    DOUBLE   shift, and go to state 22
-    INT      shift, and go to state 23
-    OBJECT   shift, and go to state 24
-    VOID     shift, and go to state 25
+    IDENT   shift, and go to state 20
+    BOOL    shift, and go to state 21
+    DOUBLE  shift, and go to state 22
+    INT     shift, and go to state 23
+    OBJECT  shift, and go to state 24
+    VOID    shift, and go to state 25
 
     type         go to state 26
     noarraytype  go to state 27
@@ -472,7 +501,7 @@ state 20
 
 state 21
 
-   34 basictype: BOOLEAN .
+   34 basictype: BOOL .
 
     $default  reduce using rule 34 (basictype)
 
@@ -564,11 +593,11 @@ state 31
 
    11 constructor: accessmodif IDENT '(' . args_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 39
-    BOOLEAN  shift, and go to state 21
-    DOUBLE   shift, and go to state 22
-    INT      shift, and go to state 23
-    OBJECT   shift, and go to state 24
+    IDENT   shift, and go to state 39
+    BOOL    shift, and go to state 21
+    DOUBLE  shift, and go to state 22
+    INT     shift, and go to state 23
+    OBJECT  shift, and go to state 24
 
     $default  reduce using rule 19 (args_e)
 
@@ -602,7 +631,7 @@ state 34
 
    13 function: accessmodif type IDENT . '(' @1 args_e ')' '{' statements '}'
    23 variable: IDENT .
-   24         | IDENT . '=' expr
+   24         | IDENT . '=' expression
 
     '='  shift, and go to state 47
     '('  shift, and go to state 48
@@ -713,7 +742,7 @@ state 46
 
 state 47
 
-   24 variable: IDENT '=' . expr
+   24 variable: IDENT '=' . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -730,9 +759,10 @@ state 47
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 73
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 73
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 48
@@ -741,7 +771,7 @@ state 48
 
     $default  reduce using rule 12 (@1)
 
-    @1  go to state 76
+    @1  go to state 77
 
 
 state 49
@@ -755,9 +785,9 @@ state 50
 
    22 variables: variables ',' . variable
 
-    IDENT  shift, and go to state 77
+    IDENT  shift, and go to state 78
 
-    variable  go to state 78
+    variable  go to state 79
 
 
 state 51
@@ -765,8 +795,8 @@ state 51
    41 arraytype: basictype '[' ',' . ']'
    42          | basictype '[' ',' . ',' ']'
 
-    ','  shift, and go to state 79
-    ']'  shift, and go to state 80
+    ','  shift, and go to state 80
+    ']'  shift, and go to state 81
 
 
 state 52
@@ -780,13 +810,13 @@ state 53
 
    18 args: args ',' . arg
 
-    IDENT    shift, and go to state 39
-    BOOLEAN  shift, and go to state 21
-    DOUBLE   shift, and go to state 22
-    INT      shift, and go to state 23
-    OBJECT   shift, and go to state 24
+    IDENT   shift, and go to state 39
+    BOOL    shift, and go to state 21
+    DOUBLE  shift, and go to state 22
+    INT     shift, and go to state 23
+    OBJECT  shift, and go to state 24
 
-    arg          go to state 81
+    arg          go to state 82
     type         go to state 43
     noarraytype  go to state 27
     basictype    go to state 28
@@ -797,7 +827,7 @@ state 54
 
    11 constructor: accessmodif IDENT '(' args_e ')' . '{' statements '}'
 
-    '{'  shift, and go to state 82
+    '{'  shift, and go to state 83
 
 
 state 55
@@ -811,7 +841,7 @@ state 56
 
    39 arraytype: IDENT '[' ',' ',' . ']'
 
-    ']'  shift, and go to state 83
+    ']'  shift, and go to state 84
 
 
 state 57
@@ -825,17 +855,17 @@ state 58
 
    15 function: accessmodif VOID IDENT '(' @2 . args_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 39
-    BOOLEAN  shift, and go to state 21
-    DOUBLE   shift, and go to state 22
-    INT      shift, and go to state 23
-    OBJECT   shift, and go to state 24
+    IDENT   shift, and go to state 39
+    BOOL    shift, and go to state 21
+    DOUBLE  shift, and go to state 22
+    INT     shift, and go to state 23
+    OBJECT  shift, and go to state 24
 
     $default  reduce using rule 19 (args_e)
 
     arg          go to state 40
     args         go to state 41
-    args_e       go to state 84
+    args_e       go to state 85
     type         go to state 43
     noarraytype  go to state 27
     basictype    go to state 28
@@ -844,75 +874,71 @@ state 58
 
 state 59
 
-   45 expr: IDENT . INCREMENT
-   46     | IDENT . DECREMENT
-   81 qualifiedname: IDENT .
-   83 qualnameorarray: IDENT .
-   84                | IDENT . arrayindex
+   99 qualifiedname: IDENT .
+  102 qualnameorarray: IDENT .
+  103                | IDENT . arrayindex
 
-    DECREMENT  shift, and go to state 85
-    INCREMENT  shift, and go to state 86
-    '['        shift, and go to state 87
+    '['  shift, and go to state 86
 
-    '('       reduce using rule 81 (qualifiedname)
-    $default  reduce using rule 83 (qualnameorarray)
+    '('       reduce using rule 99 (qualifiedname)
+    $default  reduce using rule 102 (qualnameorarray)
 
-    arrayindex  go to state 88
+    arrayindex  go to state 87
 
 
 state 60
 
-   72 expr: INTEGER .
+   90 expr: INTEGER .
 
-    $default  reduce using rule 72 (expr)
+    $default  reduce using rule 90 (expr)
 
 
 state 61
 
-   73 expr: REAL .
+   91 expr: REAL .
 
-    $default  reduce using rule 73 (expr)
+    $default  reduce using rule 91 (expr)
 
 
 state 62
 
-   75 expr: FALSE .
+   93 expr: FALSE .
 
-    $default  reduce using rule 75 (expr)
+    $default  reduce using rule 93 (expr)
 
 
 state 63
 
-   74 expr: TRUE .
+   92 expr: TRUE .
 
-    $default  reduce using rule 74 (expr)
+    $default  reduce using rule 92 (expr)
 
 
 state 64
 
-   55 expr: NEW . IDENT '(' expr_list_e ')'
-   56     | NEW . IDENT arrayindex
+   58 expr: NEW . IDENT '(' expr_list_e ')'
+   59     | NEW . IDENT arrayindex
 
-    IDENT  shift, and go to state 89
+    IDENT  shift, and go to state 88
 
 
 state 65
 
-   76 expr: THIS .
+   94 expr: THIS .
 
-    $default  reduce using rule 76 (expr)
+    $default  reduce using rule 94 (expr)
 
 
 state 66
 
-   77 expr: NUL .
+   95 expr: NUL .
 
-    $default  reduce using rule 77 (expr)
+    $default  reduce using rule 95 (expr)
 
 
 state 67
 
-   49 expr: '+' . expr
+   51 expr: '+' . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -929,14 +955,15 @@ state 67
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 90
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 89
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 68
 
-   48 expr: '-' . expr
+   50 expr: '-' . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -953,14 +980,40 @@ state 68
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 91
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 90
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 69
 
-   47 expr: '!' . expr
+   49 expr: '!' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 91
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 70
+
+   46 expr: DECREMENT . qualnameorarray
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -978,33 +1031,46 @@ state 69
     '('        shift, and go to state 72
 
     expr             go to state 92
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-
-
-state 70
-
-   44 expr: DECREMENT . IDENT
-
-    IDENT  shift, and go to state 93
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 93
 
 
 state 71
 
-   43 expr: INCREMENT . IDENT
-
-    IDENT  shift, and go to state 94
-
-
-state 72
-
-   50 expr: '(' . expr ')'
-   71     | '(' . basictype ')' expr
+   45 expr: INCREMENT . qualnameorarray
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
     REAL       shift, and go to state 61
-    BOOLEAN    shift, and go to state 21
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expr             go to state 92
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 94
+
+
+state 72
+
+   52 expr: '(' . expr ')'
+   53     | '(' . IDENT ')'
+   54     | '(' . qnora_without_id ')'
+   88     | '(' . basictype ')' expression
+   89     | '(' . IDENT ')' expression
+
+    IDENT      shift, and go to state 95
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    BOOL       shift, and go to state 21
     DOUBLE     shift, and go to state 22
     INT        shift, and go to state 23
     OBJECT     shift, and go to state 24
@@ -1020,171 +1086,201 @@ state 72
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    basictype        go to state 95
-    expr             go to state 96
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    basictype         go to state 96
+    expr              go to state 97
+    qualifiedname     go to state 75
+    qualnameorarray   go to state 98
+    qnora_without_id  go to state 99
 
 
 state 73
 
-   24 variable: IDENT '=' expr .
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
+   24 variable: IDENT '=' expression .
 
     $default  reduce using rule 24 (variable)
 
 
 state 74
 
-   53 expr: qualifiedname . '(' expr_list_e ')'
-   54     | qualifiedname . '(' expr_list_e ')' arrayindex
+   43 expression: expr .
+   60 expr: expr . EQ expression
+   62     | expr . NE expression
+   64     | expr . '<' expression
+   66     | expr . SE expression
+   68     | expr . '>' expression
+   70     | expr . LE expression
+   72     | expr . '+' expression
+   74     | expr . '-' expression
+   76     | expr . '*' expression
+   78     | expr . '/' expression
+   80     | expr . '%' expression
+   82     | expr . AND expression
+   84     | expr . OR expression
+   86     | expr . IS type
+  100 qualifiedname: expr . '.' IDENT
+  104 qualnameorarray: expr . '.' IDENT
+  106                | expr . '.' IDENT arrayindex
 
-    '('  shift, and go to state 112
+    IS   shift, and go to state 100
+    OR   shift, and go to state 101
+    AND  shift, and go to state 102
+    NE   shift, and go to state 103
+    EQ   shift, and go to state 104
+    '>'  shift, and go to state 105
+    '<'  shift, and go to state 106
+    SE   shift, and go to state 107
+    LE   shift, and go to state 108
+    '+'  shift, and go to state 109
+    '-'  shift, and go to state 110
+    '*'  shift, and go to state 111
+    '/'  shift, and go to state 112
+    '%'  shift, and go to state 113
+    '.'  shift, and go to state 114
+
+    $default  reduce using rule 43 (expression)
 
 
 state 75
 
-   51 expr: qualnameorarray .
-   52     | qualnameorarray . '=' expr
+   56 expr: qualifiedname . '(' expr_list_e ')'
+   57     | qualifiedname . '(' expr_list_e ')' arrayindex
 
-    '='  shift, and go to state 113
-
-    $default  reduce using rule 51 (expr)
+    '('  shift, and go to state 115
 
 
 state 76
 
+   44 expression: qualnameorarray .
+   47 expr: qualnameorarray . INCREMENT
+   48     | qualnameorarray . DECREMENT
+   55     | qualnameorarray . '=' expression
+   61     | qualnameorarray . EQ expression
+   63     | qualnameorarray . NE expression
+   65     | qualnameorarray . '<' expression
+   67     | qualnameorarray . SE expression
+   69     | qualnameorarray . '>' expression
+   71     | qualnameorarray . LE expression
+   73     | qualnameorarray . '+' expression
+   75     | qualnameorarray . '-' expression
+   77     | qualnameorarray . '*' expression
+   79     | qualnameorarray . '/' expression
+   81     | qualnameorarray . '%' expression
+   83     | qualnameorarray . AND expression
+   85     | qualnameorarray . OR expression
+   87     | qualnameorarray . IS type
+  101 qualifiedname: qualnameorarray . '.' IDENT
+  105 qualnameorarray: qualnameorarray . '.' IDENT
+  107                | qualnameorarray . '.' IDENT arrayindex
+
+    IS         shift, and go to state 116
+    '='        shift, and go to state 117
+    OR         shift, and go to state 118
+    AND        shift, and go to state 119
+    NE         shift, and go to state 120
+    EQ         shift, and go to state 121
+    '>'        shift, and go to state 122
+    '<'        shift, and go to state 123
+    SE         shift, and go to state 124
+    LE         shift, and go to state 125
+    '+'        shift, and go to state 126
+    '-'        shift, and go to state 127
+    '*'        shift, and go to state 128
+    '/'        shift, and go to state 129
+    '%'        shift, and go to state 130
+    DECREMENT  shift, and go to state 131
+    INCREMENT  shift, and go to state 132
+    '.'        shift, and go to state 133
+
+    $default  reduce using rule 44 (expression)
+
+
+state 77
+
    13 function: accessmodif type IDENT '(' @1 . args_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 39
-    BOOLEAN  shift, and go to state 21
-    DOUBLE   shift, and go to state 22
-    INT      shift, and go to state 23
-    OBJECT   shift, and go to state 24
+    IDENT   shift, and go to state 39
+    BOOL    shift, and go to state 21
+    DOUBLE  shift, and go to state 22
+    INT     shift, and go to state 23
+    OBJECT  shift, and go to state 24
 
     $default  reduce using rule 19 (args_e)
 
     arg          go to state 40
     args         go to state 41
-    args_e       go to state 114
+    args_e       go to state 134
     type         go to state 43
     noarraytype  go to state 27
     basictype    go to state 28
     arraytype    go to state 29
 
 
-state 77
+state 78
 
    23 variable: IDENT .
-   24         | IDENT . '=' expr
+   24         | IDENT . '=' expression
 
     '='  shift, and go to state 47
 
     $default  reduce using rule 23 (variable)
 
 
-state 78
+state 79
 
    22 variables: variables ',' variable .
 
     $default  reduce using rule 22 (variables)
 
 
-state 79
+state 80
 
    42 arraytype: basictype '[' ',' ',' . ']'
 
-    ']'  shift, and go to state 115
+    ']'  shift, and go to state 135
 
 
-state 80
+state 81
 
    41 arraytype: basictype '[' ',' ']' .
 
     $default  reduce using rule 41 (arraytype)
 
 
-state 81
+state 82
 
    18 args: args ',' arg .
 
     $default  reduce using rule 18 (args)
 
 
-state 82
+state 83
 
    11 constructor: accessmodif IDENT '(' args_e ')' '{' . statements '}'
 
-    $default  reduce using rule 100 (statements)
+    $default  reduce using rule 126 (statements)
 
-    statements  go to state 116
+    statements  go to state 136
 
 
-state 83
+state 84
 
    39 arraytype: IDENT '[' ',' ',' ']' .
 
     $default  reduce using rule 39 (arraytype)
 
 
-state 84
+state 85
 
    15 function: accessmodif VOID IDENT '(' @2 args_e . ')' '{' statements '}'
 
-    ')'  shift, and go to state 117
-
-
-state 85
-
-   46 expr: IDENT DECREMENT .
-
-    $default  reduce using rule 46 (expr)
+    ')'  shift, and go to state 137
 
 
 state 86
 
-   45 expr: IDENT INCREMENT .
-
-    $default  reduce using rule 45 (expr)
-
-
-state 87
-
-   78 arrayindex: '[' . expr ']'
-   79           | '[' . expr ',' expr ']'
-   80           | '[' . expr ',' expr ',' expr ']'
+   96 arrayindex: '[' . expression ']'
+   97           | '[' . expression ',' expression ']'
+   98           | '[' . expression ',' expression ',' expression ']'
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1201,258 +1297,289 @@ state 87
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 118
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 138
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 87
+
+  103 qualnameorarray: IDENT arrayindex .
+
+    $default  reduce using rule 103 (qualnameorarray)
 
 
 state 88
 
-   84 qualnameorarray: IDENT arrayindex .
+   58 expr: NEW IDENT . '(' expr_list_e ')'
+   59     | NEW IDENT . arrayindex
 
-    $default  reduce using rule 84 (qualnameorarray)
+    '('  shift, and go to state 139
+    '['  shift, and go to state 86
+
+    arrayindex  go to state 140
 
 
 state 89
 
-   55 expr: NEW IDENT . '(' expr_list_e ')'
-   56     | NEW IDENT . arrayindex
+   51 expr: '+' expression .
 
-    '('  shift, and go to state 119
-    '['  shift, and go to state 87
-
-    arrayindex  go to state 120
+    $default  reduce using rule 51 (expr)
 
 
 state 90
 
-   49 expr: '+' expr .
-   57     | expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
+   50 expr: '-' expression .
 
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 49 (expr)
+    $default  reduce using rule 50 (expr)
 
 
 state 91
 
-   48 expr: '-' expr .
-   57     | expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
+   49 expr: '!' expression .
 
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 48 (expr)
+    $default  reduce using rule 49 (expr)
 
 
 state 92
 
-   47 expr: '!' expr .
-   57     | expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
+   60 expr: expr . EQ expression
+   62     | expr . NE expression
+   64     | expr . '<' expression
+   66     | expr . SE expression
+   68     | expr . '>' expression
+   70     | expr . LE expression
+   72     | expr . '+' expression
+   74     | expr . '-' expression
+   76     | expr . '*' expression
+   78     | expr . '/' expression
+   80     | expr . '%' expression
+   82     | expr . AND expression
+   84     | expr . OR expression
+   86     | expr . IS type
+  100 qualifiedname: expr . '.' IDENT
+  104 qualnameorarray: expr . '.' IDENT
+  106                | expr . '.' IDENT arrayindex
 
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 47 (expr)
+    IS   shift, and go to state 100
+    OR   shift, and go to state 101
+    AND  shift, and go to state 102
+    NE   shift, and go to state 103
+    EQ   shift, and go to state 104
+    '>'  shift, and go to state 105
+    '<'  shift, and go to state 106
+    SE   shift, and go to state 107
+    LE   shift, and go to state 108
+    '+'  shift, and go to state 109
+    '-'  shift, and go to state 110
+    '*'  shift, and go to state 111
+    '/'  shift, and go to state 112
+    '%'  shift, and go to state 113
+    '.'  shift, and go to state 114
 
 
 state 93
 
-   44 expr: DECREMENT IDENT .
+   46 expr: DECREMENT qualnameorarray .
+   47     | qualnameorarray . INCREMENT
+   48     | qualnameorarray . DECREMENT
+   55     | qualnameorarray . '=' expression
+   61     | qualnameorarray . EQ expression
+   63     | qualnameorarray . NE expression
+   65     | qualnameorarray . '<' expression
+   67     | qualnameorarray . SE expression
+   69     | qualnameorarray . '>' expression
+   71     | qualnameorarray . LE expression
+   73     | qualnameorarray . '+' expression
+   75     | qualnameorarray . '-' expression
+   77     | qualnameorarray . '*' expression
+   79     | qualnameorarray . '/' expression
+   81     | qualnameorarray . '%' expression
+   83     | qualnameorarray . AND expression
+   85     | qualnameorarray . OR expression
+   87     | qualnameorarray . IS type
+  101 qualifiedname: qualnameorarray . '.' IDENT
+  105 qualnameorarray: qualnameorarray . '.' IDENT
+  107                | qualnameorarray . '.' IDENT arrayindex
 
-    $default  reduce using rule 44 (expr)
+    '='        shift, and go to state 117
+    DECREMENT  shift, and go to state 131
+    INCREMENT  shift, and go to state 132
+    '.'        shift, and go to state 133
+
+    $default  reduce using rule 46 (expr)
 
 
 state 94
 
-   43 expr: INCREMENT IDENT .
+   45 expr: INCREMENT qualnameorarray .
+   47     | qualnameorarray . INCREMENT
+   48     | qualnameorarray . DECREMENT
+   55     | qualnameorarray . '=' expression
+   61     | qualnameorarray . EQ expression
+   63     | qualnameorarray . NE expression
+   65     | qualnameorarray . '<' expression
+   67     | qualnameorarray . SE expression
+   69     | qualnameorarray . '>' expression
+   71     | qualnameorarray . LE expression
+   73     | qualnameorarray . '+' expression
+   75     | qualnameorarray . '-' expression
+   77     | qualnameorarray . '*' expression
+   79     | qualnameorarray . '/' expression
+   81     | qualnameorarray . '%' expression
+   83     | qualnameorarray . AND expression
+   85     | qualnameorarray . OR expression
+   87     | qualnameorarray . IS type
+  101 qualifiedname: qualnameorarray . '.' IDENT
+  105 qualnameorarray: qualnameorarray . '.' IDENT
+  107                | qualnameorarray . '.' IDENT arrayindex
 
-    $default  reduce using rule 43 (expr)
+    '='        shift, and go to state 117
+    DECREMENT  shift, and go to state 131
+    INCREMENT  shift, and go to state 132
+    '.'        shift, and go to state 133
+
+    $default  reduce using rule 45 (expr)
 
 
 state 95
 
-   71 expr: '(' basictype . ')' expr
+   53 expr: '(' IDENT . ')'
+   89     | '(' IDENT . ')' expression
+   99 qualifiedname: IDENT .
+  102 qualnameorarray: IDENT .
+  103                | IDENT . arrayindex
+  108 qnora_without_id: IDENT . arrayindex
 
-    ')'  shift, and go to state 121
+    ')'  shift, and go to state 141
+    '['  shift, and go to state 86
+
+    '('       reduce using rule 99 (qualifiedname)
+    $default  reduce using rule 102 (qualnameorarray)
+
+    arrayindex  go to state 142
 
 
 state 96
 
-   50 expr: '(' expr . ')'
-   57     | expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
+   88 expr: '(' basictype . ')' expression
 
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-    ')'  shift, and go to state 122
+    ')'  shift, and go to state 143
 
 
 state 97
 
-   70 expr: expr IS . type
+   52 expr: '(' expr . ')'
+   60     | expr . EQ expression
+   62     | expr . NE expression
+   64     | expr . '<' expression
+   66     | expr . SE expression
+   68     | expr . '>' expression
+   70     | expr . LE expression
+   72     | expr . '+' expression
+   74     | expr . '-' expression
+   76     | expr . '*' expression
+   78     | expr . '/' expression
+   80     | expr . '%' expression
+   82     | expr . AND expression
+   84     | expr . OR expression
+   86     | expr . IS type
+  100 qualifiedname: expr . '.' IDENT
+  104 qualnameorarray: expr . '.' IDENT
+  106                | expr . '.' IDENT arrayindex
+  109 qnora_without_id: expr . '.' IDENT
+  111                 | expr . '.' IDENT arrayindex
 
-    IDENT    shift, and go to state 39
-    BOOLEAN  shift, and go to state 21
-    DOUBLE   shift, and go to state 22
-    INT      shift, and go to state 23
-    OBJECT   shift, and go to state 24
+    IS   shift, and go to state 100
+    OR   shift, and go to state 101
+    AND  shift, and go to state 102
+    NE   shift, and go to state 103
+    EQ   shift, and go to state 104
+    '>'  shift, and go to state 105
+    '<'  shift, and go to state 106
+    SE   shift, and go to state 107
+    LE   shift, and go to state 108
+    '+'  shift, and go to state 109
+    '-'  shift, and go to state 110
+    '*'  shift, and go to state 111
+    '/'  shift, and go to state 112
+    '%'  shift, and go to state 113
+    '.'  shift, and go to state 144
+    ')'  shift, and go to state 145
 
-    type         go to state 123
+
+state 98
+
+   47 expr: qualnameorarray . INCREMENT
+   48     | qualnameorarray . DECREMENT
+   55     | qualnameorarray . '=' expression
+   61     | qualnameorarray . EQ expression
+   63     | qualnameorarray . NE expression
+   65     | qualnameorarray . '<' expression
+   67     | qualnameorarray . SE expression
+   69     | qualnameorarray . '>' expression
+   71     | qualnameorarray . LE expression
+   73     | qualnameorarray . '+' expression
+   75     | qualnameorarray . '-' expression
+   77     | qualnameorarray . '*' expression
+   79     | qualnameorarray . '/' expression
+   81     | qualnameorarray . '%' expression
+   83     | qualnameorarray . AND expression
+   85     | qualnameorarray . OR expression
+   87     | qualnameorarray . IS type
+  101 qualifiedname: qualnameorarray . '.' IDENT
+  105 qualnameorarray: qualnameorarray . '.' IDENT
+  107                | qualnameorarray . '.' IDENT arrayindex
+  110 qnora_without_id: qualnameorarray . '.' IDENT
+  112                 | qualnameorarray . '.' IDENT arrayindex
+
+    IS         shift, and go to state 116
+    '='        shift, and go to state 117
+    OR         shift, and go to state 118
+    AND        shift, and go to state 119
+    NE         shift, and go to state 120
+    EQ         shift, and go to state 121
+    '>'        shift, and go to state 122
+    '<'        shift, and go to state 123
+    SE         shift, and go to state 124
+    LE         shift, and go to state 125
+    '+'        shift, and go to state 126
+    '-'        shift, and go to state 127
+    '*'        shift, and go to state 128
+    '/'        shift, and go to state 129
+    '%'        shift, and go to state 130
+    DECREMENT  shift, and go to state 131
+    INCREMENT  shift, and go to state 132
+    '.'        shift, and go to state 146
+
+
+state 99
+
+   54 expr: '(' qnora_without_id . ')'
+
+    ')'  shift, and go to state 147
+
+
+state 100
+
+   86 expr: expr IS . type
+
+    IDENT   shift, and go to state 39
+    BOOL    shift, and go to state 21
+    DOUBLE  shift, and go to state 22
+    INT     shift, and go to state 23
+    OBJECT  shift, and go to state 24
+
+    type         go to state 148
     noarraytype  go to state 27
     basictype    go to state 28
     arraytype    go to state 29
 
 
-state 98
-
-   69 expr: expr OR . expr
-
-    IDENT      shift, and go to state 59
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-
-    expr             go to state 124
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-
-
-state 99
-
-   68 expr: expr AND . expr
-
-    IDENT      shift, and go to state 59
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-
-    expr             go to state 125
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-
-
-state 100
-
-   58 expr: expr NE . expr
-
-    IDENT      shift, and go to state 59
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-
-    expr             go to state 126
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-
-
 state 101
 
-   57 expr: expr EQ . expr
+   84 expr: expr OR . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1469,14 +1596,15 @@ state 101
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 127
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 149
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 102
 
-   61 expr: expr '>' . expr
+   82 expr: expr AND . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1493,14 +1621,15 @@ state 102
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 128
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 150
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 103
 
-   59 expr: expr '<' . expr
+   62 expr: expr NE . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1517,14 +1646,15 @@ state 103
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 129
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 151
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 104
 
-   60 expr: expr SE . expr
+   60 expr: expr EQ . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1541,14 +1671,15 @@ state 104
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 130
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 152
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 105
 
-   62 expr: expr LE . expr
+   68 expr: expr '>' . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1565,14 +1696,15 @@ state 105
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 131
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 153
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 106
 
-   63 expr: expr '+' . expr
+   64 expr: expr '<' . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1589,14 +1721,15 @@ state 106
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 132
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 154
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 107
 
-   64 expr: expr '-' . expr
+   66 expr: expr SE . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1613,14 +1746,15 @@ state 107
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 133
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 155
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 108
 
-   65 expr: expr '*' . expr
+   70 expr: expr LE . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1637,14 +1771,15 @@ state 108
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 134
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 156
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 109
 
-   66 expr: expr '/' . expr
+   72 expr: expr '+' . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1661,14 +1796,15 @@ state 109
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 135
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 157
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 110
 
-   67 expr: expr '%' . expr
+   74 expr: expr '-' . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1685,24 +1821,40 @@ state 110
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 136
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 158
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 111
 
-   82 qualifiedname: expr '.' . IDENT
-   85 qualnameorarray: expr '.' . IDENT
-   86                | expr '.' . IDENT arrayindex
+   76 expr: expr '*' . expression
 
-    IDENT  shift, and go to state 137
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 159
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 112
 
-   53 expr: qualifiedname '(' . expr_list_e ')'
-   54     | qualifiedname '(' . expr_list_e ')' arrayindex
+   78 expr: expr '/' . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1719,18 +1871,15 @@ state 112
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    $default  reduce using rule 89 (expr_list_e)
-
-    expr             go to state 138
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    expr_list        go to state 139
-    expr_list_e      go to state 140
+    expression       go to state 160
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 113
 
-   52 expr: qualnameorarray '=' . expr
+   80 expr: expr '%' . expression
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -1747,761 +1896,953 @@ state 113
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 141
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 161
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 114
 
-   13 function: accessmodif type IDENT '(' @1 args_e . ')' '{' statements '}'
+  100 qualifiedname: expr '.' . IDENT
+  104 qualnameorarray: expr '.' . IDENT
+  106                | expr '.' . IDENT arrayindex
 
-    ')'  shift, and go to state 142
+    IDENT  shift, and go to state 162
 
 
 state 115
+
+   56 expr: qualifiedname '(' . expr_list_e ')'
+   57     | qualifiedname '(' . expr_list_e ')' arrayindex
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    $default  reduce using rule 115 (expr_list_e)
+
+    expression       go to state 163
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    expr_list        go to state 164
+    expr_list_e      go to state 165
+
+
+state 116
+
+   87 expr: qualnameorarray IS . type
+
+    IDENT   shift, and go to state 39
+    BOOL    shift, and go to state 21
+    DOUBLE  shift, and go to state 22
+    INT     shift, and go to state 23
+    OBJECT  shift, and go to state 24
+
+    type         go to state 166
+    noarraytype  go to state 27
+    basictype    go to state 28
+    arraytype    go to state 29
+
+
+state 117
+
+   55 expr: qualnameorarray '=' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 167
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 118
+
+   85 expr: qualnameorarray OR . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 168
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 119
+
+   83 expr: qualnameorarray AND . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 169
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 120
+
+   63 expr: qualnameorarray NE . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 170
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 121
+
+   61 expr: qualnameorarray EQ . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 171
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 122
+
+   69 expr: qualnameorarray '>' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 172
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 123
+
+   65 expr: qualnameorarray '<' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 173
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 124
+
+   67 expr: qualnameorarray SE . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 174
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 125
+
+   71 expr: qualnameorarray LE . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 175
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 126
+
+   73 expr: qualnameorarray '+' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 176
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 127
+
+   75 expr: qualnameorarray '-' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 177
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 128
+
+   77 expr: qualnameorarray '*' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 178
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 129
+
+   79 expr: qualnameorarray '/' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 179
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 130
+
+   81 expr: qualnameorarray '%' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 180
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 131
+
+   48 expr: qualnameorarray DECREMENT .
+
+    $default  reduce using rule 48 (expr)
+
+
+state 132
+
+   47 expr: qualnameorarray INCREMENT .
+
+    $default  reduce using rule 47 (expr)
+
+
+state 133
+
+  101 qualifiedname: qualnameorarray '.' . IDENT
+  105 qualnameorarray: qualnameorarray '.' . IDENT
+  107                | qualnameorarray '.' . IDENT arrayindex
+
+    IDENT  shift, and go to state 181
+
+
+state 134
+
+   13 function: accessmodif type IDENT '(' @1 args_e . ')' '{' statements '}'
+
+    ')'  shift, and go to state 182
+
+
+state 135
 
    42 arraytype: basictype '[' ',' ',' ']' .
 
     $default  reduce using rule 42 (arraytype)
 
 
-state 116
+state 136
 
    11 constructor: accessmodif IDENT '(' args_e ')' '{' statements . '}'
-  101 statements: statements . statement
+  127 statements: statements . statement
 
-    IDENT      shift, and go to state 143
+    IDENT      shift, and go to state 183
     INTEGER    shift, and go to state 60
     REAL       shift, and go to state 61
-    BOOLEAN    shift, and go to state 21
+    BOOL       shift, and go to state 21
     DOUBLE     shift, and go to state 22
     INT        shift, and go to state 23
     OBJECT     shift, and go to state 24
-    IF         shift, and go to state 144
-    WHILE      shift, and go to state 145
-    FOR        shift, and go to state 146
+    IF         shift, and go to state 184
+    WHILE      shift, and go to state 185
+    FOR        shift, and go to state 186
     FALSE      shift, and go to state 62
     TRUE       shift, and go to state 63
     NEW        shift, and go to state 64
     THIS       shift, and go to state 65
     NUL        shift, and go to state 66
-    RETURN     shift, and go to state 147
+    RETURN     shift, and go to state 187
     '+'        shift, and go to state 67
     '-'        shift, and go to state 68
     '!'        shift, and go to state 69
     DECREMENT  shift, and go to state 70
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
-    '{'        shift, and go to state 148
-    '}'        shift, and go to state 149
+    '{'        shift, and go to state 188
+    '}'        shift, and go to state 189
 
-    type             go to state 150
+    type             go to state 190
     noarraytype      go to state 27
     basictype        go to state 28
     arraytype        go to state 29
-    expr             go to state 151
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    statement        go to state 152
-
-
-state 117
-
-   15 function: accessmodif VOID IDENT '(' @2 args_e ')' . '{' statements '}'
-
-    '{'  shift, and go to state 153
-
-
-state 118
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   78 arrayindex: '[' expr . ']'
-   79           | '[' expr . ',' expr ']'
-   80           | '[' expr . ',' expr ',' expr ']'
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-    ','  shift, and go to state 154
-    ']'  shift, and go to state 155
-
-
-state 119
-
-   55 expr: NEW IDENT '(' . expr_list_e ')'
-
-    IDENT      shift, and go to state 59
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-
-    $default  reduce using rule 89 (expr_list_e)
-
-    expr             go to state 138
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    expr_list        go to state 139
-    expr_list_e      go to state 156
-
-
-state 120
-
-   56 expr: NEW IDENT arrayindex .
-
-    $default  reduce using rule 56 (expr)
-
-
-state 121
-
-   71 expr: '(' basictype ')' . expr
-
-    IDENT      shift, and go to state 59
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-
-    expr             go to state 157
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-
-
-state 122
-
-   50 expr: '(' expr ')' .
-
-    $default  reduce using rule 50 (expr)
-
-
-state 123
-
-   70 expr: expr IS type .
-
-    $default  reduce using rule 70 (expr)
-
-
-state 124
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   69     | expr OR expr .
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    IS   shift, and go to state 97
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 69 (expr)
-
-
-state 125
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   68     | expr AND expr .
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    IS   shift, and go to state 97
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 68 (expr)
-
-
-state 126
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   58     | expr NE expr .
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 58 (expr)
-
-
-state 127
-
-   57 expr: expr . EQ expr
-   57     | expr EQ expr .
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 57 (expr)
-
-
-state 128
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   61     | expr '>' expr .
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 61 (expr)
-
-
-state 129
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   59     | expr '<' expr .
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 59 (expr)
-
-
-state 130
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   60     | expr SE expr .
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 60 (expr)
-
-
-state 131
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   62     | expr LE expr .
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 62 (expr)
-
-
-state 132
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   63     | expr '+' expr .
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 63 (expr)
-
-
-state 133
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   64     | expr '-' expr .
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 64 (expr)
-
-
-state 134
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   65     | expr '*' expr .
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 65 (expr)
-
-
-state 135
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   66     | expr '/' expr .
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 66 (expr)
-
-
-state 136
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   67     | expr '%' expr .
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 67 (expr)
+    expression       go to state 191
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    statement        go to state 192
 
 
 state 137
 
-   82 qualifiedname: expr '.' IDENT .
-   85 qualnameorarray: expr '.' IDENT .
-   86                | expr '.' IDENT . arrayindex
+   15 function: accessmodif VOID IDENT '(' @2 args_e ')' . '{' statements '}'
 
-    '['  shift, and go to state 87
-
-    '('       reduce using rule 82 (qualifiedname)
-    $default  reduce using rule 85 (qualnameorarray)
-
-    arrayindex  go to state 158
+    '{'  shift, and go to state 193
 
 
 state 138
 
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-   87 expr_list: expr .
+   96 arrayindex: '[' expression . ']'
+   97           | '[' expression . ',' expression ']'
+   98           | '[' expression . ',' expression ',' expression ']'
 
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 87 (expr_list)
+    ','  shift, and go to state 194
+    ']'  shift, and go to state 195
 
 
 state 139
 
-   88 expr_list: expr_list . ',' expr
-   90 expr_list_e: expr_list .
+   58 expr: NEW IDENT '(' . expr_list_e ')'
 
-    ','  shift, and go to state 159
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
 
-    $default  reduce using rule 90 (expr_list_e)
+    $default  reduce using rule 115 (expr_list_e)
+
+    expression       go to state 163
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    expr_list        go to state 164
+    expr_list_e      go to state 196
 
 
 state 140
 
-   53 expr: qualifiedname '(' expr_list_e . ')'
-   54     | qualifiedname '(' expr_list_e . ')' arrayindex
+   59 expr: NEW IDENT arrayindex .
 
-    ')'  shift, and go to state 160
+    $default  reduce using rule 59 (expr)
 
 
 state 141
 
-   52 expr: qualnameorarray '=' expr .
-   57     | expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
+   53 expr: '(' IDENT ')' .
+   89     | '(' IDENT ')' . expression
 
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
 
-    $default  reduce using rule 52 (expr)
+    $default  reduce using rule 53 (expr)
+
+    expression       go to state 197
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
 state 142
 
-   13 function: accessmodif type IDENT '(' @1 args_e ')' . '{' statements '}'
+  103 qualnameorarray: IDENT arrayindex .
+  108 qnora_without_id: IDENT arrayindex .
 
-    '{'  shift, and go to state 161
+    ')'       reduce using rule 108 (qnora_without_id)
+    $default  reduce using rule 103 (qualnameorarray)
 
 
 state 143
+
+   88 expr: '(' basictype ')' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 198
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 144
+
+  100 qualifiedname: expr '.' . IDENT
+  104 qualnameorarray: expr '.' . IDENT
+  106                | expr '.' . IDENT arrayindex
+  109 qnora_without_id: expr '.' . IDENT
+  111                 | expr '.' . IDENT arrayindex
+
+    IDENT  shift, and go to state 199
+
+
+state 145
+
+   52 expr: '(' expr ')' .
+
+    $default  reduce using rule 52 (expr)
+
+
+state 146
+
+  101 qualifiedname: qualnameorarray '.' . IDENT
+  105 qualnameorarray: qualnameorarray '.' . IDENT
+  107                | qualnameorarray '.' . IDENT arrayindex
+  110 qnora_without_id: qualnameorarray '.' . IDENT
+  112                 | qualnameorarray '.' . IDENT arrayindex
+
+    IDENT  shift, and go to state 200
+
+
+state 147
+
+   54 expr: '(' qnora_without_id ')' .
+
+    $default  reduce using rule 54 (expr)
+
+
+state 148
+
+   86 expr: expr IS type .
+
+    $default  reduce using rule 86 (expr)
+
+
+state 149
+
+   84 expr: expr OR expression .
+
+    $default  reduce using rule 84 (expr)
+
+
+state 150
+
+   82 expr: expr AND expression .
+
+    $default  reduce using rule 82 (expr)
+
+
+state 151
+
+   62 expr: expr NE expression .
+
+    $default  reduce using rule 62 (expr)
+
+
+state 152
+
+   60 expr: expr EQ expression .
+
+    $default  reduce using rule 60 (expr)
+
+
+state 153
+
+   68 expr: expr '>' expression .
+
+    $default  reduce using rule 68 (expr)
+
+
+state 154
+
+   64 expr: expr '<' expression .
+
+    $default  reduce using rule 64 (expr)
+
+
+state 155
+
+   66 expr: expr SE expression .
+
+    $default  reduce using rule 66 (expr)
+
+
+state 156
+
+   70 expr: expr LE expression .
+
+    $default  reduce using rule 70 (expr)
+
+
+state 157
+
+   72 expr: expr '+' expression .
+
+    $default  reduce using rule 72 (expr)
+
+
+state 158
+
+   74 expr: expr '-' expression .
+
+    $default  reduce using rule 74 (expr)
+
+
+state 159
+
+   76 expr: expr '*' expression .
+
+    $default  reduce using rule 76 (expr)
+
+
+state 160
+
+   78 expr: expr '/' expression .
+
+    $default  reduce using rule 78 (expr)
+
+
+state 161
+
+   80 expr: expr '%' expression .
+
+    $default  reduce using rule 80 (expr)
+
+
+state 162
+
+  100 qualifiedname: expr '.' IDENT .
+  104 qualnameorarray: expr '.' IDENT .
+  106                | expr '.' IDENT . arrayindex
+
+    '['  shift, and go to state 86
+
+    '('       reduce using rule 100 (qualifiedname)
+    $default  reduce using rule 104 (qualnameorarray)
+
+    arrayindex  go to state 201
+
+
+state 163
+
+  113 expr_list: expression .
+
+    $default  reduce using rule 113 (expr_list)
+
+
+state 164
+
+  114 expr_list: expr_list . ',' expression
+  116 expr_list_e: expr_list .
+
+    ','  shift, and go to state 202
+
+    $default  reduce using rule 116 (expr_list_e)
+
+
+state 165
+
+   56 expr: qualifiedname '(' expr_list_e . ')'
+   57     | qualifiedname '(' expr_list_e . ')' arrayindex
+
+    ')'  shift, and go to state 203
+
+
+state 166
+
+   87 expr: qualnameorarray IS type .
+
+    $default  reduce using rule 87 (expr)
+
+
+state 167
+
+   55 expr: qualnameorarray '=' expression .
+
+    $default  reduce using rule 55 (expr)
+
+
+state 168
+
+   85 expr: qualnameorarray OR expression .
+
+    $default  reduce using rule 85 (expr)
+
+
+state 169
+
+   83 expr: qualnameorarray AND expression .
+
+    $default  reduce using rule 83 (expr)
+
+
+state 170
+
+   63 expr: qualnameorarray NE expression .
+
+    $default  reduce using rule 63 (expr)
+
+
+state 171
+
+   61 expr: qualnameorarray EQ expression .
+
+    $default  reduce using rule 61 (expr)
+
+
+state 172
+
+   69 expr: qualnameorarray '>' expression .
+
+    $default  reduce using rule 69 (expr)
+
+
+state 173
+
+   65 expr: qualnameorarray '<' expression .
+
+    $default  reduce using rule 65 (expr)
+
+
+state 174
+
+   67 expr: qualnameorarray SE expression .
+
+    $default  reduce using rule 67 (expr)
+
+
+state 175
+
+   71 expr: qualnameorarray LE expression .
+
+    $default  reduce using rule 71 (expr)
+
+
+state 176
+
+   73 expr: qualnameorarray '+' expression .
+
+    $default  reduce using rule 73 (expr)
+
+
+state 177
+
+   75 expr: qualnameorarray '-' expression .
+
+    $default  reduce using rule 75 (expr)
+
+
+state 178
+
+   77 expr: qualnameorarray '*' expression .
+
+    $default  reduce using rule 77 (expr)
+
+
+state 179
+
+   79 expr: qualnameorarray '/' expression .
+
+    $default  reduce using rule 79 (expr)
+
+
+state 180
+
+   81 expr: qualnameorarray '%' expression .
+
+    $default  reduce using rule 81 (expr)
+
+
+state 181
+
+  101 qualifiedname: qualnameorarray '.' IDENT .
+  105 qualnameorarray: qualnameorarray '.' IDENT .
+  107                | qualnameorarray '.' IDENT . arrayindex
+
+    '['  shift, and go to state 86
+
+    '('       reduce using rule 101 (qualifiedname)
+    $default  reduce using rule 105 (qualnameorarray)
+
+    arrayindex  go to state 204
+
+
+state 182
+
+   13 function: accessmodif type IDENT '(' @1 args_e ')' . '{' statements '}'
+
+    '{'  shift, and go to state 205
+
+
+state 183
 
    31 noarraytype: IDENT .
    37 arraytype: IDENT . '[' ']'
    38          | IDENT . '[' ',' ']'
    39          | IDENT . '[' ',' ',' ']'
-   45 expr: IDENT . INCREMENT
-   46     | IDENT . DECREMENT
-   81 qualifiedname: IDENT .
-   83 qualnameorarray: IDENT .
-   84                | IDENT . arrayindex
+   99 qualifiedname: IDENT .
+  102 qualnameorarray: IDENT .
+  103                | IDENT . arrayindex
 
-    DECREMENT  shift, and go to state 85
-    INCREMENT  shift, and go to state 86
-    '['        shift, and go to state 162
+    '['  shift, and go to state 206
 
     IDENT     reduce using rule 31 (noarraytype)
-    '('       reduce using rule 81 (qualifiedname)
-    $default  reduce using rule 83 (qualnameorarray)
+    '('       reduce using rule 99 (qualifiedname)
+    $default  reduce using rule 102 (qualnameorarray)
 
-    arrayindex  go to state 88
-
-
-state 144
-
-   91 statement: IF . '(' expr ')' statement
-   92          | IF . '(' expr ')' statement ELSE statement
-
-    '('  shift, and go to state 163
+    arrayindex  go to state 87
 
 
-state 145
+state 184
 
-   93 statement: WHILE . '(' expr ')' statement
+  117 statement: IF . '(' expression ')' statement
+  118          | IF . '(' expression ')' statement ELSE statement
 
-    '('  shift, and go to state 164
-
-
-state 146
-
-   94 statement: FOR . '(' variables_e ';' expr_e ';' expr_e ')' statement
-
-    '('  shift, and go to state 165
+    '('  shift, and go to state 207
 
 
-state 147
+state 185
 
-   99 statement: RETURN . expr_e ';'
+  119 statement: WHILE . '(' expression ')' statement
+
+    '('  shift, and go to state 208
+
+
+state 186
+
+  120 statement: FOR . '(' variables_e ';' expr_e ';' expr_e ')' statement
+
+    '('  shift, and go to state 209
+
+
+state 187
+
+  125 statement: RETURN . expr_e ';'
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -2518,170 +2859,68 @@ state 147
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    $default  reduce using rule 104 (expr_e)
+    $default  reduce using rule 130 (expr_e)
 
-    expr             go to state 166
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    expr_e           go to state 167
-
-
-state 148
-
-   98 statement: '{' . @3 statements '}'
-
-    $default  reduce using rule 97 (@3)
-
-    @3  go to state 168
+    expression       go to state 210
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    expr_e           go to state 211
 
 
-state 149
+state 188
+
+  124 statement: '{' . @3 statements '}'
+
+    $default  reduce using rule 123 (@3)
+
+    @3  go to state 212
+
+
+state 189
 
    11 constructor: accessmodif IDENT '(' args_e ')' '{' statements '}' .
 
     $default  reduce using rule 11 (constructor)
 
 
-state 150
+state 190
 
-   96 statement: type . variables ';'
+  122 statement: type . variables ';'
 
-    IDENT  shift, and go to state 77
+    IDENT  shift, and go to state 78
 
-    variables  go to state 169
+    variables  go to state 213
     variable   go to state 36
 
 
-state 151
+state 191
 
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-   95 statement: expr . ';'
+  121 statement: expression . ';'
 
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-    ';'  shift, and go to state 170
+    ';'  shift, and go to state 214
 
 
-state 152
+state 192
 
-  101 statements: statements statement .
+  127 statements: statements statement .
 
-    $default  reduce using rule 101 (statements)
+    $default  reduce using rule 127 (statements)
 
 
-state 153
+state 193
 
    15 function: accessmodif VOID IDENT '(' @2 args_e ')' '{' . statements '}'
 
-    $default  reduce using rule 100 (statements)
+    $default  reduce using rule 126 (statements)
 
-    statements  go to state 171
-
-
-state 154
-
-   79 arrayindex: '[' expr ',' . expr ']'
-   80           | '[' expr ',' . expr ',' expr ']'
-
-    IDENT      shift, and go to state 59
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-
-    expr             go to state 172
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    statements  go to state 215
 
 
-state 155
+state 194
 
-   78 arrayindex: '[' expr ']' .
-
-    $default  reduce using rule 78 (arrayindex)
-
-
-state 156
-
-   55 expr: NEW IDENT '(' expr_list_e . ')'
-
-    ')'  shift, and go to state 173
-
-
-state 157
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   71     | '(' basictype ')' expr .
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 71 (expr)
-
-
-state 158
-
-   86 qualnameorarray: expr '.' IDENT arrayindex .
-
-    $default  reduce using rule 86 (qualnameorarray)
-
-
-state 159
-
-   88 expr_list: expr_list ',' . expr
+   97 arrayindex: '[' expression ',' . expression ']'
+   98           | '[' expression ',' . expression ',' expression ']'
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -2698,40 +2937,142 @@ state 159
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 174
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 216
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
-state 160
+state 195
 
-   53 expr: qualifiedname '(' expr_list_e ')' .
-   54     | qualifiedname '(' expr_list_e ')' . arrayindex
+   96 arrayindex: '[' expression ']' .
 
-    '['  shift, and go to state 87
-
-    $default  reduce using rule 53 (expr)
-
-    arrayindex  go to state 175
+    $default  reduce using rule 96 (arrayindex)
 
 
-state 161
+state 196
+
+   58 expr: NEW IDENT '(' expr_list_e . ')'
+
+    ')'  shift, and go to state 217
+
+
+state 197
+
+   89 expr: '(' IDENT ')' expression .
+
+    $default  reduce using rule 89 (expr)
+
+
+state 198
+
+   88 expr: '(' basictype ')' expression .
+
+    $default  reduce using rule 88 (expr)
+
+
+state 199
+
+  100 qualifiedname: expr '.' IDENT .
+  104 qualnameorarray: expr '.' IDENT .
+  106                | expr '.' IDENT . arrayindex
+  109 qnora_without_id: expr '.' IDENT .
+  111                 | expr '.' IDENT . arrayindex
+
+    '['  shift, and go to state 86
+
+    '('       reduce using rule 100 (qualifiedname)
+    ')'       reduce using rule 109 (qnora_without_id)
+    $default  reduce using rule 104 (qualnameorarray)
+
+    arrayindex  go to state 218
+
+
+state 200
+
+  101 qualifiedname: qualnameorarray '.' IDENT .
+  105 qualnameorarray: qualnameorarray '.' IDENT .
+  107                | qualnameorarray '.' IDENT . arrayindex
+  110 qnora_without_id: qualnameorarray '.' IDENT .
+  112                 | qualnameorarray '.' IDENT . arrayindex
+
+    '['  shift, and go to state 86
+
+    '('       reduce using rule 101 (qualifiedname)
+    ')'       reduce using rule 110 (qnora_without_id)
+    $default  reduce using rule 105 (qualnameorarray)
+
+    arrayindex  go to state 219
+
+
+state 201
+
+  106 qualnameorarray: expr '.' IDENT arrayindex .
+
+    $default  reduce using rule 106 (qualnameorarray)
+
+
+state 202
+
+  114 expr_list: expr_list ',' . expression
+
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    expression       go to state 220
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+
+
+state 203
+
+   56 expr: qualifiedname '(' expr_list_e ')' .
+   57     | qualifiedname '(' expr_list_e ')' . arrayindex
+
+    '['  shift, and go to state 86
+
+    $default  reduce using rule 56 (expr)
+
+    arrayindex  go to state 221
+
+
+state 204
+
+  107 qualnameorarray: qualnameorarray '.' IDENT arrayindex .
+
+    $default  reduce using rule 107 (qualnameorarray)
+
+
+state 205
 
    13 function: accessmodif type IDENT '(' @1 args_e ')' '{' . statements '}'
 
-    $default  reduce using rule 100 (statements)
+    $default  reduce using rule 126 (statements)
 
-    statements  go to state 176
+    statements  go to state 222
 
 
-state 162
+state 206
 
    37 arraytype: IDENT '[' . ']'
    38          | IDENT '[' . ',' ']'
    39          | IDENT '[' . ',' ',' ']'
-   78 arrayindex: '[' . expr ']'
-   79           | '[' . expr ',' expr ']'
-   80           | '[' . expr ',' expr ',' expr ']'
+   96 arrayindex: '[' . expression ']'
+   97           | '[' . expression ',' expression ']'
+   98           | '[' . expression ',' expression ',' expression ']'
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -2750,39 +3091,16 @@ state 162
     ','        shift, and go to state 44
     ']'        shift, and go to state 45
 
-    expr             go to state 118
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 138
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
-state 163
+state 207
 
-   91 statement: IF '(' . expr ')' statement
-   92          | IF '(' . expr ')' statement ELSE statement
-
-    IDENT      shift, and go to state 59
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-
-    expr             go to state 177
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-
-
-state 164
-
-   93 statement: WHILE '(' . expr ')' statement
+  117 statement: IF '(' . expression ')' statement
+  118          | IF '(' . expression ')' statement ELSE statement
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -2799,437 +3117,322 @@ state 164
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 178
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 223
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
-state 165
+state 208
 
-   94 statement: FOR '(' . variables_e ';' expr_e ';' expr_e ')' statement
+  119 statement: WHILE '(' . expression ')' statement
 
-    IDENT    shift, and go to state 39
-    BOOLEAN  shift, and go to state 21
-    DOUBLE   shift, and go to state 22
-    INT      shift, and go to state 23
-    OBJECT   shift, and go to state 24
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
 
-    $default  reduce using rule 102 (variables_e)
+    expression       go to state 224
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
-    type         go to state 179
+
+state 209
+
+  120 statement: FOR '(' . variables_e ';' expr_e ';' expr_e ')' statement
+
+    IDENT   shift, and go to state 39
+    BOOL    shift, and go to state 21
+    DOUBLE  shift, and go to state 22
+    INT     shift, and go to state 23
+    OBJECT  shift, and go to state 24
+
+    $default  reduce using rule 128 (variables_e)
+
+    type         go to state 225
     noarraytype  go to state 27
     basictype    go to state 28
     arraytype    go to state 29
-    variables_e  go to state 180
+    variables_e  go to state 226
 
 
-state 166
+state 210
 
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-  105 expr_e: expr .
+  131 expr_e: expression .
 
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 105 (expr_e)
+    $default  reduce using rule 131 (expr_e)
 
 
-state 167
+state 211
 
-   99 statement: RETURN expr_e . ';'
+  125 statement: RETURN expr_e . ';'
 
-    ';'  shift, and go to state 181
-
-
-state 168
-
-   98 statement: '{' @3 . statements '}'
-
-    $default  reduce using rule 100 (statements)
-
-    statements  go to state 182
+    ';'  shift, and go to state 227
 
 
-state 169
+state 212
+
+  124 statement: '{' @3 . statements '}'
+
+    $default  reduce using rule 126 (statements)
+
+    statements  go to state 228
+
+
+state 213
 
    22 variables: variables . ',' variable
-   96 statement: type variables . ';'
+  122 statement: type variables . ';'
 
-    ';'  shift, and go to state 183
+    ';'  shift, and go to state 229
     ','  shift, and go to state 50
 
 
-state 170
+state 214
 
-   95 statement: expr ';' .
+  121 statement: expression ';' .
 
-    $default  reduce using rule 95 (statement)
+    $default  reduce using rule 121 (statement)
 
 
-state 171
+state 215
 
    15 function: accessmodif VOID IDENT '(' @2 args_e ')' '{' statements . '}'
-  101 statements: statements . statement
+  127 statements: statements . statement
 
-    IDENT      shift, and go to state 143
+    IDENT      shift, and go to state 183
     INTEGER    shift, and go to state 60
     REAL       shift, and go to state 61
-    BOOLEAN    shift, and go to state 21
+    BOOL       shift, and go to state 21
     DOUBLE     shift, and go to state 22
     INT        shift, and go to state 23
     OBJECT     shift, and go to state 24
-    IF         shift, and go to state 144
-    WHILE      shift, and go to state 145
-    FOR        shift, and go to state 146
+    IF         shift, and go to state 184
+    WHILE      shift, and go to state 185
+    FOR        shift, and go to state 186
     FALSE      shift, and go to state 62
     TRUE       shift, and go to state 63
     NEW        shift, and go to state 64
     THIS       shift, and go to state 65
     NUL        shift, and go to state 66
-    RETURN     shift, and go to state 147
+    RETURN     shift, and go to state 187
     '+'        shift, and go to state 67
     '-'        shift, and go to state 68
     '!'        shift, and go to state 69
     DECREMENT  shift, and go to state 70
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
-    '{'        shift, and go to state 148
-    '}'        shift, and go to state 184
+    '{'        shift, and go to state 188
+    '}'        shift, and go to state 230
 
-    type             go to state 150
+    type             go to state 190
     noarraytype      go to state 27
     basictype        go to state 28
     arraytype        go to state 29
-    expr             go to state 151
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    statement        go to state 152
+    expression       go to state 191
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    statement        go to state 192
 
 
-state 172
+state 216
 
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   79 arrayindex: '[' expr ',' expr . ']'
-   80           | '[' expr ',' expr . ',' expr ']'
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
+   97 arrayindex: '[' expression ',' expression . ']'
+   98           | '[' expression ',' expression . ',' expression ']'
 
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-    ','  shift, and go to state 185
-    ']'  shift, and go to state 186
+    ','  shift, and go to state 231
+    ']'  shift, and go to state 232
 
 
-state 173
+state 217
 
-   55 expr: NEW IDENT '(' expr_list_e ')' .
+   58 expr: NEW IDENT '(' expr_list_e ')' .
 
-    $default  reduce using rule 55 (expr)
-
-
-state 174
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-   88 expr_list: expr_list ',' expr .
-
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-
-    $default  reduce using rule 88 (expr_list)
+    $default  reduce using rule 58 (expr)
 
 
-state 175
+state 218
 
-   54 expr: qualifiedname '(' expr_list_e ')' arrayindex .
+  106 qualnameorarray: expr '.' IDENT arrayindex .
+  111 qnora_without_id: expr '.' IDENT arrayindex .
 
-    $default  reduce using rule 54 (expr)
+    ')'       reduce using rule 111 (qnora_without_id)
+    $default  reduce using rule 106 (qualnameorarray)
 
 
-state 176
+state 219
+
+  107 qualnameorarray: qualnameorarray '.' IDENT arrayindex .
+  112 qnora_without_id: qualnameorarray '.' IDENT arrayindex .
+
+    ')'       reduce using rule 112 (qnora_without_id)
+    $default  reduce using rule 107 (qualnameorarray)
+
+
+state 220
+
+  114 expr_list: expr_list ',' expression .
+
+    $default  reduce using rule 114 (expr_list)
+
+
+state 221
+
+   57 expr: qualifiedname '(' expr_list_e ')' arrayindex .
+
+    $default  reduce using rule 57 (expr)
+
+
+state 222
 
    13 function: accessmodif type IDENT '(' @1 args_e ')' '{' statements . '}'
-  101 statements: statements . statement
+  127 statements: statements . statement
 
-    IDENT      shift, and go to state 143
+    IDENT      shift, and go to state 183
     INTEGER    shift, and go to state 60
     REAL       shift, and go to state 61
-    BOOLEAN    shift, and go to state 21
+    BOOL       shift, and go to state 21
     DOUBLE     shift, and go to state 22
     INT        shift, and go to state 23
     OBJECT     shift, and go to state 24
-    IF         shift, and go to state 144
-    WHILE      shift, and go to state 145
-    FOR        shift, and go to state 146
+    IF         shift, and go to state 184
+    WHILE      shift, and go to state 185
+    FOR        shift, and go to state 186
     FALSE      shift, and go to state 62
     TRUE       shift, and go to state 63
     NEW        shift, and go to state 64
     THIS       shift, and go to state 65
     NUL        shift, and go to state 66
-    RETURN     shift, and go to state 147
+    RETURN     shift, and go to state 187
     '+'        shift, and go to state 67
     '-'        shift, and go to state 68
     '!'        shift, and go to state 69
     DECREMENT  shift, and go to state 70
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
-    '{'        shift, and go to state 148
-    '}'        shift, and go to state 187
+    '{'        shift, and go to state 188
+    '}'        shift, and go to state 233
 
-    type             go to state 150
+    type             go to state 190
     noarraytype      go to state 27
     basictype        go to state 28
     arraytype        go to state 29
-    expr             go to state 151
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    statement        go to state 152
+    expression       go to state 191
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    statement        go to state 192
 
 
-state 177
+state 223
 
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-   91 statement: IF '(' expr . ')' statement
-   92          | IF '(' expr . ')' statement ELSE statement
+  117 statement: IF '(' expression . ')' statement
+  118          | IF '(' expression . ')' statement ELSE statement
 
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-    ')'  shift, and go to state 188
+    ')'  shift, and go to state 234
 
 
-state 178
+state 224
 
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-   93 statement: WHILE '(' expr . ')' statement
+  119 statement: WHILE '(' expression . ')' statement
 
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-    ')'  shift, and go to state 189
+    ')'  shift, and go to state 235
 
 
-state 179
+state 225
 
-  103 variables_e: type . variables
+  129 variables_e: type . variables
 
-    IDENT  shift, and go to state 77
+    IDENT  shift, and go to state 78
 
-    variables  go to state 190
+    variables  go to state 236
     variable   go to state 36
 
 
-state 180
+state 226
 
-   94 statement: FOR '(' variables_e . ';' expr_e ';' expr_e ')' statement
+  120 statement: FOR '(' variables_e . ';' expr_e ';' expr_e ')' statement
 
-    ';'  shift, and go to state 191
-
-
-state 181
-
-   99 statement: RETURN expr_e ';' .
-
-    $default  reduce using rule 99 (statement)
+    ';'  shift, and go to state 237
 
 
-state 182
+state 227
 
-   98 statement: '{' @3 statements . '}'
-  101 statements: statements . statement
+  125 statement: RETURN expr_e ';' .
 
-    IDENT      shift, and go to state 143
+    $default  reduce using rule 125 (statement)
+
+
+state 228
+
+  124 statement: '{' @3 statements . '}'
+  127 statements: statements . statement
+
+    IDENT      shift, and go to state 183
     INTEGER    shift, and go to state 60
     REAL       shift, and go to state 61
-    BOOLEAN    shift, and go to state 21
+    BOOL       shift, and go to state 21
     DOUBLE     shift, and go to state 22
     INT        shift, and go to state 23
     OBJECT     shift, and go to state 24
-    IF         shift, and go to state 144
-    WHILE      shift, and go to state 145
-    FOR        shift, and go to state 146
+    IF         shift, and go to state 184
+    WHILE      shift, and go to state 185
+    FOR        shift, and go to state 186
     FALSE      shift, and go to state 62
     TRUE       shift, and go to state 63
     NEW        shift, and go to state 64
     THIS       shift, and go to state 65
     NUL        shift, and go to state 66
-    RETURN     shift, and go to state 147
+    RETURN     shift, and go to state 187
     '+'        shift, and go to state 67
     '-'        shift, and go to state 68
     '!'        shift, and go to state 69
     DECREMENT  shift, and go to state 70
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
-    '{'        shift, and go to state 148
-    '}'        shift, and go to state 192
+    '{'        shift, and go to state 188
+    '}'        shift, and go to state 238
 
-    type             go to state 150
+    type             go to state 190
     noarraytype      go to state 27
     basictype        go to state 28
     arraytype        go to state 29
-    expr             go to state 151
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    statement        go to state 152
+    expression       go to state 191
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    statement        go to state 192
 
 
-state 183
+state 229
 
-   96 statement: type variables ';' .
+  122 statement: type variables ';' .
 
-    $default  reduce using rule 96 (statement)
+    $default  reduce using rule 122 (statement)
 
 
-state 184
+state 230
 
    15 function: accessmodif VOID IDENT '(' @2 args_e ')' '{' statements '}' .
 
     $default  reduce using rule 15 (function)
 
 
-state 185
+state 231
 
-   80 arrayindex: '[' expr ',' expr ',' . expr ']'
+   98 arrayindex: '[' expression ',' expression ',' . expression ']'
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -3246,257 +3449,118 @@ state 185
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expr             go to state 193
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
+    expression       go to state 239
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
 
 
-state 186
+state 232
 
-   79 arrayindex: '[' expr ',' expr ']' .
+   97 arrayindex: '[' expression ',' expression ']' .
 
-    $default  reduce using rule 79 (arrayindex)
+    $default  reduce using rule 97 (arrayindex)
 
 
-state 187
+state 233
 
    13 function: accessmodif type IDENT '(' @1 args_e ')' '{' statements '}' .
 
     $default  reduce using rule 13 (function)
 
 
-state 188
+state 234
 
-   91 statement: IF '(' expr ')' . statement
-   92          | IF '(' expr ')' . statement ELSE statement
+  117 statement: IF '(' expression ')' . statement
+  118          | IF '(' expression ')' . statement ELSE statement
 
-    IDENT      shift, and go to state 143
+    IDENT      shift, and go to state 183
     INTEGER    shift, and go to state 60
     REAL       shift, and go to state 61
-    BOOLEAN    shift, and go to state 21
+    BOOL       shift, and go to state 21
     DOUBLE     shift, and go to state 22
     INT        shift, and go to state 23
     OBJECT     shift, and go to state 24
-    IF         shift, and go to state 144
-    WHILE      shift, and go to state 145
-    FOR        shift, and go to state 146
+    IF         shift, and go to state 184
+    WHILE      shift, and go to state 185
+    FOR        shift, and go to state 186
     FALSE      shift, and go to state 62
     TRUE       shift, and go to state 63
     NEW        shift, and go to state 64
     THIS       shift, and go to state 65
     NUL        shift, and go to state 66
-    RETURN     shift, and go to state 147
+    RETURN     shift, and go to state 187
     '+'        shift, and go to state 67
     '-'        shift, and go to state 68
     '!'        shift, and go to state 69
     DECREMENT  shift, and go to state 70
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
-    '{'        shift, and go to state 148
+    '{'        shift, and go to state 188
 
-    type             go to state 150
+    type             go to state 190
     noarraytype      go to state 27
     basictype        go to state 28
     arraytype        go to state 29
-    expr             go to state 151
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    statement        go to state 194
+    expression       go to state 191
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    statement        go to state 240
 
 
-state 189
+state 235
 
-   93 statement: WHILE '(' expr ')' . statement
+  119 statement: WHILE '(' expression ')' . statement
 
-    IDENT      shift, and go to state 143
+    IDENT      shift, and go to state 183
     INTEGER    shift, and go to state 60
     REAL       shift, and go to state 61
-    BOOLEAN    shift, and go to state 21
+    BOOL       shift, and go to state 21
     DOUBLE     shift, and go to state 22
     INT        shift, and go to state 23
     OBJECT     shift, and go to state 24
-    IF         shift, and go to state 144
-    WHILE      shift, and go to state 145
-    FOR        shift, and go to state 146
+    IF         shift, and go to state 184
+    WHILE      shift, and go to state 185
+    FOR        shift, and go to state 186
     FALSE      shift, and go to state 62
     TRUE       shift, and go to state 63
     NEW        shift, and go to state 64
     THIS       shift, and go to state 65
     NUL        shift, and go to state 66
-    RETURN     shift, and go to state 147
+    RETURN     shift, and go to state 187
     '+'        shift, and go to state 67
     '-'        shift, and go to state 68
     '!'        shift, and go to state 69
     DECREMENT  shift, and go to state 70
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
-    '{'        shift, and go to state 148
+    '{'        shift, and go to state 188
 
-    type             go to state 150
+    type             go to state 190
     noarraytype      go to state 27
     basictype        go to state 28
     arraytype        go to state 29
-    expr             go to state 151
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    statement        go to state 195
+    expression       go to state 191
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    statement        go to state 241
 
 
-state 190
+state 236
 
    22 variables: variables . ',' variable
-  103 variables_e: type variables .
+  129 variables_e: type variables .
 
     ','  shift, and go to state 50
 
-    $default  reduce using rule 103 (variables_e)
+    $default  reduce using rule 129 (variables_e)
 
 
-state 191
+state 237
 
-   94 statement: FOR '(' variables_e ';' . expr_e ';' expr_e ')' statement
-
-    IDENT      shift, and go to state 59
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-
-    $default  reduce using rule 104 (expr_e)
-
-    expr             go to state 166
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    expr_e           go to state 196
-
-
-state 192
-
-   98 statement: '{' @3 statements '}' .
-
-    $default  reduce using rule 98 (statement)
-
-
-state 193
-
-   57 expr: expr . EQ expr
-   58     | expr . NE expr
-   59     | expr . '<' expr
-   60     | expr . SE expr
-   61     | expr . '>' expr
-   62     | expr . LE expr
-   63     | expr . '+' expr
-   64     | expr . '-' expr
-   65     | expr . '*' expr
-   66     | expr . '/' expr
-   67     | expr . '%' expr
-   68     | expr . AND expr
-   69     | expr . OR expr
-   70     | expr . IS type
-   80 arrayindex: '[' expr ',' expr ',' expr . ']'
-   82 qualifiedname: expr . '.' IDENT
-   85 qualnameorarray: expr . '.' IDENT
-   86                | expr . '.' IDENT arrayindex
-
-    IS   shift, and go to state 97
-    OR   shift, and go to state 98
-    AND  shift, and go to state 99
-    NE   shift, and go to state 100
-    EQ   shift, and go to state 101
-    '>'  shift, and go to state 102
-    '<'  shift, and go to state 103
-    SE   shift, and go to state 104
-    LE   shift, and go to state 105
-    '+'  shift, and go to state 106
-    '-'  shift, and go to state 107
-    '*'  shift, and go to state 108
-    '/'  shift, and go to state 109
-    '%'  shift, and go to state 110
-    '.'  shift, and go to state 111
-    ']'  shift, and go to state 197
-
-
-state 194
-
-   91 statement: IF '(' expr ')' statement .
-   92          | IF '(' expr ')' statement . ELSE statement
-
-    ELSE  shift, and go to state 198
-
-    $default  reduce using rule 91 (statement)
-
-
-state 195
-
-   93 statement: WHILE '(' expr ')' statement .
-
-    $default  reduce using rule 93 (statement)
-
-
-state 196
-
-   94 statement: FOR '(' variables_e ';' expr_e . ';' expr_e ')' statement
-
-    ';'  shift, and go to state 199
-
-
-state 197
-
-   80 arrayindex: '[' expr ',' expr ',' expr ']' .
-
-    $default  reduce using rule 80 (arrayindex)
-
-
-state 198
-
-   92 statement: IF '(' expr ')' statement ELSE . statement
-
-    IDENT      shift, and go to state 143
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    BOOLEAN    shift, and go to state 21
-    DOUBLE     shift, and go to state 22
-    INT        shift, and go to state 23
-    OBJECT     shift, and go to state 24
-    IF         shift, and go to state 144
-    WHILE      shift, and go to state 145
-    FOR        shift, and go to state 146
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    RETURN     shift, and go to state 147
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-    '{'        shift, and go to state 148
-
-    type             go to state 150
-    noarraytype      go to state 27
-    basictype        go to state 28
-    arraytype        go to state 29
-    expr             go to state 151
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    statement        go to state 200
-
-
-state 199
-
-   94 statement: FOR '(' variables_e ';' expr_e ';' . expr_e ')' statement
+  120 statement: FOR '(' variables_e ';' . expr_e ';' expr_e ')' statement
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -3513,68 +3577,182 @@ state 199
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    $default  reduce using rule 104 (expr_e)
+    $default  reduce using rule 130 (expr_e)
 
-    expr             go to state 166
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    expr_e           go to state 201
-
-
-state 200
-
-   92 statement: IF '(' expr ')' statement ELSE statement .
-
-    $default  reduce using rule 92 (statement)
+    expression       go to state 210
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    expr_e           go to state 242
 
 
-state 201
+state 238
 
-   94 statement: FOR '(' variables_e ';' expr_e ';' expr_e . ')' statement
+  124 statement: '{' @3 statements '}' .
 
-    ')'  shift, and go to state 202
+    $default  reduce using rule 124 (statement)
 
 
-state 202
+state 239
 
-   94 statement: FOR '(' variables_e ';' expr_e ';' expr_e ')' . statement
+   98 arrayindex: '[' expression ',' expression ',' expression . ']'
 
-    IDENT      shift, and go to state 143
+    ']'  shift, and go to state 243
+
+
+state 240
+
+  117 statement: IF '(' expression ')' statement .
+  118          | IF '(' expression ')' statement . ELSE statement
+
+    ELSE  shift, and go to state 244
+
+    $default  reduce using rule 117 (statement)
+
+
+state 241
+
+  119 statement: WHILE '(' expression ')' statement .
+
+    $default  reduce using rule 119 (statement)
+
+
+state 242
+
+  120 statement: FOR '(' variables_e ';' expr_e . ';' expr_e ')' statement
+
+    ';'  shift, and go to state 245
+
+
+state 243
+
+   98 arrayindex: '[' expression ',' expression ',' expression ']' .
+
+    $default  reduce using rule 98 (arrayindex)
+
+
+state 244
+
+  118 statement: IF '(' expression ')' statement ELSE . statement
+
+    IDENT      shift, and go to state 183
     INTEGER    shift, and go to state 60
     REAL       shift, and go to state 61
-    BOOLEAN    shift, and go to state 21
+    BOOL       shift, and go to state 21
     DOUBLE     shift, and go to state 22
     INT        shift, and go to state 23
     OBJECT     shift, and go to state 24
-    IF         shift, and go to state 144
-    WHILE      shift, and go to state 145
-    FOR        shift, and go to state 146
+    IF         shift, and go to state 184
+    WHILE      shift, and go to state 185
+    FOR        shift, and go to state 186
     FALSE      shift, and go to state 62
     TRUE       shift, and go to state 63
     NEW        shift, and go to state 64
     THIS       shift, and go to state 65
     NUL        shift, and go to state 66
-    RETURN     shift, and go to state 147
+    RETURN     shift, and go to state 187
     '+'        shift, and go to state 67
     '-'        shift, and go to state 68
     '!'        shift, and go to state 69
     DECREMENT  shift, and go to state 70
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
-    '{'        shift, and go to state 148
+    '{'        shift, and go to state 188
 
-    type             go to state 150
+    type             go to state 190
     noarraytype      go to state 27
     basictype        go to state 28
     arraytype        go to state 29
-    expr             go to state 151
-    qualifiedname    go to state 74
-    qualnameorarray  go to state 75
-    statement        go to state 203
+    expression       go to state 191
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    statement        go to state 246
 
 
-state 203
+state 245
 
-   94 statement: FOR '(' variables_e ';' expr_e ';' expr_e ')' statement .
+  120 statement: FOR '(' variables_e ';' expr_e ';' . expr_e ')' statement
 
-    $default  reduce using rule 94 (statement)
+    IDENT      shift, and go to state 59
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+
+    $default  reduce using rule 130 (expr_e)
+
+    expression       go to state 210
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    expr_e           go to state 247
+
+
+state 246
+
+  118 statement: IF '(' expression ')' statement ELSE statement .
+
+    $default  reduce using rule 118 (statement)
+
+
+state 247
+
+  120 statement: FOR '(' variables_e ';' expr_e ';' expr_e . ')' statement
+
+    ')'  shift, and go to state 248
+
+
+state 248
+
+  120 statement: FOR '(' variables_e ';' expr_e ';' expr_e ')' . statement
+
+    IDENT      shift, and go to state 183
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    BOOL       shift, and go to state 21
+    DOUBLE     shift, and go to state 22
+    INT        shift, and go to state 23
+    OBJECT     shift, and go to state 24
+    IF         shift, and go to state 184
+    WHILE      shift, and go to state 185
+    FOR        shift, and go to state 186
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    RETURN     shift, and go to state 187
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+    '{'        shift, and go to state 188
+
+    type             go to state 190
+    noarraytype      go to state 27
+    basictype        go to state 28
+    arraytype        go to state 29
+    expression       go to state 191
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    statement        go to state 249
+
+
+state 249
+
+  120 statement: FOR '(' variables_e ';' expr_e ';' expr_e ')' statement .
+
+    $default  reduce using rule 120 (statement)

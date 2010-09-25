@@ -73,7 +73,7 @@
 
 %type	<tArrayIndex>	arrayindex
 %type	<tQualName>		qualifiedname
-%type	<tQualNArray>	qualnameorarray
+%type	<tQualNArray>	qualnameorarray	qnora_without_id
 
 %type	<tStats>		statements
 %type	<tStat>			statement
