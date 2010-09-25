@@ -156,16 +156,17 @@ Grammar
   123 @3: /* empty */
 
   124 statement: '{' @3 statements '}'
-  125          | RETURN expr_e ';'
+  125          | RETURN expression ';'
 
   126 statements: /* empty */
   127           | statements statement
 
   128 variables_e: /* empty */
   129            | type variables
+  130            | variable
 
-  130 expr_e: /* empty */
-  131       | expression
+  131 expr_e: /* empty */
+  132       | expression
 
 
 Terminals, with rules where they appear
@@ -259,7 +260,7 @@ args_e (68)
 variables (69)
     on left: 21 22, on right: 10 22 122 129
 variable (70)
-    on left: 23 24, on right: 21 22
+    on left: 23 24, on right: 21 22 130
 accessmodif (71)
     on left: 25 26 27 28, on right: 10 11 13 15
 type (72)
@@ -273,7 +274,7 @@ arraytype (75)
 expression (76)
     on left: 43 44, on right: 24 49 50 51 55 60 61 62 63 64 65 66 67
     68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 88 89 96
-    97 98 113 114 117 118 119 121 131
+    97 98 113 114 117 118 119 121 125 132
 expr (77)
     on left: 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62
     63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83
@@ -300,9 +301,9 @@ statement (84)
 statements (86)
     on left: 126 127, on right: 11 13 15 124 127
 variables_e (87)
-    on left: 128 129, on right: 120
+    on left: 128 129 130, on right: 120
 expr_e (88)
-    on left: 130 131, on right: 120 125
+    on left: 131 132, on right: 120
 
 
 state 0
@@ -2842,7 +2843,7 @@ state 186
 
 state 187
 
-  125 statement: RETURN . expr_e ';'
+  125 statement: RETURN . expression ';'
 
     IDENT      shift, and go to state 59
     INTEGER    shift, and go to state 60
@@ -2859,13 +2860,10 @@ state 187
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    $default  reduce using rule 130 (expr_e)
-
     expression       go to state 210
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
-    expr_e           go to state 211
 
 
 state 188
@@ -2874,7 +2872,7 @@ state 188
 
     $default  reduce using rule 123 (@3)
 
-    @3  go to state 212
+    @3  go to state 211
 
 
 state 189
@@ -2890,7 +2888,7 @@ state 190
 
     IDENT  shift, and go to state 78
 
-    variables  go to state 213
+    variables  go to state 212
     variable   go to state 36
 
 
@@ -2898,7 +2896,7 @@ state 191
 
   121 statement: expression . ';'
 
-    ';'  shift, and go to state 214
+    ';'  shift, and go to state 213
 
 
 state 192
@@ -2914,7 +2912,7 @@ state 193
 
     $default  reduce using rule 126 (statements)
 
-    statements  go to state 215
+    statements  go to state 214
 
 
 state 194
@@ -2937,7 +2935,7 @@ state 194
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expression       go to state 216
+    expression       go to state 215
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
@@ -2954,7 +2952,7 @@ state 196
 
    58 expr: NEW IDENT '(' expr_list_e . ')'
 
-    ')'  shift, and go to state 217
+    ')'  shift, and go to state 216
 
 
 state 197
@@ -2985,7 +2983,7 @@ state 199
     ')'       reduce using rule 109 (qnora_without_id)
     $default  reduce using rule 104 (qualnameorarray)
 
-    arrayindex  go to state 218
+    arrayindex  go to state 217
 
 
 state 200
@@ -3002,7 +3000,7 @@ state 200
     ')'       reduce using rule 110 (qnora_without_id)
     $default  reduce using rule 105 (qualnameorarray)
 
-    arrayindex  go to state 219
+    arrayindex  go to state 218
 
 
 state 201
@@ -3031,7 +3029,7 @@ state 202
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expression       go to state 220
+    expression       go to state 219
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
@@ -3046,7 +3044,7 @@ state 203
 
     $default  reduce using rule 56 (expr)
 
-    arrayindex  go to state 221
+    arrayindex  go to state 220
 
 
 state 204
@@ -3062,7 +3060,7 @@ state 205
 
     $default  reduce using rule 126 (statements)
 
-    statements  go to state 222
+    statements  go to state 221
 
 
 state 206
@@ -3117,7 +3115,7 @@ state 207
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expression       go to state 223
+    expression       go to state 222
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
@@ -3142,7 +3140,7 @@ state 208
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expression       go to state 224
+    expression       go to state 223
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
@@ -3152,7 +3150,7 @@ state 209
 
   120 statement: FOR '(' . variables_e ';' expr_e ';' expr_e ')' statement
 
-    IDENT   shift, and go to state 39
+    IDENT   shift, and go to state 224
     BOOL    shift, and go to state 21
     DOUBLE  shift, and go to state 22
     INT     shift, and go to state 23
@@ -3160,53 +3158,47 @@ state 209
 
     $default  reduce using rule 128 (variables_e)
 
-    type         go to state 225
+    variable     go to state 225
+    type         go to state 226
     noarraytype  go to state 27
     basictype    go to state 28
     arraytype    go to state 29
-    variables_e  go to state 226
+    variables_e  go to state 227
 
 
 state 210
 
-  131 expr_e: expression .
+  125 statement: RETURN expression . ';'
 
-    $default  reduce using rule 131 (expr_e)
+    ';'  shift, and go to state 228
 
 
 state 211
-
-  125 statement: RETURN expr_e . ';'
-
-    ';'  shift, and go to state 227
-
-
-state 212
 
   124 statement: '{' @3 . statements '}'
 
     $default  reduce using rule 126 (statements)
 
-    statements  go to state 228
+    statements  go to state 229
 
 
-state 213
+state 212
 
    22 variables: variables . ',' variable
   122 statement: type variables . ';'
 
-    ';'  shift, and go to state 229
+    ';'  shift, and go to state 230
     ','  shift, and go to state 50
 
 
-state 214
+state 213
 
   121 statement: expression ';' .
 
     $default  reduce using rule 121 (statement)
 
 
-state 215
+state 214
 
    15 function: accessmodif VOID IDENT '(' @2 args_e ')' '{' statements . '}'
   127 statements: statements . statement
@@ -3234,7 +3226,7 @@ state 215
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
     '{'        shift, and go to state 188
-    '}'        shift, and go to state 230
+    '}'        shift, and go to state 231
 
     type             go to state 190
     noarraytype      go to state 27
@@ -3247,23 +3239,23 @@ state 215
     statement        go to state 192
 
 
-state 216
+state 215
 
    97 arrayindex: '[' expression ',' expression . ']'
    98           | '[' expression ',' expression . ',' expression ']'
 
-    ','  shift, and go to state 231
-    ']'  shift, and go to state 232
+    ','  shift, and go to state 232
+    ']'  shift, and go to state 233
 
 
-state 217
+state 216
 
    58 expr: NEW IDENT '(' expr_list_e ')' .
 
     $default  reduce using rule 58 (expr)
 
 
-state 218
+state 217
 
   106 qualnameorarray: expr '.' IDENT arrayindex .
   111 qnora_without_id: expr '.' IDENT arrayindex .
@@ -3272,7 +3264,7 @@ state 218
     $default  reduce using rule 106 (qualnameorarray)
 
 
-state 219
+state 218
 
   107 qualnameorarray: qualnameorarray '.' IDENT arrayindex .
   112 qnora_without_id: qualnameorarray '.' IDENT arrayindex .
@@ -3281,21 +3273,21 @@ state 219
     $default  reduce using rule 107 (qualnameorarray)
 
 
-state 220
+state 219
 
   114 expr_list: expr_list ',' expression .
 
     $default  reduce using rule 114 (expr_list)
 
 
-state 221
+state 220
 
    57 expr: qualifiedname '(' expr_list_e ')' arrayindex .
 
     $default  reduce using rule 57 (expr)
 
 
-state 222
+state 221
 
    13 function: accessmodif type IDENT '(' @1 args_e ')' '{' statements . '}'
   127 statements: statements . statement
@@ -3323,7 +3315,7 @@ state 222
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
     '{'        shift, and go to state 188
-    '}'        shift, and go to state 233
+    '}'        shift, and go to state 234
 
     type             go to state 190
     noarraytype      go to state 27
@@ -3336,46 +3328,69 @@ state 222
     statement        go to state 192
 
 
-state 223
+state 222
 
   117 statement: IF '(' expression . ')' statement
   118          | IF '(' expression . ')' statement ELSE statement
 
-    ')'  shift, and go to state 234
+    ')'  shift, and go to state 235
+
+
+state 223
+
+  119 statement: WHILE '(' expression . ')' statement
+
+    ')'  shift, and go to state 236
 
 
 state 224
 
-  119 statement: WHILE '(' expression . ')' statement
+   23 variable: IDENT .
+   24         | IDENT . '=' expression
+   31 noarraytype: IDENT .
+   37 arraytype: IDENT . '[' ']'
+   38          | IDENT . '[' ',' ']'
+   39          | IDENT . '[' ',' ',' ']'
 
-    ')'  shift, and go to state 235
+    '='  shift, and go to state 47
+    '['  shift, and go to state 32
+
+    IDENT     reduce using rule 31 (noarraytype)
+    $default  reduce using rule 23 (variable)
 
 
 state 225
+
+  130 variables_e: variable .
+
+    $default  reduce using rule 130 (variables_e)
+
+
+state 226
 
   129 variables_e: type . variables
 
     IDENT  shift, and go to state 78
 
-    variables  go to state 236
+    variables  go to state 237
     variable   go to state 36
-
-
-state 226
-
-  120 statement: FOR '(' variables_e . ';' expr_e ';' expr_e ')' statement
-
-    ';'  shift, and go to state 237
 
 
 state 227
 
-  125 statement: RETURN expr_e ';' .
+  120 statement: FOR '(' variables_e . ';' expr_e ';' expr_e ')' statement
+
+    ';'  shift, and go to state 238
+
+
+state 228
+
+  125 statement: RETURN expression ';' .
 
     $default  reduce using rule 125 (statement)
 
 
-state 228
+state 229
 
   124 statement: '{' @3 statements . '}'
   127 statements: statements . statement
@@ -3403,7 +3418,7 @@ state 228
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
     '{'        shift, and go to state 188
-    '}'        shift, and go to state 238
+    '}'        shift, and go to state 239
 
     type             go to state 190
     noarraytype      go to state 27
@@ -3416,21 +3431,21 @@ state 228
     statement        go to state 192
 
 
-state 229
+state 230
 
   122 statement: type variables ';' .
 
     $default  reduce using rule 122 (statement)
 
 
-state 230
+state 231
 
    15 function: accessmodif VOID IDENT '(' @2 args_e ')' '{' statements '}' .
 
     $default  reduce using rule 15 (function)
 
 
-state 231
+state 232
 
    98 arrayindex: '[' expression ',' expression ',' . expression ']'
 
@@ -3449,69 +3464,30 @@ state 231
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    expression       go to state 239
+    expression       go to state 240
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
 
 
-state 232
+state 233
 
    97 arrayindex: '[' expression ',' expression ']' .
 
     $default  reduce using rule 97 (arrayindex)
 
 
-state 233
+state 234
 
    13 function: accessmodif type IDENT '(' @1 args_e ')' '{' statements '}' .
 
     $default  reduce using rule 13 (function)
 
 
-state 234
+state 235
 
   117 statement: IF '(' expression ')' . statement
   118          | IF '(' expression ')' . statement ELSE statement
-
-    IDENT      shift, and go to state 183
-    INTEGER    shift, and go to state 60
-    REAL       shift, and go to state 61
-    BOOL       shift, and go to state 21
-    DOUBLE     shift, and go to state 22
-    INT        shift, and go to state 23
-    OBJECT     shift, and go to state 24
-    IF         shift, and go to state 184
-    WHILE      shift, and go to state 185
-    FOR        shift, and go to state 186
-    FALSE      shift, and go to state 62
-    TRUE       shift, and go to state 63
-    NEW        shift, and go to state 64
-    THIS       shift, and go to state 65
-    NUL        shift, and go to state 66
-    RETURN     shift, and go to state 187
-    '+'        shift, and go to state 67
-    '-'        shift, and go to state 68
-    '!'        shift, and go to state 69
-    DECREMENT  shift, and go to state 70
-    INCREMENT  shift, and go to state 71
-    '('        shift, and go to state 72
-    '{'        shift, and go to state 188
-
-    type             go to state 190
-    noarraytype      go to state 27
-    basictype        go to state 28
-    arraytype        go to state 29
-    expression       go to state 191
-    expr             go to state 74
-    qualifiedname    go to state 75
-    qualnameorarray  go to state 76
-    statement        go to state 240
-
-
-state 235
-
-  119 statement: WHILE '(' expression ')' . statement
 
     IDENT      shift, and go to state 183
     INTEGER    shift, and go to state 60
@@ -3550,6 +3526,45 @@ state 235
 
 state 236
 
+  119 statement: WHILE '(' expression ')' . statement
+
+    IDENT      shift, and go to state 183
+    INTEGER    shift, and go to state 60
+    REAL       shift, and go to state 61
+    BOOL       shift, and go to state 21
+    DOUBLE     shift, and go to state 22
+    INT        shift, and go to state 23
+    OBJECT     shift, and go to state 24
+    IF         shift, and go to state 184
+    WHILE      shift, and go to state 185
+    FOR        shift, and go to state 186
+    FALSE      shift, and go to state 62
+    TRUE       shift, and go to state 63
+    NEW        shift, and go to state 64
+    THIS       shift, and go to state 65
+    NUL        shift, and go to state 66
+    RETURN     shift, and go to state 187
+    '+'        shift, and go to state 67
+    '-'        shift, and go to state 68
+    '!'        shift, and go to state 69
+    DECREMENT  shift, and go to state 70
+    INCREMENT  shift, and go to state 71
+    '('        shift, and go to state 72
+    '{'        shift, and go to state 188
+
+    type             go to state 190
+    noarraytype      go to state 27
+    basictype        go to state 28
+    arraytype        go to state 29
+    expression       go to state 191
+    expr             go to state 74
+    qualifiedname    go to state 75
+    qualnameorarray  go to state 76
+    statement        go to state 242
+
+
+state 237
+
    22 variables: variables . ',' variable
   129 variables_e: type variables .
 
@@ -3558,7 +3573,7 @@ state 236
     $default  reduce using rule 129 (variables_e)
 
 
-state 237
+state 238
 
   120 statement: FOR '(' variables_e ';' . expr_e ';' expr_e ')' statement
 
@@ -3577,61 +3592,68 @@ state 237
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    $default  reduce using rule 130 (expr_e)
+    $default  reduce using rule 131 (expr_e)
 
-    expression       go to state 210
+    expression       go to state 243
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
-    expr_e           go to state 242
+    expr_e           go to state 244
 
 
-state 238
+state 239
 
   124 statement: '{' @3 statements '}' .
 
     $default  reduce using rule 124 (statement)
 
 
-state 239
+state 240
 
    98 arrayindex: '[' expression ',' expression ',' expression . ']'
 
-    ']'  shift, and go to state 243
+    ']'  shift, and go to state 245
 
 
-state 240
+state 241
 
   117 statement: IF '(' expression ')' statement .
   118          | IF '(' expression ')' statement . ELSE statement
 
-    ELSE  shift, and go to state 244
+    ELSE  shift, and go to state 246
 
     $default  reduce using rule 117 (statement)
 
 
-state 241
+state 242
 
   119 statement: WHILE '(' expression ')' statement .
 
     $default  reduce using rule 119 (statement)
 
 
-state 242
+state 243
+
+  132 expr_e: expression .
+
+    $default  reduce using rule 132 (expr_e)
+
+
+state 244
 
   120 statement: FOR '(' variables_e ';' expr_e . ';' expr_e ')' statement
 
-    ';'  shift, and go to state 245
+    ';'  shift, and go to state 247
 
 
-state 243
+state 245
 
    98 arrayindex: '[' expression ',' expression ',' expression ']' .
 
     $default  reduce using rule 98 (arrayindex)
 
 
-state 244
+state 246
 
   118 statement: IF '(' expression ')' statement ELSE . statement
 
@@ -3667,10 +3689,10 @@ state 244
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
-    statement        go to state 246
+    statement        go to state 248
 
 
-state 245
+state 247
 
   120 statement: FOR '(' variables_e ';' expr_e ';' . expr_e ')' statement
 
@@ -3689,30 +3711,30 @@ state 245
     INCREMENT  shift, and go to state 71
     '('        shift, and go to state 72
 
-    $default  reduce using rule 130 (expr_e)
+    $default  reduce using rule 131 (expr_e)
 
-    expression       go to state 210
+    expression       go to state 243
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
-    expr_e           go to state 247
+    expr_e           go to state 249
 
 
-state 246
+state 248
 
   118 statement: IF '(' expression ')' statement ELSE statement .
 
     $default  reduce using rule 118 (statement)
 
 
-state 247
+state 249
 
   120 statement: FOR '(' variables_e ';' expr_e ';' expr_e . ')' statement
 
-    ')'  shift, and go to state 248
+    ')'  shift, and go to state 250
 
 
-state 248
+state 250
 
   120 statement: FOR '(' variables_e ';' expr_e ';' expr_e ')' . statement
 
@@ -3748,10 +3770,10 @@ state 248
     expr             go to state 74
     qualifiedname    go to state 75
     qualnameorarray  go to state 76
-    statement        go to state 249
+    statement        go to state 251
 
 
-state 249
+state 251
 
   120 statement: FOR '(' variables_e ';' expr_e ';' expr_e ')' statement .
 

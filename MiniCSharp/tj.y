@@ -636,7 +636,7 @@ statement:		  IF '(' expression ')' statement %prec IF_PREC
 							$$ = new Block($3, lin, col);
 							symtab->OutScope();
 						 }
-				| RETURN expr_e ';'
+				| RETURN expression ';'
 					{
 						$$ = new Return($2, lin, col);
 					}
@@ -661,6 +661,9 @@ variables_e:		  /* Empty */
 					{
 						$$ = new Variables_e($1, $2, lin, col);
 					} 
+				| variable
+					{
+				    } 
 ;
 
 expr_e:			  /* Empty */
