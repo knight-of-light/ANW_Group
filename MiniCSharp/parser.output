@@ -1,9 +1,3 @@
-Terminals which are not used
-
-   EXTENDS
-   INSTANCEOF
-
-
 Grammar
 
     0 $accept: root $end
@@ -67,7 +61,7 @@ Grammar
    36 noarraytype: IDENT
    37            | arraytype
 
-   38 arraytype: BOOLEAN
+   38 arraytype: BOOL
    39          | INT
    40          | DOUBLE
 
@@ -210,7 +204,7 @@ IDENT (258) 3 4 12 13 15 17 19 21 22 29 30 36 41 42 43 57 62 63 93
 INTEGER (259) 94
 REAL (260) 95
 CLASS (261) 3 4
-BOOLEAN (262) 38
+BOOL (262) 38
 DOUBLE (263) 40
 INT (264) 39
 IS (265) 90 91
@@ -220,107 +214,105 @@ WHILE (268) 123
 FOR (269) 124
 FALSE (270) 97
 TRUE (271) 96
-EXTENDS (272)
-INSTANCEOF (273)
-NEW (274) 62 63
-THIS (275) 98
-NUL (276) 99
-PRIVATE (277) 31 33
-STATIC (278) 32 33
-VOID (279) 17 21
-RETURN (280) 129
-EXPRESSION (281)
-IF_PREC (282)
-OR (283) 88 89
-AND (284) 86 87
-NE (285) 66 67
-EQ (286) 64 65
-SE (287) 70 71
-LE (288) 74 75
-CAST (289)
-UNARY_OP (290)
-DECREMENT (291) 50 52
-INCREMENT (292) 49 51
+NEW (272) 62 63
+THIS (273) 98
+NUL (274) 99
+PRIVATE (275) 31 33
+STATIC (276) 32 33
+VOID (277) 17 21
+RETURN (278) 129
+EXPRESSION (279)
+IF_PREC (280)
+OR (281) 88 89
+AND (282) 86 87
+NE (283) 66 67
+EQ (284) 64 65
+SE (285) 70 71
+LE (286) 74 75
+CAST (287)
+UNARY_OP (288)
+DECREMENT (289) 50 52
+INCREMENT (290) 49 51
 
 
 Nonterminals, with rules where they appear
 
-$accept (57)
+$accept (55)
     on left: 0
-root (58)
+root (56)
     on left: 1 2, on right: 0 2
-class (59)
+class (57)
     on left: 3 4, on right: 2
-member (60)
+member (58)
     on left: 5 6, on right: 3 4 6
-field (61)
+field (59)
     on left: 7 8 9, on right: 6
-global (62)
+global (60)
     on left: 10 11, on right: 7
-constructor (63)
+constructor (61)
     on left: 12 13, on right: 8
-function (64)
+function (62)
     on left: 15 17 19 21, on right: 9
-@1 (65)
+@1 (63)
     on left: 14, on right: 15
-@2 (66)
+@2 (64)
     on left: 16, on right: 17
-@3 (67)
+@3 (65)
     on left: 18, on right: 19
-@4 (68)
+@4 (66)
     on left: 20, on right: 21
-args (69)
+args (67)
     on left: 22, on right: 23 24
-arg (70)
+arg (68)
     on left: 23 24, on right: 24 26
-arg_e (71)
+arg_e (69)
     on left: 25 26, on right: 12 13 15 17 19 21
-variables (72)
+variables (70)
     on left: 27 28, on right: 10 11 28 126 133
-variable (73)
+variable (71)
     on left: 29 30, on right: 27 28
-accessmodif (74)
+accessmodif (72)
     on left: 31 32 33, on right: 10 13 15 17
-type (75)
+type (73)
     on left: 34 35, on right: 10 11 15 19 22 90 91 126 133
-noarraytype (76)
+noarraytype (74)
     on left: 36 37, on right: 34
-arraytype (77)
+arraytype (75)
     on left: 38 39 40, on right: 37 44 45 46 92
-arr_type (78)
+arr_type (76)
     on left: 41 42 43 44 45 46, on right: 35
-expression (79)
+expression (77)
     on left: 47 48, on right: 30 53 54 55 59 64 65 66 67 68 69 70 71
     72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 92 93 100
     101 102 117 118 121 122 123 125 135
-expr (80)
+expr (78)
     on left: 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66
     67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87
     88 89 90 91 92 93 94 95 96 97 98 99, on right: 47 56 64 66 68 70
     72 74 76 78 80 82 84 86 88 90 104 108 110 113 115
-arrayindex (81)
+arrayindex (79)
     on left: 100 101 102, on right: 61 63 107 110 111 112 115 116
-qualifiedname (82)
+qualifiedname (80)
     on left: 103 104 105, on right: 60 61
-qualnameorarray (83)
+qualnameorarray (81)
     on left: 106 107 108 109 110 111, on right: 48 49 50 51 52 59 65
     67 69 71 73 75 77 79 81 83 85 87 89 91 105 109 111 114 116
-qnora_without_id (84)
+qnora_without_id (82)
     on left: 112 113 114 115 116, on right: 58
-expr_list (85)
+expr_list (83)
     on left: 117 118, on right: 118 120
-expr_list_e (86)
+expr_list_e (84)
     on left: 119 120, on right: 60 61 62
-statement (87)
+statement (85)
     on left: 121 122 123 124 125 126 128 129, on right: 121 122 123
     124 131
-@5 (88)
+@5 (86)
     on left: 127, on right: 128
-statements (89)
+statements (87)
     on left: 130 131, on right: 12 13 15 17 19 21 128 131
-vars_decl_e (90)
+vars_decl_e (88)
     on left: 132 133, on right: 124
-expr_e (91)
+expr_e (89)
     on left: 134 135, on right: 124 129
 
 
@@ -397,7 +389,7 @@ state 8
     6 member: member . field
 
     IDENT    shift, and go to state 10
-    BOOLEAN  shift, and go to state 11
+    BOOL     shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
     PRIVATE  shift, and go to state 14
@@ -439,7 +431,7 @@ state 10
 
 state 11
 
-   38 arraytype: BOOLEAN .
+   38 arraytype: BOOL .
 
     $default  reduce using rule 38 (arraytype)
 
@@ -524,11 +516,11 @@ state 22
    15 function: accessmodif . type IDENT '(' @1 arg_e ')' '{' statements '}'
    17         | accessmodif . VOID IDENT '(' @2 arg_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 32
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
-    VOID     shift, and go to state 33
+    IDENT   shift, and go to state 32
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
+    VOID    shift, and go to state 33
 
     type         go to state 34
     noarraytype  go to state 24
@@ -586,10 +578,10 @@ state 28
 
    12 constructor: IDENT '(' . arg_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     $default  reduce using rule 25 (arg_e)
 
@@ -702,7 +694,7 @@ state 39
     6 member: member . field
 
     IDENT    shift, and go to state 10
-    BOOLEAN  shift, and go to state 11
+    BOOL     shift, and go to state 11
     DOUBLE   shift, and go to state 12
     INT      shift, and go to state 13
     PRIVATE  shift, and go to state 14
@@ -793,10 +785,10 @@ state 48
 
    13 constructor: accessmodif IDENT '(' . arg_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     $default  reduce using rule 25 (arg_e)
 
@@ -914,10 +906,10 @@ state 59
 
    24 arg: arg ',' . args
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     args         go to state 92
     type         go to state 44
@@ -958,10 +950,10 @@ state 64
 
    21 function: VOID IDENT '(' @4 . arg_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     $default  reduce using rule 25 (arg_e)
 
@@ -1204,7 +1196,7 @@ state 82
     IDENT      shift, and go to state 108
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     FALSE      shift, and go to state 72
@@ -1331,10 +1323,10 @@ state 87
 
    19 function: type IDENT '(' @3 . arg_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     $default  reduce using rule 25 (arg_e)
 
@@ -1419,10 +1411,10 @@ state 97
 
    17 function: accessmodif VOID IDENT '(' @2 . arg_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     $default  reduce using rule 25 (arg_e)
 
@@ -1439,10 +1431,10 @@ state 98
 
    15 function: accessmodif type IDENT '(' @1 . arg_e ')' '{' statements '}'
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     $default  reduce using rule 25 (arg_e)
 
@@ -1744,10 +1736,10 @@ state 113
 
    90 expr: expr IS . type
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     type         go to state 164
     noarraytype  go to state 24
@@ -2123,10 +2115,10 @@ state 129
 
    91 expr: qualnameorarray IS . type
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     type         go to state 182
     noarraytype  go to state 24
@@ -2529,7 +2521,7 @@ state 149
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -3124,7 +3116,7 @@ state 210
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -3405,10 +3397,10 @@ state 228
 
   124 statement: FOR '(' . vars_decl_e ';' expr_e ';' expr_e ')' statement
 
-    IDENT    shift, and go to state 40
-    BOOLEAN  shift, and go to state 11
-    DOUBLE   shift, and go to state 12
-    INT      shift, and go to state 13
+    IDENT   shift, and go to state 40
+    BOOL    shift, and go to state 11
+    DOUBLE  shift, and go to state 12
+    INT     shift, and go to state 13
 
     $default  reduce using rule 132 (vars_decl_e)
 
@@ -3466,7 +3458,7 @@ state 234
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -3579,7 +3571,7 @@ state 244
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -3658,7 +3650,7 @@ state 250
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -3712,7 +3704,7 @@ state 253
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -3752,7 +3744,7 @@ state 254
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -3831,7 +3823,7 @@ state 258
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -3869,7 +3861,7 @@ state 259
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -4004,7 +3996,7 @@ state 270
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200
@@ -4084,7 +4076,7 @@ state 274
     IDENT      shift, and go to state 199
     INTEGER    shift, and go to state 70
     REAL       shift, and go to state 71
-    BOOLEAN    shift, and go to state 11
+    BOOL       shift, and go to state 11
     DOUBLE     shift, and go to state 12
     INT        shift, and go to state 13
     IF         shift, and go to state 200

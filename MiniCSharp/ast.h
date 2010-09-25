@@ -188,7 +188,7 @@ public:
 class ExprType : public Node
 {
 public:	
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
+	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = BOOL, 4: void
 	int type;
 
 	ExprType(int, int, int);
@@ -211,7 +211,7 @@ public:
 class Expr : public Node
 {
 public:
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
+	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = BOOL, 4: void
 	int type ;
 	Expr(int, int);
 	virtual void accept(Visitor *);
@@ -597,7 +597,7 @@ public:
 	//1:class 2: func, 3: global Variable, 4: constructor, 5: Local Variable, 6: Argument
 	int kind;
 	string name;
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
+	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = BOOL, 4: void
 	int type;
 	vector<int> *argsTypes;
 	int returnType;

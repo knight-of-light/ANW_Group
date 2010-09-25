@@ -7,7 +7,7 @@ TypeVisitor::Visit(ClassDef *n)
 	types[0] = "null";
 	types[1] = "int";
 	types[2] = "double";
-	types[3] = "boolean";
+	types[3] = "BOOL";
 	types[4] = "void";
 	n->fields->accept(this);
 }

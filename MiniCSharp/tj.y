@@ -65,10 +65,10 @@
 %token	<tInteger>	INTEGER 
 %token	<tReal>		REAL
 
-%token CLASS BOOLEAN DOUBLE INT IS
+%token CLASS BOOL DOUBLE INT IS
 %token IF ELSE WHILE FOR 
-%token FALSE TRUE EXTENDS
-%token INSTANCEOF NEW 
+%token FALSE TRUE
+%token NEW
 %token THIS NUL PRIVATE STATIC 
 %token VOID RETURN 
 
@@ -80,13 +80,12 @@
 %right '='
 %left OR
 %left AND
-%left EQ NE IS
-%left '>' '<' LE SE
-%nonassoc INSTANCEOF
-%nonassoc CAST
+%left EQ NE
+%left '>' '<' LE SE IS
+%right CAST
 %left '+' '-'
 %left '*'  '/'  '%'
-%left '!' INCREMENT DECREMENT UNARY_OP
+%right '!' INCREMENT DECREMENT UNARY_OP
 %left '.'
 %left '(' 
 
@@ -246,7 +245,7 @@ noarraytype:	  IDENT
 					}
 ;
 
-arraytype:	  BOOLEAN
+arraytype:	  BOOL
 					{
 						//$$ = new ExprType(3, lin, col);
 					}
