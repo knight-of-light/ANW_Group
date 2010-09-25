@@ -37,9 +37,9 @@ REAL3	(0|[1-9][0-9]*)([eE][-+]?(0|[1-9][0-9]*))
 						col += yyleng;
 						return CLASS;
 					}
-"boolean"			{						
+"bool"			{						
 						col += yyleng;
-						return BOOLEAN;
+						return BOOL;
 					}
 "double"			{
 						col += yyleng;

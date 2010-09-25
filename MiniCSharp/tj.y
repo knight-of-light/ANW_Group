@@ -68,7 +68,7 @@
 %type	<tType>			type
 %type	<tNoArrayType>	noarraytype	basictype
 %type	<tArrayType>	arraytype
-%type	<tExpr>			expr	expr_e
+%type	<tExpr>			expr	expression	expr_e
 %type	<tExprList>		expr_list	expr_list_e
 
 %type	<tArrayIndex>	arrayindex
@@ -83,12 +83,14 @@
 %token	<tInteger>		INTEGER 
 %token	<tReal>			REAL
 
-%token CLASS BOOLEAN DOUBLE INT IS OBJECT
+%token CLASS BOOL DOUBLE INT IS OBJECT
 %token IF ELSE WHILE FOR 
-%token FALSE TRUE EXTENDS
-%token INSTANCEOF NEW 
+%token FALSE TRUE
+%token NEW
 %token THIS NUL PRIVATE STATIC 
 %token VOID RETURN 
+
+%nonassoc EXPRESSION
 
 %nonassoc IF_PREC
 %nonassoc ELSE
@@ -96,13 +98,12 @@
 %right '='
 %left OR
 %left AND
-%left EQ NE IS
-%left '>' '<' LE SE
-%nonassoc INSTANCEOF
+%left EQ NE
+%left '>' '<' LE SE IS
+%right CAST
 %left '+' '-'
 %left '*'  '/'  '%'
-%left '!' INCREMENT DECREMENT UNARY_OP
-%nonassoc change_type
+%right '!' INCREMENT DECREMENT UNARY_OP
 %left '.'
 %left '(' 
 
@@ -228,7 +229,7 @@ variable:		  IDENT
 					{
 						$$ = new Variable($1, lin, col);
 					}
-				| IDENT '=' expr
+				| IDENT '=' expression
 					{
 						$$ = new Variable($1, $3, lin, col);
 					}
@@ -270,7 +271,7 @@ basictype:		  OBJECT
 					{
 						$$ = new NoArrayType(5, lin, col);
 					}
-				| BOOLEAN
+				| BOOL
 					{
 						$$ = new NoArrayType(3, lin, col);
 					}
@@ -310,48 +311,57 @@ arraytype:		  IDENT '[' ']'
 					}
 ;
 
-expr:			  INCREMENT IDENT
+expression:		  expr %prec EXPRESSION
 					{
-						$$ = new Incr($2, true, lin, col);
+					}
+				| qualnameorarray %prec EXPRESSION
+					{
+					}
+;
+
+expr:			  INCREMENT qualnameorarray
+					{
+						// $$ = new Incr($2, true, lin, col);
+						// symtab->IsDeclared($2);
+					}
+				| DECREMENT qualnameorarray  
+					{
+						// $$ = new Decr($2, true, lin, col);
 						// symtab->IsDeclared($2);
 					} 
-				| DECREMENT IDENT  
+				| qualnameorarray INCREMENT  
 					{
-						$$ = new Decr($2, true, lin, col);
-						// symtab->IsDeclared($2);
-					} 
-				| IDENT INCREMENT  
-					{
-						$$ = new Incr($1, false, lin, col);
+						// $$ = new Incr($1, false, lin, col);
 						// symtab->IsDeclared($1);
 					} 
-				| IDENT DECREMENT 
+				| qualnameorarray DECREMENT 
 					{
-						$$ = new Decr($1, false, lin, col);
+						// $$ = new Decr($1, false, lin, col);
 						// symtab->IsDeclared($1);
 					}
-				| '!' expr  
+				| '!' expression  
 					{
 						$$ = new Not($2, lin, col);
 					}
-				| '-' expr %prec UNARY_OP 
+				| '-' expression %prec UNARY_OP 
 					{
 						$$ = new Minus($2, lin, col);
 					} 
-				| '+' expr %prec UNARY_OP 
+				| '+' expression %prec UNARY_OP 
 					{
 						$$ = new Plus($2, lin, col);
 					} 
 				| '(' expr ')' 
 					{
 						$$ = new Paren($2, lin, col);
-					} 
-				| qualnameorarray 
+					}
+				| '(' IDENT ')' %prec CAST
 					{
-						$$ = new QualNArrExp($1, lin, col);
-						// symtab->IsDeclared($1, def);
-					}  
-				| qualnameorarray '=' expr  
+					}
+				| '(' qnora_without_id ')' 
+					{
+					}
+				| qualnameorarray '=' expression  
 					{
 						$$ = new Assign($1, $3, lin, col);
 						// symtab->IsDeclared($1);
@@ -373,63 +383,108 @@ expr:			  INCREMENT IDENT
 					{
 						$$ = new NewArr($2, $3, lin, col);
 					}
-				| expr EQ expr 
+				| expr EQ expression 
 					{
 						$$ = new Equal($1, $3, lin, col);
-					} 
-				| expr NE expr 
+					}
+				| qualnameorarray EQ expression 
+					{
+					}
+				| expr NE expression 
 					{
 						$$ = new NotEq($1, $3, lin, col);
-					} 
-				| expr '<' expr 
+					}
+				| qualnameorarray NE expression 
+					{
+					}
+				| expr '<' expression 
 					{
 						$$ = new Smaller($1, $3, lin, col);
-					} 
-				| expr SE expr 
+					}
+				| qualnameorarray '<' expression 
+					{
+					}
+				| expr SE expression 
 					{
 						$$ = new SmallerEq($1, $3, lin, col);
 					}
-				| expr '>' expr 
+				| qualnameorarray SE expression 
+					{
+					}
+				| expr '>' expression 
 					{
 						$$ = new Larger($1, $3, lin, col);
-					} 
-				| expr LE expr 
+					}
+				| qualnameorarray '>' expression 
+					{
+					}
+				| expr LE expression 
 					{
 						$$ = new LargerEq($1, $3, lin, col);
 					}
-				| expr '+' expr 
+				| qualnameorarray LE expression 
+					{
+					}
+				| expr '+' expression 
 					{
 						$$ = new Add($1, $3, lin, col);
-					} 
-				| expr '-' expr 
+					}
+				| qualnameorarray '+' expression 
+					{
+					}
+				| expr '-' expression 
 					{
 						$$ = new Sub($1, $3, lin, col);
-					} 
-				| expr '*' expr 
+					}
+				| qualnameorarray '-' expression 
+					{
+					}
+				| expr '*' expression 
 					{
 						$$ = new Mult($1, $3, lin, col);
-					} 
-				| expr '/' expr 
+					}
+				| qualnameorarray '*' expression 
+					{
+					}
+				| expr '/' expression 
 					{
 						$$ = new Div($1, $3, lin, col);
-					} 
-				| expr '%' expr 
+					}
+				| qualnameorarray '/' expression 
+					{
+					}
+				| expr '%' expression 
 					{
 						$$ = new Mod($1, $3, lin, col);
-					} 
-				| expr AND expr 
+					}
+				| qualnameorarray '%' expression 
+					{
+					}
+				| expr AND expression 
 					{
 						$$ = new And($1, $3, lin, col);
-					} 
-				| expr OR expr 
+					}
+				| qualnameorarray AND expression 
+					{
+					}
+				| expr OR expression 
 					{
 						$$ = new Or($1, $3, lin, col);
+					}
+				| qualnameorarray OR expression 
+					{
 					}
 				| expr IS type
 					{
 						$$ = new Is($1, $3, lin, col);
 					}
-				| '(' basictype ')' expr %prec change_type
+				| qualnameorarray IS type
+					{
+					}
+				| '(' basictype ')' expression
+					{
+					}
+				| '(' IDENT ')' expression
 					{
 					}
 				| INTEGER 
@@ -458,15 +513,15 @@ expr:			  INCREMENT IDENT
 					}
 ;
 
-arrayindex:		  '[' expr ']'
+arrayindex:		  '[' expression ']'
 					{
 						$$ = new ArrayIndex_1($2, lin, col);
 					}
-				| '[' expr ',' expr ']'
+				| '[' expression ',' expression ']'
 					{
 						$$ = new ArrayIndex_2($2, $4, lin, col);
 					}
-				| '[' expr ',' expr ',' expr ']'
+				| '[' expression ',' expression ',' expression ']'
 					{
 						$$ = new ArrayIndex_3($2, $4, $6, lin, col);
 					}
@@ -479,6 +534,9 @@ qualifiedname:	  IDENT
 				| expr '.' IDENT
 					{
 						$$ = new QualName_Exp($3, $1, lin, col);
+					}
+				| qualnameorarray '.' IDENT
+					{
 					}
 ;
 
@@ -494,17 +552,40 @@ qualnameorarray:  IDENT
 					{
 						$$ = new QualName_Exp($3, $1, lin, col);
 					}
+				| qualnameorarray '.' IDENT
+					{
+					}
 				| expr '.' IDENT arrayindex
 					{
 						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
 					}
+				| qualnameorarray '.' IDENT arrayindex
+					{
+					}
 ;
 
-expr_list:		  expr  
+qnora_without_id:  IDENT arrayindex
+					{
+					}
+				| expr '.' IDENT
+					{
+					}
+				| qualnameorarray '.' IDENT
+					{
+					}
+				| expr '.' IDENT arrayindex
+					{
+					}
+				| qualnameorarray '.' IDENT arrayindex
+					{
+					}
+;
+
+expr_list:		  expression  
 					{
 						$$ = new ExprList($1, lin, col);
-					}
-				| expr_list ',' expr 
+					} 
+				| expr_list ',' expression 
 					{
 						$1->AddExpr($3);
 						$$ = $1;
@@ -520,15 +601,15 @@ expr_list_e:	  /* empty */
 					}
 ;
 
-statement:		  IF '(' expr ')' statement %prec IF_PREC
+statement:		  IF '(' expression ')' statement %prec IF_PREC
 					{
 						$$ = new If($3, $5, lin, col);
 					} 
-				| IF '(' expr ')' statement ELSE statement
+				| IF '(' expression ')' statement ELSE statement
 					{
 						$$ = new IfElse($3, $5, $7, lin, col);
 					}	
-				| WHILE '(' expr ')'  statement
+				| WHILE '(' expression ')'  statement
 					{
 						$$ = new While($3, $5, lin, col);
 					} 
@@ -536,7 +617,7 @@ statement:		  IF '(' expr ')' statement %prec IF_PREC
 					{
 						$$ = new For($3, $5, $7, $9, lin, col);
 					}  
-				| expr ';'
+				| expression ';'
 					{
 						$$ = new ExprStat($1, lin, col);
 					}  					
@@ -586,7 +667,7 @@ expr_e:			  /* Empty */
 					{
 						$$ = new Expr(lin, col);
 					} 
-				| expr
+				| expression
 					{
 						$$ = $1;
 					} 
