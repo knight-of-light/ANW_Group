@@ -12,11 +12,19 @@ class A
 	{
 		if (g>=1)
 		{
-		for (int x=1; x<10; x++)//note: int Must to write it here
+		for (x=1; x<10; x++)
 			 x=1;
+        for(x=1; x<9;)
+            x++;
+       /*for (x=1;)  Error but in PNF it should to allow this format
+            x--;*/
 		}
-		else 
-			return true;
+		else
+            for (int x=1; x<10; x++)
+			x=1;
+		return true;
+        //return ;  error
+        return 0;
 	}
 
 /***********members Function***********/
@@ -25,7 +33,19 @@ class A
 	{
 		int m=1;
 		m++;
-		if (m!=0)
+        (double)m;
+        (double)++m;
+       
+        if (v=0)
+            {
+            }
+        else
+            {
+            }
+		while (x=0)
+            {
+            }
+        if (m!=0)
 			--m;
 		while (m>10)
 		m++;
