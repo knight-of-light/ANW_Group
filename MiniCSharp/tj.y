@@ -83,10 +83,10 @@
 %left EQ NE IS
 %left '>' '<' LE SE
 %nonassoc INSTANCEOF
+%nonassoc CAST
 %left '+' '-'
 %left '*'  '/'  '%'
 %left '!' INCREMENT DECREMENT UNARY_OP
-%nonassoc CAST
 %left '.'
 %left '(' 
 
@@ -320,9 +320,15 @@ expr:			  INCREMENT qualnameorarray
 					{
 						$$ = new Plus($2, lin, col);
 					} 
-				| '(' expression ')' 
+				| '(' expr ')' 
 					{
 						$$ = new Paren($2, lin, col);
+					}
+				| '(' IDENT ')' %prec CAST
+					{
+					}
+				| '(' qnora_without_id ')' 
+					{
 					}
 				| qualnameorarray '=' expression  
 					{
@@ -440,7 +446,10 @@ expr:			  INCREMENT qualnameorarray
 				| qualnameorarray IS type
 					{
 					}
-				| '(' arraytype ')' expression %prec CAST
+				| '(' arraytype ')' expression
+					{
+					}
+				| '(' IDENT ')' expression
 					{
 					}
 				| INTEGER 
@@ -494,6 +503,23 @@ qualnameorarray:		  IDENT
 					{
 					}
 				| IDENT arrayindex
+					{
+					}
+				| expr '.' IDENT
+					{
+					}
+				| qualnameorarray '.' IDENT
+					{
+					}
+				| expr '.' IDENT arrayindex
+					{
+					}
+				| qualnameorarray '.' IDENT arrayindex
+					{
+					}
+;
+
+qnora_without_id:  IDENT arrayindex
 					{
 					}
 				| expr '.' IDENT
