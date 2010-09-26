@@ -1,9 +1,9 @@
-%{	
-	#include "stdio.h"	
+%{
+	#include "stdio.h"
 	
 	#include "symbol_table.h"
 	#include "ast.h"
-		
+	
 	#define YYDEBUG 1
 	
 	extern int yylex();
@@ -13,13 +13,13 @@
 	extern int col;
 	
 	extern SymTab *symtab;
-	File *file;	
+	File *file;
 	extern Deffered *def;
 %}
 
 %union{
-		Root		*tRoot;
 		File		*tFile;
+		Root		*tRoot;
 		Class		*tClass;
 		Members		*tMembers;
 		Member		*tMember;
@@ -38,7 +38,7 @@
 		ArrayType	*tArrayType;
 		Expr		*tExpr;
 		ExprList	*tExprList;
-
+		
 		ArrayIndex	*tArrayIndex;
 		QualName	*tQualName;
 		QualNArray	*tQualNArray;
@@ -48,10 +48,10 @@
 		Variables_e	*tVariables_e;
 		
 		Integer		*tInteger;
-		Real		*tReal;		
-		Ident		*tIdent;				
+		Real		*tReal;
+		Ident		*tIdent;
 	}
-%type	<tFile>		file
+%type	<tFile>			file
 %type	<tRoot>			root
 %type	<tClass>		class
 %type	<tMembers>		members
@@ -80,16 +80,16 @@
 %type	<tStat>			statement
 %type	<tVariables_e>	variables_e
 
-%token	<tIdent>		IDENT	
-%token	<tInteger>		INTEGER 
+%token	<tIdent>		IDENT
+%token	<tInteger>		INTEGER
 %token	<tReal>			REAL
 
 %token CLASS BOOL DOUBLE INT IS OBJECT
-%token IF ELSE WHILE FOR 
+%token IF ELSE WHILE FOR
 %token FALSE TRUE
 %token NEW
-%token THIS NUL PRIVATE STATIC 
-%token VOID RETURN 
+%token THIS NUL PRIVATE STATIC
+%token VOID RETURN
 
 %nonassoc EXPRESSION
 
@@ -106,10 +106,10 @@
 %left '*'  '/'  '%'
 %right '!' INCREMENT DECREMENT UNARY_OP
 %left '.'
-%left '(' 
+%left '('
 
 %%
-file:			root
+file:			  root
 					{
 						$$ = new File(lin, col);
 						symtab->OutScope();
@@ -122,7 +122,6 @@ root:			/* empty */
 						$$ = new Root(lin, col);
 						symtab->AddNewScope();
 					}
-				
 				| root class
 					{
 						$1->AddClass($2);
@@ -130,40 +129,41 @@ root:			/* empty */
 					}
 ;
 
-class:		  CLASS IDENT '{'
-			{					
-						symtab->AddSym($2, 0, -1);
-						symtab->AddNewScope();
-			}
-					 members '}'
-			{
-						$$ = new Class($2, $5, lin, col);	
-						symtab->OutScope();		
-										
-			}
-				| CLASS IDENT ':' IDENT '{'
-				{
-						symtab->AddSym($2, 0, -1);
-						symtab->IsDeclared($4  ,0 ,-1);
-						symtab->AddNewScope();
-				}
-				 members '}'
+class:			  CLASS IDENT '{'
 					{
-							$$ = new ClassInher($2, $4, $7, lin, col);
-							$$->AddParent($4);
-							symtab->OutScope();		
+						symtab->AddSym($2, 0, -1);
+						symtab->AddNewScope();
+					}
+					 members '}'
+					{
+						$$ = new Class($2, $5, lin, col);
+						symtab->OutScope();
+					}
+				| CLASS IDENT ':' IDENT '{'
+					{
+						symtab->AddSym($2, 0, -1);
+						symtab->IsDeclared($4, 0, -1);
+						symtab->AddNewScope();
+					}
+					 members '}'
+					{
+						$$ = new ClassInher($2, $4, $7, lin, col);
+						$$->AddParent($4);
+						symtab->OutScope();
 					}
 ;
+
 members:		  /* empty */
 					{
 						$$ = new Members(lin, col);
 					}
-				| members member 
+				| members member
 					{
 						$1->AddMember($2);
 						$$ = $1;
 					}
 ;
+
 member:			  global
 					{$$ = $1;}
 				| constructor
@@ -186,28 +186,27 @@ constructor:	  accessmodif IDENT '(' args_e ')' '{' statements '}'
 					}
 ;
 
-
 function:		  accessmodif type IDENT '('
 					{
 						symtab->AddNewScope();
-					}				 
-				   args_e ')' '{' statements '}' 
+					}
+					 args_e ')' '{' statements '}'
 					{
-						$$ = new Function($1, $2, $3, $6, $9, lin, col); 
-						symtab->OutScope();	
+						$$ = new Function($1, $2, $3, $6, $9, lin, col);
+						symtab->OutScope();
 						symtab->AddSym($3, 2, -1, $6, $2->type, $$);
 					}
-				| accessmodif VOID IDENT '(' 
+				| accessmodif VOID IDENT '('
 					 {
 						 symtab->AddSym($3, 1, -1);
 						 symtab->AddNewScope();
-					 }				 
-				   args_e ')' '{' statements '}' 
+					 }
+					 args_e ')' '{' statements '}'
 					{
-						$$ = new Function($1, $3, $6, $9, lin, col); 
+						$$ = new Function($1, $3, $6, $9, lin, col);
 						symtab->OutScope();
 						symtab->AddSym($3, 2, -1, $6, 4, $$);
-					}				
+					}
 ;
 
 arg :			  type IDENT
@@ -221,7 +220,7 @@ args:			  arg
 					{
 						$$ = new Args($1, lin, col);
 					}
-				| args ',' arg 
+				| args ',' arg
 					{
 						$1->AddArg($3);
 						$$ = $1;
@@ -234,11 +233,11 @@ args_e:			  /* empty */
 					}
 				| args
 					{
-						$$ = $1;						
+						$$ = $1;
 					}
 ;
 
-variables:		  variable 
+variables:		  variable
 					{
 						$$ = new Variables($1, lin, col);
 					}
@@ -248,7 +247,8 @@ variables:		  variable
 						$$ = $1;
 					}
 ;
-variable:		  IDENT 
+
+variable:		  IDENT
 					{
 						$$ = new Variable($1, lin, col);
 					}
@@ -285,7 +285,7 @@ type:			  noarraytype
 noarraytype:	  IDENT
 					{
 						$$ = new NoArrayType($1, lin, col);
-						 symtab->IsDeclared($1 );
+						 symtab->IsDeclared($1);
 					}
 				| basictype
 					{$$ = $1;}
@@ -312,22 +312,21 @@ basictype:		  OBJECT
 arraytype:		  IDENT '[' ']'
 					{
 						$$ = new ArrayType(1, $1, lin, col);
-						 symtab->IsDeclared($1 );
+						symtab->IsDeclared($1);
 					}
 				| IDENT '[' ',' ']'
 					{
 						$$ = new ArrayType(2, $1, lin, col);
-							 symtab->IsDeclared($1 );
+						symtab->IsDeclared($1);
 					}
 				| IDENT '[' ',' ',' ']'
 					{
 						$$ = new ArrayType(3, $1, lin, col);
-							 symtab->IsDeclared($1 );
+						symtab->IsDeclared($1);
 					}
 				| basictype '[' ']'
 					{
 						$$ = new ArrayType($1->type, 1, lin, col);
-						
 					}
 				| basictype '[' ',' ']'
 					{
@@ -351,48 +350,48 @@ expr:			  INCREMENT qualnameorarray
 					{
 						// $$ = new Incr($2, true, lin, col);
 					}
-				| DECREMENT qualnameorarray  
+				| DECREMENT qualnameorarray
 					{
 						// $$ = new Decr($2, true, lin, col);
 						// symtab->IsDeclared($2);
-					} 
-				| qualnameorarray INCREMENT  
+					}
+				| qualnameorarray INCREMENT
 					{
 						// $$ = new Incr($1, false, lin, col);
 						// symtab->IsDeclared($1);
-					} 
-				| qualnameorarray DECREMENT 
+					}
+				| qualnameorarray DECREMENT
 					{
 						// $$ = new Decr($1, false, lin, col);
 						// symtab->IsDeclared($1);
 					}
-				| '!' expression  
+				| '!' expression
 					{
 						$$ = new Not($2, lin, col);
 					}
-				| '-' expression %prec UNARY_OP 
+				| '-' expression %prec UNARY_OP
 					{
 						$$ = new Minus($2, lin, col);
-					} 
-				| '+' expression %prec UNARY_OP 
+					}
+				| '+' expression %prec UNARY_OP
 					{
 						$$ = new Plus($2, lin, col);
-					} 
-				| '(' expr ')' 
+					}
+				| '(' expr ')'
 					{
 						$$ = new Paren($2, lin, col);
 					}
 				| '(' IDENT ')' %prec CAST
 					{
 					}
-				| '(' qnora_without_id ')' 
+				| '(' qnora_without_id ')'
 					{
 					}
-				| qualnameorarray '=' expression  
+				| qualnameorarray '=' expression
 					{
 						$$ = new Assign($1, $3, lin, col);
-					} 
-				| qualifiedname '(' expr_list_e ')'	 
+					}
+				| qualifiedname '(' expr_list_e ')'
 					{
 						$$ = new Invoke($1, $3, lin, col);
 					}
@@ -410,95 +409,95 @@ expr:			  INCREMENT qualnameorarray
 						$$ = new NewArr($2, $3, lin, col);
 						symtab->AddSym($2, 1, -1);
 					}
-				| expr EQ expression 
+				| expr EQ expression
 					{
 						$$ = new Equal($1, $3, lin, col);
 					}
-				| qualnameorarray EQ expression 
+				| qualnameorarray EQ expression
 					{
 					}
-				| expr NE expression 
+				| expr NE expression
 					{
 						$$ = new NotEq($1, $3, lin, col);
 					}
-				| qualnameorarray NE expression 
+				| qualnameorarray NE expression
 					{
 					}
-				| expr '<' expression 
+				| expr '<' expression
 					{
 						$$ = new Smaller($1, $3, lin, col);
 					}
-				| qualnameorarray '<' expression 
+				| qualnameorarray '<' expression
 					{
 					}
-				| expr SE expression 
+				| expr SE expression
 					{
 						$$ = new SmallerEq($1, $3, lin, col);
 					}
-				| qualnameorarray SE expression 
+				| qualnameorarray SE expression
 					{
 					}
-				| expr '>' expression 
+				| expr '>' expression
 					{
 						$$ = new Larger($1, $3, lin, col);
 					}
-				| qualnameorarray '>' expression 
+				| qualnameorarray '>' expression
 					{
 					}
-				| expr LE expression 
+				| expr LE expression
 					{
 						$$ = new LargerEq($1, $3, lin, col);
 					}
-				| qualnameorarray LE expression 
+				| qualnameorarray LE expression
 					{
 					}
-				| expr '+' expression 
+				| expr '+' expression
 					{
 						$$ = new Add($1, $3, lin, col);
 					}
-				| qualnameorarray '+' expression 
+				| qualnameorarray '+' expression
 					{
 					}
-				| expr '-' expression 
+				| expr '-' expression
 					{
 						$$ = new Sub($1, $3, lin, col);
 					}
-				| qualnameorarray '-' expression 
+				| qualnameorarray '-' expression
 					{
 					}
-				| expr '*' expression 
+				| expr '*' expression
 					{
 						$$ = new Mult($1, $3, lin, col);
 					}
-				| qualnameorarray '*' expression 
+				| qualnameorarray '*' expression
 					{
 					}
-				| expr '/' expression 
+				| expr '/' expression
 					{
 						$$ = new Div($1, $3, lin, col);
 					}
-				| qualnameorarray '/' expression 
+				| qualnameorarray '/' expression
 					{
 					}
-				| expr '%' expression 
+				| expr '%' expression
 					{
 						$$ = new Mod($1, $3, lin, col);
 					}
-				| qualnameorarray '%' expression 
+				| qualnameorarray '%' expression
 					{
 					}
-				| expr AND expression 
+				| expr AND expression
 					{
 						$$ = new And($1, $3, lin, col);
 					}
-				| qualnameorarray AND expression 
+				| qualnameorarray AND expression
 					{
 					}
-				| expr OR expression 
+				| expr OR expression
 					{
 						$$ = new Or($1, $3, lin, col);
 					}
-				| qualnameorarray OR expression 
+				| qualnameorarray OR expression
 					{
 					}
 				| expr IS type
@@ -514,18 +513,18 @@ expr:			  INCREMENT qualnameorarray
 				| '(' IDENT ')' expression
 					{
 					}
-				| INTEGER 
+				| INTEGER
 					{
 						$$ = $1;
-					} 
+					}
 				| REAL
 					{
 						$$ = $1;
-					} 
-				| TRUE 
+					}
+				| TRUE
 					{
 						$$ = new True(lin, col);
-					} 
+					}
 				| FALSE 
 					{
 						$$ = new False(lin, col);
@@ -557,8 +556,7 @@ arrayindex:		  '[' expression ']'
 qualifiedname:	  IDENT
 					{
 						$$ = new QualName_ID($1, lin, col);
-						 symtab->IsDeclared($1);
-						
+						symtab->IsDeclared($1);
 					}
 				| expr '.' IDENT
 					{
@@ -598,7 +596,7 @@ qualnameorarray:  IDENT
 					}
 ;
 
-qnora_without_id:  IDENT arrayindex
+qnora_without_id: IDENT arrayindex
 					{
 					}
 				| expr '.' IDENT
@@ -615,20 +613,21 @@ qnora_without_id:  IDENT arrayindex
 					}
 ;
 
-expr_list:		  expression  
+expr_list:		  expression
 					{
 						$$ = new ExprList($1, lin, col);
-					} 
-				| expr_list ',' expression 
+					}
+				| expr_list ',' expression
 					{
 						$1->AddExpr($3);
 						$$ = $1;
 					}
 ;
+
 expr_list_e:	  /* empty */
 					{
 						$$ = new ExprList(lin, col);
-					} 
+					}
 				| expr_list
 					{
 						$$ = $1;
@@ -638,39 +637,42 @@ expr_list_e:	  /* empty */
 statement:		  IF '(' expression ')' statement %prec IF_PREC
 					{
 						$$ = new If($3, $5, lin, col);
-					} 
+					}
 				| IF '(' expression ')' statement ELSE statement
 					{
 						$$ = new IfElse($3, $5, $7, lin, col);
-					}	
+					}
 				| WHILE '(' expression ')'  statement
 					{
 						$$ = new While($3, $5, lin, col);
-					} 
+					}
 				| FOR '(' variables_e ';' expr_e ';' expr_e ')' statement
 					{
 						$$ = new For($3, $5, $7, $9, lin, col);
-					}  
+					}
 				| expression ';'
 					{
 						$$ = new ExprStat($1, lin, col);
-					}  					
+					}
 				| type variables ';'
 					{
 						$$ = new VariablesStat($1, $2, lin, col);
 						for(int i = 0; i < $2->variables->size(); i++)
 							symtab->AddSym($2->variables->at(i)->name, 3, $1->type);
-					} 
-				|   '{'
-						{
-							symtab->AddNewScope();
-						}
-					 statements '}' 
-						 {
-							$$ = new Block($3, lin, col);
-							symtab->OutScope();
-						 }
-				| RETURN expression ';'
+					}
+				| ';'
+					{
+					}
+				| '{'
+					{
+						symtab->AddNewScope();
+					}
+					 statements '}'
+					{
+						$$ = new Block($3, lin, col);
+						symtab->OutScope();
+					}
+				| RETURN expr_e ';'
 					{
 						$$ = new Return($2, lin, col);
 					}
@@ -679,35 +681,35 @@ statement:		  IF '(' expression ')' statement %prec IF_PREC
 statements:			  /* Empty */
 					{
 						$$ = new Stats(lin, col);
-					} 
+					}
 				|statements statement
 					{
 						$1->AddStat($2);
 						$$ = $1;
-					} 
+					}
 ;
 
 variables_e:		  /* Empty */
 					{
 						$$ = NULL;
-					} 
+					}
 				| type variables
 					{
 						$$ = new Variables_e($1, $2, lin, col);
-					} 
+					}
 				| variable
 					{
-				    } 
+				    }
 ;
 
 expr_e:			  /* Empty */
 					{
 						$$ = new Expr(lin, col);
-					} 
+					}
 				| expression
 					{
 						$$ = $1;
-					} 
+					}
 ;
 
 %%

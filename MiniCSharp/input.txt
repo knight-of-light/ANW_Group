@@ -9,56 +9,60 @@ class A
 /***********members Constructor***********/		
 
 	void e (bool f,int g)
-	{
-		if (g>=1)
-		{
-		for (x=1; x<10; x++)
-			 x=1;
-        for(x=1; x<9;)
-            x++;
-       /*for (x=1;)  Error but in PNF it should to allow this format
-            x--;*/
-		}
-		else
-            for (int x=1; x<10; x++)
-			x=1;
-		return true;
+    {
+        //;
+        //{ }
+        //for (; ; ) { }
+        if (g >= 1)
+        {
+            for (x = 1; x < 10; x++)
+                x = 1;
+            for (x = 1; x < 9; )
+                x++;
+            /*for (x=1;)  Error but in PNF it should to allow this format
+                 x--;*/
+        }
+
+        else
+            for (int x = 1; x < 10; x++)
+                x = 1;
+        return true;
         //return ;  error
         return 0;
-	}
+    }
 
 /***********members Function***********/
 
 	private void h (int i,int c)
-	{
-		int m=1;
-		m++;
+    {
+        int m = 1;
+        m++;
         (double)m;
         (double)++m;
-       
-        if (v=0)
-            {
-            }
+
+        if (v = 0)
+        {
+        }
         else
-            {
-            }
-		while (x=0)
-            {
-            }
-        if (m!=0)
-			--m;
-		while (m>10)
-		m++;
-	}
+        {
+        }
+        while (x = 0)
+        {
+        }
+        if (m != 0)
+            --m;
+        while (m > 10)
+            m++;
+    }
 	
 	bool t (int i)
-	{
-		h(5,5.9);
-		if (i==0.1)
-		{ 
-			return true;
-		}
-	}
+    {
+        h(5, 5.9);
+        if (i == 0.1)
+        {
+            return true;
+        }
+    }
 	//h(); Error
 }
 class B:A

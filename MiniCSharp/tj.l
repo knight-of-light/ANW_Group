@@ -1,9 +1,8 @@
-
 %{
 	#include "stdio.h"
 	
 	#include <iostream>
-	using std::cout;	
+	using std::cout;
 	using std::endl;
 	using std::left;
 	
@@ -14,7 +13,7 @@
     int c = getchar(); \
     result = (c == EOF) ? YY_NULL : (buf[0] = c, 1); \
     }\
-
+	
 	
 	#include "parser.h"
 	
@@ -37,7 +36,7 @@ REAL3	(0|[1-9][0-9]*)([eE][-+]?(0|[1-9][0-9]*))
 						col += yyleng;
 						return CLASS;
 					}
-"bool"			{						
+"bool"				{						
 						col += yyleng;
 						return BOOL;
 					}
@@ -121,7 +120,7 @@ REAL3	(0|[1-9][0-9]*)([eE][-+]?(0|[1-9][0-9]*))
 						col += yyleng;
 						return LE;
 					}
-"<="				{						
+"<="				{
 						col += yyleng;
 						return SE;
 					}
@@ -141,14 +140,11 @@ REAL3	(0|[1-9][0-9]*)([eE][-+]?(0|[1-9][0-9]*))
 						col += yyleng;
 						return OR;
 					}
-			
-									
 0|[1-9][0-9]*		{
 						col += yyleng;
 						yylval.tInteger = new Integer(atoi(yytext), lin, col);
 						return INTEGER;
 					}
-					
 (0|[1-9][0-9]*)"."[0-9]*([eE][-+]?(0|[1-9][0-9]*))? |
 "."[0-9]+([eE][-+]?(0|[1-9][0-9]*))?				|
 (0|[1-9][0-9]*)([eE][-+]?(0|[1-9][0-9]*))			{
@@ -156,11 +152,11 @@ REAL3	(0|[1-9][0-9]*)([eE][-+]?(0|[1-9][0-9]*))
 														yylval.tReal = new Real(atof(yytext), lin, col);
 														return REAL;
 													}
-([a-zA-Z]|_)([a-zA-Z]|[0-9]|_)*	{
-									col += yyleng;
-									yylval.tIdent = new Ident(strdup(yytext), lin, col);
-									return IDENT;
-								}
+([a-zA-Z]|_)([a-zA-Z]|[0-9]|_)*						{
+														col += yyleng;
+														yylval.tIdent = new Ident(strdup(yytext), lin, col);
+														return IDENT;
+													}
 [\t]*				col += 4 * yyleng;
 [ ]*				col += yyleng;
 \n					lin++; col = 1;
@@ -174,7 +170,3 @@ int yywrap(void)
 {
 	return 1;
 }
-
-
-
-   
