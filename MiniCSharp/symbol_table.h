@@ -18,7 +18,7 @@ using std::string;
 class Sym
 {
 public:
-	//1:class 2: func, 3: global Global, 4: constructor, 5: Local Global, 6: Argument
+	//0:class 1: func, 2: global Global, 3: constructor, 4: Local Global, 5: Argument
 	int kind;
 	string name;
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void

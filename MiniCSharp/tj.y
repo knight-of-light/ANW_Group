@@ -351,17 +351,14 @@ expr:			  INCREMENT qualnameorarray
 				| DECREMENT qualnameorarray
 					{
 						$$ = new Decr($2, true, lin, col);
-						// symtab->IsDeclared($2);
 					}
 				| qualnameorarray INCREMENT
 					{
 						$$ = new Incr($1, false, lin, col);
-						// symtab->IsDeclared($1);
 					}
 				| qualnameorarray DECREMENT
 					{
 						$$ = new Decr($1, false, lin, col);
-						// symtab->IsDeclared($1);
 					}
 				| '!' expression
 					{
@@ -382,6 +379,7 @@ expr:			  INCREMENT qualnameorarray
 				| '(' IDENT ')' %prec CAST
 					{
 						$$ = new Paren($2, lin, col);
+						symtab->IsDeclared($2);
 					}
 				| '(' qnora_without_id ')'
 					{
@@ -528,6 +526,7 @@ expr:			  INCREMENT qualnameorarray
 				| '(' IDENT ')' expression
 					{
 						$$ = new Cast($2, $4, lin, col);
+						symtab->IsDeclared($2);
 					}
 				| INTEGER
 					{$$ = $1;}
@@ -578,6 +577,7 @@ qualifiedname:	  IDENT
 				| qualnameorarray '.' IDENT
 					{
 						$$ = new QualName_Exp($3, $1, lin, col);
+						symtab->IsDeclared($3);
 					}
 ;
 
@@ -599,6 +599,7 @@ qualnameorarray:  IDENT
 				| qualnameorarray '.' IDENT
 					{
 						$$ = new QualName_Exp($3, $1, lin, col);
+						symtab->IsDeclared($3);
 					}
 				| expr '.' IDENT arrayindex
 					{
@@ -608,6 +609,7 @@ qualnameorarray:  IDENT
 				| qualnameorarray '.' IDENT arrayindex
 					{
 						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
+						symtab->IsDeclared($3);
 					}
 ;
 
@@ -624,6 +626,7 @@ qnora_without_id: IDENT arrayindex
 				| qualnameorarray '.' IDENT
 					{
 						$$ = new QualName_Exp($3, $1, lin, col);
+						symtab->IsDeclared($3);
 					}
 				| expr '.' IDENT arrayindex
 					{
@@ -633,6 +636,7 @@ qnora_without_id: IDENT arrayindex
 				| qualnameorarray '.' IDENT arrayindex
 					{
 						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
+						symtab->IsDeclared($3);
 					}
 ;
 

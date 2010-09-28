@@ -40,13 +40,11 @@ void
 Class::AddParent(Ident *pa) 
 {
 	this->Parents->push_back(pa);
-	pa->father = this;
 }
-ClassInher::ClassInher(Ident *n, Ident *b, Members *ms, int l, int c) : Class(n,ms,l,c)
+ClassInher::ClassInher(Ident *n, Ident *p, Members *ms, int l, int c) : Class(n,ms,l,c)
 {
-	this->base = b;
-	b->father = this;
-	this->Parents=new vector<Ident *>;
+	this->parent = p;
+	p->father = this;
 }
 
 //*******     Members		*********

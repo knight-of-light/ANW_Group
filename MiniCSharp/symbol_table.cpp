@@ -1,5 +1,8 @@
 #include "symbol_table.h"
 
+//***********************************************************************
+//					Symbol
+//***********************************************************************
 Sym::Sym(string name, int kind, int type)
 {
 
@@ -7,7 +10,6 @@ Sym::Sym(string name, int kind, int type)
 	this->kind = kind;
 	this->type = type;
 	this->argTypes = NULL;
-
 }
 
 Sym::Sym(string n, int kind, int type, 
@@ -24,7 +26,9 @@ Sym::Sym(string n, int kind, int type,
 		this->argTypes->push_back(ps->args->at(i)->type->type);
 }
 
-
+//***********************************************************************
+//					Scope
+//***********************************************************************
 Scope::Scope()
 {
 	this->father = NULL;
@@ -40,8 +44,9 @@ Scope::AddChild()
 	child->father = this;
 }
 
-//************************************************
-
+//***********************************************************************
+//					SymTab
+//***********************************************************************
 SymTab::SymTab(Errors *errors)
 {
 	this->errors = errors;
@@ -53,19 +58,6 @@ SymTab::SymTab(Errors *errors)
 	kinds[0] = "c";//class
 	kinds[1] = "f";//function
 	kinds[2] = "v";//variable
-}
-
-void
-SymTab::AddNewScope()
-{
-	this->current->AddChild();
-	this->current = this->current->children->at(this->current->children->size() - 1);
-}
-
-void
-SymTab::OutScope()
-{
-	this->current = this->current->father;
 }
 
 Sym *
@@ -102,8 +94,8 @@ SymTab::IsDeclared(Ident *id )
 			this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
 			return false;
 		}
-
 }
+
 bool
 SymTab::IsDeclared(Ident *id , int kind  ,int type )
 {
@@ -123,6 +115,7 @@ SymTab::IsDeclared(Ident *id , int kind  ,int type )
 		}
 
 }
+
 /*
 	SymTab::IsDeclared(Ident *id, ExprList *el)
 	this function is for the case of invoking 
@@ -210,6 +203,19 @@ SymTab::AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function
 	}
 }
 
+void
+SymTab::AddNewScope()
+{
+	this->current->AddChild();
+	this->current = this->current->children->at(this->current->children->size() - 1);
+}
+
+void
+SymTab::OutScope()
+{
+	this->current = this->current->father;
+}
+
 void 
 SymTab::AddVars(Variables *v, Type *et)
 {
@@ -218,12 +224,13 @@ SymTab::AddVars(Variables *v, Type *et)
 }
 
 
-///****************  Deffered  **********************************8
+//***********************************************************************
+//					Deffered
+//***********************************************************************
 Deffered::Deffered()
 {
 	this->ids = new vector<Ident *>;
 }
-
 
 void
 Deffered::AddIdent(Ident *id)
@@ -244,7 +251,6 @@ Deffered::CheckAll(SymTab *symtab)
 	}
 
 }
-
 
 //***********************************************************************
 //					Error

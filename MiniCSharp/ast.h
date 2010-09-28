@@ -144,8 +144,8 @@ public:
 class ClassInher : public Class	// Class with Inheritance
 {
 public:
-	Ident	*base;
-	vector<Ident *>	*Parents;
+	Ident	*parent;
+
 	ClassInher(Ident *, Ident *, Members *, int, int);
 	virtual void accept(Visitor *);
 };
