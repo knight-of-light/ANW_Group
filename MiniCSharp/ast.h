@@ -15,7 +15,6 @@ using std::vector;
 #include <string>
 using std::string;
 
-#include "hash_table.h"
 class Node;
 class File;
 class Root;
@@ -35,7 +34,6 @@ class Type;
 class NoArrayType;
 class ArrayType;
 class Ident;
-
 class Expr;
 class Incr;
 class Decr;
@@ -43,53 +41,42 @@ class Not;
 class Minus;
 class Plus;
 class Paren;
-class QualNArrExp;
 class Assign;
 class Invoke;
 class InvokeArr;
-
 class NewObject;
 class NewArr;
-
 class Equal;
 class NotEq;
 class Smaller;
 class SmallerEq;
 class Larger;
 class LargerEq;
-
 class Add;
 class Sub;
 class Mult;
 class Div;
 class Mod;
-
 class And;
 class Or;
-
 class Is;
 class Cast;
 class Integer;
 class Real;
-
 class True;
 class False;
 class This;
 class Null;
-
 class ArrayIndex;
 class ArrayIndex_1;
 class ArrayIndex_2;
 class ArrayIndex_3;
-
 class QualNArray;
 class QualNArray_ID_Index;
 class QualNArray_Exp_Index;
-
 class QualName;
 class QualName_ID;
 class QualName_Exp;
-
 class ExprList;
 class Stat;
 class Stats;
@@ -911,180 +898,6 @@ public:
 	Variables	*variables;
 	Variables_e(Type *, Variables *, int, int);
 	virtual void accept(Visitor *);
-};
-
-//***********************************************************************
-//					Symbol
-//***********************************************************************
-
-class Sym
-{
-public:
-	//1:class 2: func, 3: global Global, 4: constructor, 5: Local Global, 6: Argument
-	int kind;
-	string name;
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
-	int type;
-	vector<int> *argTypes;
-	int returnType;
-	Function *method;
-
-	Sym(string n, int kind, int type);
-	Sym(std::string , int kind, int type, Args * ps, int returnType, Function *meth);	
-};
-
-//*******      HashTab		*********
-typedef CHashTable<Sym> HashTab;
-
-//*******       Scope		*********
-class Scope
-{
-public:
-	Scope *father;
-	vector<Scope *> *children;
-	HashTab	*hashTab;
-
-	Scope();
-	void AddChild();	
-};
-
-//*******   Symbol Table	*********
-class SymTab
-{
-private:
-	string types [5];
-	string kinds[5];
-public:
-	Scope *current;
-	Errors *errors;
-
-	SymTab(Errors *errors);
-	Sym *Lookup(string name);
-	bool IsDeclared(Ident *id );
-	bool IsDeclared(Ident *id, ExprList *el);
-	bool IsDeclared(Ident *id, Deffered *def);
-	bool IsDeclared(Ident *id , int kind  ,int type );
-	bool AddSym(Ident *id, int kind, int type);
-	bool AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth);	
-
-	void AddNewScope();
-	void OutScope();
-
-	void AddVars(Variables *v, Type *et);
-};
-
-//***********************************************************************
-//					Deffered
-//***********************************************************************
-
-class Deffered
-{
-public:
-	vector<Ident *> *ids;
-	//vector<Sym *> *syms;
-	Deffered();
-	void AddIdent(Ident *);
-	void CheckAll(SymTab *symtab);
-};
-
-//***********************************************************************
-//					Error
-//***********************************************************************
-
-class Error
-{
-public:
-	string message;
-	int line;
-	int column;
-
-	Error(string message, int line, int column);
-};
-
-class Errors
-{
-public:
-	vector<Error *> *messages;
-	Errors();
-	void AddError(string message, int line, int column);
-	void Print();
-};
-
-//***********************************************************************
-//					Visitor
-//***********************************************************************
-
-class Visitor
-{
-public:
-	virtual void Visit(File *) = 0;
-	virtual void Visit(Root *) = 0;
-	virtual void Visit(Class *) = 0;
-	virtual void Visit(ClassInher *) = 0;
-	virtual void Visit(Members *) = 0;
-	virtual void Visit(Member  *) = 0;
-	virtual void Visit(Global  *) = 0;
-	virtual void Visit(Constructor *) = 0;
-	virtual void Visit(Function *) = 0;
-	virtual void Visit( Variables *)=0;
-	virtual void Visit( Variable  *)=0;
-	virtual void Visit(Args *) = 0;
-	virtual void Visit(Arg  *) = 0;
-	virtual void Visit(AccessModif *) = 0;
-	virtual void Visit(Type *) = 0;
-	virtual void Visit(Ident *) = 0;
-	virtual void Visit(Expr *) = 0;
-	virtual void Visit(Cast *) = 0;
-	virtual void Visit(Integer *) = 0;
-	virtual void Visit(Real *) = 0;
-	virtual void Visit(True *) = 0;
-	virtual void Visit(False *) = 0;
-	virtual void Visit(Paren  *) = 0;
-	virtual void Visit( QualNArrExp *)=0;
-	virtual void Visit( Assign *)=0;
-	virtual void Visit( Invoke *)=0;
-	virtual void Visit( ExprList *)=0;
-	virtual void Visit( Not *)=0;
-	virtual void Visit( Minus *)=0;
-	virtual void Visit( Incr *)=0;
-	virtual void Visit( Add *)=0;
-	virtual void Visit( Mult *)=0;
-	virtual void Visit( Larger *)=0;
-	virtual void Visit( LargerEq *)=0;
-	virtual void Visit( Stat *)=0;
-	virtual void Visit( Stats *)=0;
-	virtual void Visit( ExprStat *)=0;
-	virtual void Visit( VariablesStat *)=0;
-	virtual void Visit( If *)=0;
-	virtual void Visit( IfElse *)=0;
-	virtual void Visit( While *)=0;
-	virtual void Visit(Semi *)=0;
-	virtual void Visit( Block *)=0;
-	virtual void Visit( Return *)=0;
-	virtual void Visit(Variables_e *)=0;
-	virtual void Visit(Null *)=0;
-	virtual void Visit(Plus *)=0;
-	virtual void Visit(Decr *)=0;
-	virtual void Visit(Sub *)=0;
-	virtual void Visit(Div *)=0;
-	virtual void Visit(Mod *)=0;
-	virtual void Visit(Smaller *)=0;
-	virtual void Visit(SmallerEq *)=0;
-	virtual void Visit(Equal *)=0;
-	virtual void Visit(NotEq *)=0;
-	virtual void Visit(Or *)=0;
-	virtual void Visit(And *)=0;
-	virtual void Visit(For *)=0;
-	virtual void Visit(ArrayIndex *)=0;
-	virtual void Visit(ArrayIndex_1 *)=0;
-	virtual void Visit(ArrayIndex_2 *)=0;
-	virtual void Visit(ArrayIndex_3 *)=0;
-	virtual void Visit(QualName *)=0;
-	virtual void Visit(QualName_ID *)=0;
-	virtual void Visit(QualName_Exp *)=0;
-	virtual void Visit(QualNArray *)=0;
-	virtual void Visit(QualNArray_ID_Index *)=0;
-	virtual void Visit(QualNArray_Exp_Index *)=0;
 };
 
 #endif

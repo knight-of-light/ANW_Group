@@ -1,4 +1,4 @@
-#include "ast.h"
+#include "visitors.h"
 
 //*******      Node		*************
 Node::Node(int line, int column)
@@ -7,6 +7,7 @@ Node::Node(int line, int column)
 	this->column = column;
 	this->father = NULL;
 }
+
 //*******     File		*************
 File::File(int l, int c) : Node(l,c)
 {
@@ -26,7 +27,6 @@ Root::AddClass(Class *cd)
 }
 
 //*******       Class		*********
-
 Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 {
 	this->name = n;
@@ -288,13 +288,6 @@ Paren::Paren(Ident *n, int l, int c) : Expr(l,c)
 {
 	this->name = n;
 	n->father = this->expr;
-}
-
-//*******     QualNArrExp		*********
-QualNArrExp::QualNArrExp(QualNArray *qna, int l, int c) : Expr(l,c)
-{
-	this->qualNArray = qna;
-	qna->father = this;
 }
 
 //*******      Assign		*********
@@ -757,47 +750,6 @@ Variables_e::Variables_e(Type *ty, Variables *vs, int l,int c) : Node(l,c)
 
 
 //***********************************************************************
-//					Error
-//***********************************************************************
-Error::Error(string message, int line, int column)
-{
-	this->message = message;
-	this->line = line;
-	this->column = column;
-}
-
-Errors::Errors()
-{
-	this->messages = new vector<Error *>;
-}
-
-void
-Errors::AddError(std::string message, int line, int column)
-{
-	Error *error = new Error(message, line, column);
-	this->messages->push_back(error);
-}
-
-void
-Errors::Print()
-{
-	int size = this->messages->size();
-	if(size == 0)
-		cout << "Semntic analysis was done successfully! " << endl;
-	else
-	{
-		cout << "There are " << size << " semantic errors: " << endl;
-		for(int i = 0; i < size; i++)
-		{ 
-			cout << this->messages->at(i)->message << " at line: "
-				<< this->messages->at(i)->line << " , column: "
-				<< this->messages->at(i)->column << endl;
-		}
-	}
-}
-
-
-//***********************************************************************
 //					Accept
 //***********************************************************************
 
@@ -953,12 +905,6 @@ Plus::accept(Visitor *v)
 
 void
 Paren ::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-QualNArrExp::accept(Visitor *v)
 {
 	v->Visit(this);
 }

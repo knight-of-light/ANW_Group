@@ -13,6 +13,26 @@
 //}
 
 void
+TypeVisitor::Visit(File *n)
+{
+}
+
+void
+TypeVisitor::Visit(Root *n)
+{
+}
+
+void
+TypeVisitor::Visit(Class *n)
+{
+}
+
+void
+TypeVisitor::Visit(ClassInher *n)
+{
+}
+
+void
 TypeVisitor::Visit(Members *n)
 {
 	for(int i = 0; i < n->members->size(); i++)
@@ -20,21 +40,35 @@ TypeVisitor::Visit(Members *n)
 }
 
 void
-TypeVisitor::Visit(Member  *n)
+TypeVisitor::Visit(Member *n)
 {
-	
 }
 
 void
-TypeVisitor::Visit(Global  *n)
+TypeVisitor::Visit(Global *n)
 {
 	n->variables->accept(this);		
+}
+
+void
+TypeVisitor::Visit(Constructor *n)
+{
 }
 
 void
 TypeVisitor::Visit(Function *n)
 {
 	n->stats->accept(this);
+}
+
+void
+TypeVisitor::Visit(Arg  *n)
+{
+}
+
+void
+TypeVisitor::Visit(Args *n)
+{
 }
 
 void
@@ -83,77 +117,64 @@ TypeVisitor::Visit(Variable  *n)
 			}
 }
 
-
 void
-TypeVisitor::Visit(Args *n)
+TypeVisitor::Visit(AccessModif *n)
 {
-	
-}
-
-void
-TypeVisitor::Visit(Arg  *n)
-{
-	
 }
 
 void
 TypeVisitor::Visit(Type *n)
 {
-	
+}
+
+void
+TypeVisitor::Visit(NoArrayType *n)
+{
+}
+
+void
+TypeVisitor::Visit(ArrayType *n)
+{
 }
 
 void
 TypeVisitor::Visit(Ident *n)
 {
-	
 }
 
 void
 TypeVisitor::Visit(Expr *n)
 {
-	
 }
 
 void
-TypeVisitor::Visit(Cast *n)
+TypeVisitor::Visit(Incr *n)
 {
-
 }
 
 void
-TypeVisitor::Visit(Integer *n)
+TypeVisitor::Visit(Decr *n)
 {
-	n->type = 1;
 }
 
 void
-TypeVisitor::Visit(Real *n)
+TypeVisitor::Visit(Not *n)
 {
-	n->type = 2;
 }
 
 void
-TypeVisitor::Visit(True *n)
+TypeVisitor::Visit(Minus *n)
 {
-	n->type = 3;
 }
 
 void
-TypeVisitor::Visit(False *n)
+TypeVisitor::Visit(Plus *n)
 {
-	n->type = 3;
 }
 
 void
 TypeVisitor::Visit(Paren  *n)
 {
-	
-}
-
-void
-TypeVisitor::Visit(QualNArrExp *n)
-{
-	n->type = n->qualNArray->ident->symbol->type;
 }
 
 void
@@ -201,27 +222,48 @@ TypeVisitor::Visit(Invoke *n)
 }
 
 void
-TypeVisitor::Visit(ExprList *n)
+TypeVisitor::Visit(InvokeArr *n)
 {
-	
 }
 
 void
-TypeVisitor::Visit(Not *n)
+TypeVisitor::Visit(NewObject *n)
 {
-	
 }
 
 void
-TypeVisitor::Visit(Minus *n)
+TypeVisitor::Visit(NewArr *n)
 {
-	
 }
 
 void
-TypeVisitor::Visit(Incr *n)
+TypeVisitor::Visit(Equal *n)
 {
-	
+}
+
+void
+TypeVisitor::Visit(NotEq *n)
+{
+}
+
+void
+TypeVisitor::Visit(Smaller *n)
+{
+}
+
+void
+TypeVisitor::Visit(SmallerEq *n)
+{
+}
+
+void
+TypeVisitor::Visit(Larger *n)
+{
+}
+
+void
+TypeVisitor::Visit(LargerEq *n)
+{
 }
  
 void
@@ -272,27 +314,130 @@ TypeVisitor::Visit(Add *n)
 }
 
 void
+TypeVisitor::Visit(Sub *n)
+{
+}
+
+void
 TypeVisitor::Visit(Mult *n)
 {
-	
 }
 
 void
-TypeVisitor::Visit(Larger *n)
+TypeVisitor::Visit(Div *n)
 {
-	
 }
 
 void
-TypeVisitor::Visit(LargerEq *n)
+TypeVisitor::Visit(Mod *n)
 {
-	
+}
+
+void
+TypeVisitor::Visit(And *n)
+{
+}
+
+void
+TypeVisitor::Visit(Or *n)
+{
+}
+
+void
+TypeVisitor::Visit(Is *n)
+{
+}
+
+void
+TypeVisitor::Visit(Cast *n)
+{
+}
+
+void
+TypeVisitor::Visit(Integer *n)
+{
+	n->type = 1;
+}
+
+void
+TypeVisitor::Visit(Real *n)
+{
+	n->type = 2;
+}
+
+void
+TypeVisitor::Visit(True *n)
+{
+	n->type = 3;
+}
+
+void
+TypeVisitor::Visit(False *n)
+{
+	n->type = 3;
+}
+
+void
+TypeVisitor::Visit(This *n)
+{
+}
+
+void
+TypeVisitor::Visit(Null *n)
+{
+	n->type = 0;
+}
+
+
+void
+TypeVisitor::Visit(ArrayIndex *n)
+{
+}
+void
+TypeVisitor::Visit(ArrayIndex_1 *n)
+{
+}
+void
+TypeVisitor::Visit(ArrayIndex_2 *n)
+{
+}
+void
+TypeVisitor::Visit(ArrayIndex_3 *n)
+{
+}
+void
+TypeVisitor::Visit(QualNArray *n)
+{
+}
+void
+TypeVisitor::Visit(QualNArray_ID_Index *n)
+{
+}
+void
+TypeVisitor::Visit(QualNArray_Exp_Index *n)
+{
+}
+void
+TypeVisitor::Visit(QualName *n)
+{
+}
+void
+TypeVisitor::Visit(QualName_ID *n)
+{
+}
+void
+TypeVisitor::Visit(QualName_Exp *n)
+{
+}
+
+void
+TypeVisitor::Visit(ExprList *n)
+{
 }
 
 void
 TypeVisitor::Visit(Stat *n)
 {
-	
 }
 
 void
@@ -300,6 +445,26 @@ TypeVisitor::Visit(Stats *n)
 {
 	for(int i = 0; i < n->stats->size(); i++)
 		n->stats->at(i)->accept(this);
+}
+
+void
+TypeVisitor::Visit(If *n)
+{
+}
+
+void
+TypeVisitor::Visit(IfElse *n)
+{
+}
+
+void
+TypeVisitor::Visit(While *n)
+{
+}
+
+void
+TypeVisitor::Visit(For *n)
+{
 }
 
 void
@@ -315,24 +480,6 @@ TypeVisitor::Visit(VariablesStat *n)
 }
 
 void
-TypeVisitor::Visit(If *n)
-{
-	
-}
-
-void
-TypeVisitor::Visit(IfElse *n)
-{
-	
-}
-
-void
-TypeVisitor::Visit(While *n)
-{
-	
-}
-
-void
 TypeVisitor::Visit(Semi *n)
 {
 }
@@ -340,13 +487,6 @@ TypeVisitor::Visit(Semi *n)
 void
 TypeVisitor::Visit(Block *n)
 {
-	
-}
-
-void
-TypeVisitor::Visit(Variables_e *n)
-{
-	n->variables->accept(this);	
 }
 
 void
@@ -385,142 +525,8 @@ TypeVisitor::Visit(Return *n)
 		 n->column);*/
 }
 
-
 void
-TypeVisitor::Visit(Null *n)
+TypeVisitor::Visit(Variables_e *n)
 {
-	n->type = 0;
-}
-
-void
-TypeVisitor::Visit(Plus *n)
-{
-	
-}
-
-void
-TypeVisitor::Visit(Decr *n)
-{
-	
-}
-
-void
-TypeVisitor::Visit(Sub *n)
-{
-	
-}
-
-void
-TypeVisitor::Visit(Div *n)
-{
-	
-}
-
-void
-TypeVisitor::Visit(Mod *n)
-{
-	
-}
-
-void
-TypeVisitor::Visit(Smaller *n)
-{
-	
-}
-
-void
-TypeVisitor::Visit(SmallerEq *n)
-{
-	
-}
-
-void
-TypeVisitor::Visit(Equal *n){
-	
-}
-
-void
-TypeVisitor::Visit(NotEq *n){
-	
-}
-
-void
-TypeVisitor::Visit(Or *n){
-	
-}
-
-void
-TypeVisitor::Visit(And *n){
-	
-}
-
-void
-TypeVisitor::Visit(For *n){
-	
-}
-
-
-void
-TypeVisitor::Visit(ArrayIndex *n){
-	
-}
-void
-TypeVisitor::Visit(ArrayIndex_1 *n){
-	
-}
-void
-TypeVisitor::Visit(ArrayIndex_2 *n){
-	
-}
-void
-TypeVisitor::Visit(ArrayIndex_3 *n){
-	
-}
-void
-TypeVisitor::Visit(QualName *n){
-
-}
-void
-TypeVisitor::Visit(QualName_ID *n){
-	
-}
-void
-TypeVisitor::Visit(QualName_Exp *n){
-	
-}
-void
-TypeVisitor::Visit(QualNArray *n){
-	
-}
-void
-TypeVisitor::Visit(QualNArray_ID_Index *n){
-	
-}
-void
-TypeVisitor::Visit(QualNArray_Exp_Index *n){
-	
-}
-void
-TypeVisitor::Visit(AccessModif *n){
-	
-}
-void
-TypeVisitor::Visit(Constructor *n){
-	
-}
-void
-TypeVisitor::Visit(ClassInher *n){
-	
-}
-void
-TypeVisitor::Visit(Class *n){
-	
-}
-void
-TypeVisitor::Visit(File *n){
-	
-}
-void
-TypeVisitor::Visit(Root *n){
-	
+	n->variables->accept(this);	
 }

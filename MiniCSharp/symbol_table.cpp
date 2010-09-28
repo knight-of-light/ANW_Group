@@ -1,4 +1,4 @@
-#include "ast.h"
+#include "symbol_table.h"
 
 Sym::Sym(string name, int kind, int type)
 {
@@ -243,4 +243,45 @@ Deffered::CheckAll(SymTab *symtab)
 			symtab->errors->AddError("Undeclared Identifier '" + this->ids->at(i)->name + "'", this->ids->at(i)->line, this->ids->at(i)->column);
 	}
 
+}
+
+
+//***********************************************************************
+//					Error
+//***********************************************************************
+Error::Error(string message, int line, int column)
+{
+	this->message = message;
+	this->line = line;
+	this->column = column;
+}
+
+Errors::Errors()
+{
+	this->messages = new vector<Error *>;
+}
+
+void
+Errors::AddError(std::string message, int line, int column)
+{
+	Error *error = new Error(message, line, column);
+	this->messages->push_back(error);
+}
+
+void
+Errors::Print()
+{
+	int size = this->messages->size();
+	if(size == 0)
+		cout << "Semntic analysis was done successfully! " << endl;
+	else
+	{
+		cout << "There are " << size << " semantic errors: " << endl;
+		for(int i = 0; i < size; i++)
+		{ 
+			cout << this->messages->at(i)->message << " at line: "
+				<< this->messages->at(i)->line << " , column: "
+				<< this->messages->at(i)->column << endl;
+		}
+	}
 }
