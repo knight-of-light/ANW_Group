@@ -87,7 +87,7 @@ SymTab::Lookup(std::string name)
 bool
 SymTab::IsDeclared(Ident *id )
 {
-	if(id->symbol!= NULL)
+	if(id->symbol != NULL)
 	{
 		string key =kinds[id->symbol->kind]+id->name;
 		Sym *sym = this->Lookup(key);

@@ -115,6 +115,12 @@ TypeVisitor::Visit(Expr *n)
 }
 
 void
+TypeVisitor::Visit(Cast *n)
+{
+
+}
+
+void
 TypeVisitor::Visit(Integer *n)
 {
 	n->type = 1;
@@ -324,6 +330,11 @@ void
 TypeVisitor::Visit(While *n)
 {
 	
+}
+
+void
+TypeVisitor::Visit(Semi *n)
+{
 }
 
 void

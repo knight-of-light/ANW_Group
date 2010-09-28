@@ -31,20 +31,22 @@ Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 {
 	this->name = n;
 	this->members = ms;
+	this->Parents = new vector<Ident *>;
+
 	n->father = this;
 	ms->father = this;
-	this->Parents=new vector<Ident  *>;
 }
 void
-Class::AddParent(Ident * cl) 
+Class::AddParent(Ident *pa) 
 {
-	
+	this->Parents->push_back(pa);
+	pa->father = this;
 }
 ClassInher::ClassInher(Ident *n, Ident *b, Members *ms, int l, int c) : Class(n,ms,l,c)
 {
 	this->base = b;
 	b->father = this;
-	this->Parents=new vector<Ident  *>;
+	this->Parents=new vector<Ident *>;
 }
 
 //*******     Members		*********
@@ -62,11 +64,10 @@ Members::AddMember(Member *m)
 
 Member::Member(int l, int c) : Node(l,c)
 {
-	
 }
 
 //*******     Global		*********
-Global::Global(AccessModif	*am, Type *ty, Variables *vs, int l, int c) : Member(l,c)
+Global::Global(AccessModif *am, Type *ty, Variables *vs, int l, int c) : Member(l,c)
 {
 	this->accessModif = am;
 	this->type = ty;
@@ -240,19 +241,19 @@ Expr::Expr(int l, int c) : Node(l, c)
 }
 
 //*******       Incr		*********
-Incr::Incr(Ident *id, bool ip, int l, int c) : Expr(l, c)
+Incr::Incr(QualNArray *qu, bool ip, int l, int c) : Expr(l, c)
 {
-	this->ident = id;
+	this->qual = qu;
 	this->isPrev = ip;
-	id->father = this;
+	qu->father = this;
 }
 
 //*******       Decr		*********
-Decr::Decr(Ident *id, bool ip, int l, int c) : Expr(l, c)
+Decr::Decr(QualNArray *qu, bool ip, int l, int c) : Expr(l, c)
 {
-	this->ident = id;
+	this->qual = qu;
 	this->isPrev = ip;
-	id->father = this;
+	qu->father = this;
 }
 
 //*******        Not		*********
@@ -281,6 +282,12 @@ Paren::Paren(Expr *e, int l, int c) : Expr(l, c)
 {
 	this->expr = e;
 	e->father = this;
+}
+
+Paren::Paren(Ident *n, int l, int c) : Expr(l,c)
+{
+	this->name = n;
+	n->father = this->expr;
 }
 
 //*******     QualNArrExp		*********
@@ -480,6 +487,28 @@ Is::Is(Expr *e, Type *ty, int l, int c) : Expr(l,c)
 	ty->father = this;
 }
 
+//*******        Cast		*********
+Cast::Cast(Type *t, Expr *e, int l, int c) : Expr(l,c)
+{
+	this->typ = t;
+	this->expr = e;
+
+	t->father = this;
+	e->father = this;
+}
+
+Cast::Cast(Ident *n, Expr *e, int l, int c) : Expr(l,c)
+{
+	this->typ->type = 6;
+	this->typ->name = n;
+	this->expr = e;
+
+	n->father = this->typ;
+	typ->father = this;
+
+	e->father = this;
+}
+
 //*******      Integer		*********
 Integer::Integer(int v, int l, int c) : Expr(l,c)
 {
@@ -549,7 +578,7 @@ ArrayIndex_3::ArrayIndex_3(Expr *exp1, Expr *exp2, Expr *exp3, int l, int c) : A
 }
 
 //*******   QualNameOrArr	*********
-QualNArray::QualNArray(int l, int c):Node(l ,c)
+QualNArray::QualNArray(int l, int c):Expr(l ,c)
 {
 	this->ident = NULL;
 }
@@ -696,6 +725,11 @@ VariablesStat::VariablesStat(Type *ty, Variables *vs, int l, int c) : Stat(l,c)
 	this->variables = vs;
 	ty->father = this;
 	vs->father = this;
+}
+
+//*******     Semicolon		*********
+Semi::Semi(int l, int c) : Stat(l,c)
+{
 }
 
 //*******      Block		*********
@@ -1044,6 +1078,12 @@ Is::accept(Visitor *v)
 }
 
 void
+Cast::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
 Integer::accept(Visitor *v)
 {
 	v->Visit(this);
@@ -1189,6 +1229,12 @@ ExprStat::accept(Visitor *v)
 
 void
 VariablesStat::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+Semi::accept(Visitor *v)
 {
 	v->Visit(this);
 }

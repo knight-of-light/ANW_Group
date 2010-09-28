@@ -68,7 +68,7 @@ class And;
 class Or;
 
 class Is;
-
+class Cast;
 class Integer;
 class Real;
 
@@ -99,6 +99,7 @@ class While;
 class For;
 class ExprStat;
 class VariablesStat;
+class Semi;
 class Block;
 class Return;
 class Variables_e;
@@ -147,6 +148,7 @@ public:
 	Ident	*name;
 	Members	*members;
 	vector<Ident *>	*Parents;
+
 	void AddParent(Ident * );
 	Class(Ident *, Members *, int, int);
 	virtual void accept(Visitor *);
@@ -338,10 +340,10 @@ public:
 class Incr  : public Expr
 {
 public:
-	Ident	*ident;
+	QualNArray	*qual;
 	bool	isPrev;
 
-	Incr(Ident *, bool, int, int);
+	Incr(QualNArray *, bool, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -349,10 +351,10 @@ public:
 class Decr  : public Expr
 {
 public:
-	Ident	*ident;
+	QualNArray	*qual;
 	bool	isPrev;
 
-	Decr(Ident *, bool, int, int);
+	Decr(QualNArray *, bool, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -377,7 +379,7 @@ public:
 };
 
 //*******       Plus		*********
-class Plus  : public Expr
+class Plus : public Expr
 {
 public:
 	Expr	*expr;
@@ -387,17 +389,19 @@ public:
 };
 
 //*******      Paren		*********
-class Paren  : public Expr
+class Paren : public Expr
 {
 public:
 	Expr	*expr;
+	Ident	*name;
 
 	Paren(Expr *, int, int);
+	Paren(Ident *, int, int);
 	virtual void accept(Visitor *);
 };
 
 //*******     QualNArrExp		*********
-class QualNArrExp  : public Expr
+class QualNArrExp : public Expr
 {
 public:
 	QualNArray	*qualNArray;
@@ -407,7 +411,7 @@ public:
 };
 
 //*******      Assign		*********
-class Assign  : public Expr
+class Assign : public Expr
 {
 public:
 	QualNArray	*qualNArray;
@@ -418,7 +422,7 @@ public:
 };
 
 //*******       Invoke		*********
-class Invoke  : public Expr
+class Invoke : public Expr
 {
 public:
 	QualName	*qualName;
@@ -616,6 +620,18 @@ public:
 	virtual void accept(Visitor *);
 };
 
+//*******        Cast		*********
+class Cast : public Expr
+{
+public:
+	Type	*typ;
+	Expr	*expr;
+
+	Cast(Type *, Expr *, int, int);
+	Cast(Ident *, Expr *, int, int);
+	virtual void accept(Visitor *);
+};
+
 //*******      Integer		*********
 class Integer : public Expr
 {
@@ -707,7 +723,7 @@ public:
 };
 
 //*******   QualNameOrArr	*********
-class QualNArray : public Node
+class QualNArray : public Expr
 {
 public:
 	Ident   *ident;
@@ -860,6 +876,14 @@ public:
 	virtual void accept(Visitor *);
 };
 
+//*******     Semicolon		*********
+class Semi : public Stat
+{
+public:
+	Semi(int, int);
+	virtual void accept(Visitor *);
+};
+
 //*******      Block		*********
 class Block : public Stat
 {
@@ -904,6 +928,7 @@ public:
 	vector<int> *argTypes;
 	int returnType;
 	Function *method;
+
 	Sym(string n, int kind, int type);
 	Sym(std::string , int kind, int type, Args * ps, int returnType, Function *meth);	
 };
@@ -932,6 +957,7 @@ private:
 public:
 	Scope *current;
 	Errors *errors;
+
 	SymTab(Errors *errors);
 	Sym *Lookup(string name);
 	bool IsDeclared(Ident *id );
@@ -1008,6 +1034,7 @@ public:
 	virtual void Visit(Type *) = 0;
 	virtual void Visit(Ident *) = 0;
 	virtual void Visit(Expr *) = 0;
+	virtual void Visit(Cast *) = 0;
 	virtual void Visit(Integer *) = 0;
 	virtual void Visit(Real *) = 0;
 	virtual void Visit(True *) = 0;
@@ -1031,6 +1058,7 @@ public:
 	virtual void Visit( If *)=0;
 	virtual void Visit( IfElse *)=0;
 	virtual void Visit( While *)=0;
+	virtual void Visit(Semi *)=0;
 	virtual void Visit( Block *)=0;
 	virtual void Visit( Return *)=0;
 	virtual void Visit(Variables_e *)=0;

@@ -24,6 +24,7 @@ public:
 	virtual void Visit( Type *);
 	virtual void Visit( Ident *);
 	virtual void Visit( Expr *);
+	virtual void Visit( Cast *);
 	virtual void Visit( Integer *);
 	virtual void Visit( Real *);
 	virtual void Visit( True *);
@@ -47,6 +48,7 @@ public:
 	virtual void Visit( If *);
 	virtual void Visit( IfElse *);
 	virtual void Visit( While *);
+	virtual void Visit(Semi *);
 	virtual void Visit( Block *);
 	virtual void Visit( Return *);
 	virtual void Visit(Variables_e *);
