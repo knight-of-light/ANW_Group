@@ -175,6 +175,7 @@ SymTab::AddSym(Ident *id, int kind, int type)
 	{
 		this->errors->AddError("Redefinition of Identifier '" + id->name + "'", id->line, id->column);
 		return false;
+		id->symbol->method=NULL;
 	}
 }
 

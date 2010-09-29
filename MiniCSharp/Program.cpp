@@ -10,7 +10,7 @@ extern int yyerror(const char *);
 extern int yydebug;
 extern int yyparse();
 
-extern File *file;
+extern Root *file;
 
 extern int lineno;
 extern int columnno;

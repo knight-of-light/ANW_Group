@@ -13,12 +13,11 @@
 	extern int col;
 	
 	extern SymTab *symtab;
-	File *file;
+	Root *file;
 	extern Deffered *def;
 %}
 
 %union{
-		File		*tFile;
 		Root		*tRoot;
 		Class		*tClass;
 		Members		*tMembers;
@@ -51,7 +50,6 @@
 		Real		*tReal;
 		Ident		*tIdent;
 	}
-%type	<tFile>			file
 %type	<tRoot>			root
 %type	<tClass>		class
 %type	<tMembers>		members
@@ -109,23 +107,17 @@
 %left '('
 
 %%
-file:			  root
-					{
-						$$ = new File(lin, col);
-						symtab->OutScope();
-						file = $$;
-					}
-;
-
 root:			/* empty */
 					{
 						$$ = new Root(lin, col);
 						symtab->AddNewScope();
+						file=$$;
 					}
 				| root class
 					{
 						$1->AddClass($2);
 						$$ = $1;
+						file=$$;
 					}
 ;
 
