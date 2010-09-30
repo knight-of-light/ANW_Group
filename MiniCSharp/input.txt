@@ -13,5 +13,18 @@ class Test
 	}
 
 }
+class Test2
+{
+    double x = 1;
+    int func2(double a,int c)
+    {
+        int x = 5; 
+        /*while (x < 5)
+        {
+            int i = 1;
+        }*/
+    }
+}
+
 
 

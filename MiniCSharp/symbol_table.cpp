@@ -147,6 +147,8 @@ bool
 SymTab::IsDeclared(Ident *id, Deffered *def )
 {
 	string key=id->name;
+	//string key = "l" + id->name;
+
 	Sym *sym = this->Lookup(key);
 	if(sym != NULL)
 	{
@@ -163,10 +165,33 @@ SymTab::IsDeclared(Ident *id, Deffered *def )
 bool
 SymTab::AddSym(Ident *id, int kind, int type)
 {
-	string key =kinds[kind]+id->name;
+	string key = " ";
+	//string key =kinds[kind]+id->name;
+	switch (kind)
+	{
+	case 1:
+			key = "c";
+			break;
+	case 2:
+			key = "f";
+			break;
+	case 3:
+			key = "con";
+			break;
+	case 4:
+			key = "g";
+			break;
+	case 5:
+			key = "l";
+			break;
+	case 6:
+			key = "a";
+	}
+	key +=id->name;
+
 	if(this->Lookup(key) == NULL)
 	{
-		Sym *sym = new Sym(key, kind, type);
+		Sym *sym = new Sym(id->name, kind, type);
 		this->current->hashTab->AddKey(key, sym);
 		id->symbol = sym;
 		return true;
@@ -182,7 +207,31 @@ SymTab::AddSym(Ident *id, int kind, int type)
 bool
 SymTab::AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth)
 {
-	string key = id->name;
+	//string key = id->name;
+		string key = " ";
+	//string key =kinds[kind]+id->name;
+	switch (kind)
+	{
+	case 1:
+			key = "c";
+			break;
+	case 2:
+			key = "f";
+			break;
+	case 3:
+			key = "con";
+			break;
+	case 4:
+			key = "g";
+			break;
+	case 5:
+			key = "l";
+			break;
+	case 6:
+			key = "a";
+	}
+	key +=id->name;
+
 	for(int i = 0; i < ps->args->size(); i++)
 	{
 		int t = ps->args->at(i)->type->type;
@@ -221,7 +270,7 @@ void
 SymTab::AddVars(Variables *v, Type *et)
 {
 	for(int i = 0; i < v->variables->size(); i++)
-		this->AddSym(v->variables->at(i)->name, 3, et->type);
+		this->AddSym(v->variables->at(i)->name, 4, et->type);
 }
 
 

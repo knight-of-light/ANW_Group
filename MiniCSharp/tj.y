@@ -123,7 +123,7 @@ root:			/* empty */
 
 class:			  CLASS IDENT '{'
 					{
-						symtab->AddSym($2, 0, -1);
+						symtab->AddSym($2, 1, -1);
 						symtab->AddNewScope();
 					}
 					 members '}'
@@ -133,8 +133,8 @@ class:			  CLASS IDENT '{'
 					}
 				| CLASS IDENT ':' IDENT '{'
 					{
-						symtab->AddSym($2, 0, -1);
-						symtab->IsDeclared($4, 0, -1);
+						symtab->AddSym($2, 1, -1);
+						symtab->IsDeclared($4, 1, -1);
 						symtab->AddNewScope();
 					}
 					 members '}'
@@ -190,7 +190,7 @@ function:		  accessmodif type IDENT '('
 					}
 				| accessmodif VOID IDENT '('
 					 {
-						 symtab->AddSym($3, 1, -1);
+						 symtab->AddSym($3, 2, -1);
 						 symtab->AddNewScope();
 					 }
 					 args_e ')' '{' statements '}'
@@ -677,7 +677,7 @@ statement:		  IF '(' expression ')' statement %prec IF_PREC
 					{
 						$$ = new VariablesStat($1, $2, lin, col);
 						for(int i = 0; i < $2->variables->size(); i++)
-							symtab->AddSym($2->variables->at(i)->name, 3, $1->type);
+							symtab->AddSym($2->variables->at(i)->name, 5, $1->type);
 					}
 				| ';'
 					{
