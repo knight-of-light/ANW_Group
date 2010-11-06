@@ -134,7 +134,7 @@ class:			  CLASS IDENT '{'
 				| CLASS IDENT ':' IDENT '{'
 					{
 						symtab->AddSym($2, 1, -1);
-						symtab->IsDeclared($4, 1, -1);
+						symtab->IsDeclared($4);
 						symtab->AddNewScope();
 					}
 					 members '}'
@@ -167,14 +167,20 @@ member:			  global
 global:			  accessmodif type variables ';'
 					{
 						$$ = new Global($1, $2, $3, lin, col);
-						symtab->AddVars($3, $2);
+						for(int i=0; i < $3->variables->size(); i++)
+							symtab->AddSym($3->variables->at(i)->name, 4, $2->type);
 					}
 ;
 
-constructor:	  accessmodif IDENT '(' args_e ')' '{' statements '}'
+constructor:	  accessmodif IDENT '('
 					{
-						$$ = new Constructor($1, $2, $4, $7, lin, col);
-						symtab->AddSym($2, 1, -1);
+						symtab->AddNewScope();
+					}
+					 args_e ')' '{' statements '}'
+					{
+						$$ = new Constructor($1, $2, $5, $8, lin, col);
+						symtab->OutScope();
+						symtab->AddSym($2, 3, -1, $5, $$);
 					}
 ;
 
@@ -392,12 +398,14 @@ expr:			  INCREMENT qualnameorarray
 				| NEW IDENT '(' expr_list_e ')'
 					{
 						$$ = new NewObject($2, $4, lin, col);
-						symtab->AddSym($2, 1, -1);
+						symtab->IsDeclared($2);
+						//symtab->AddSym($2, 1, -1);
 					}
 				| NEW IDENT arrayindex
 					{
 						$$ = new NewArr($2, $3, lin, col);
-						symtab->AddSym($2, 1, -1);
+						symtab->IsDeclared($2);
+						//symtab->AddSym($2, 1, -1);
 					}
 				| expr EQ expression
 					{

@@ -9,15 +9,31 @@ Sym::Sym(string name, int kind, int type)
 	this->name = name;
 	this->kind = kind;
 	this->type = type;
+	this->constructor = NULL;
+	this->method = NULL;
 	this->argTypes = NULL;
 }
 
-Sym::Sym(string n, int kind, int type, 
-		 Args *ps, int returnType, Function *meth)
+Sym::Sym(string n, int kind, int type, Args *ps, Constructor *constr)
 {
 	this->name = n;
 	this->kind = kind;
 	this->type = type;
+	this->constructor = constr;
+	this->method = NULL;
+	this->argTypes = new vector<int>;
+
+	for(int i=0; i< ps->args->size(); i++)
+		this->argTypes->push_back(ps->args->at(i)->type->type);
+	
+}
+
+Sym::Sym(string n, int kind, int type, Args *ps, int returnType, Function *meth)
+{
+	this->name = n;
+	this->kind = kind;
+	this->type = type;
+	this->constructor = NULL;
 	this->method = meth;
 	this->returnType = returnType;
 	this->argTypes = new vector<int>;
@@ -53,11 +69,18 @@ SymTab::SymTab(Errors *errors)
 	types[0] = "null";
 	types[1] = "int";
 	types[2] = "double";
-	types[3] = "BOOL";
+	types[3] = "boolean";
 	types[4] = "void";
-	kinds[0] = "c";//class
-	kinds[1] = "f";//function
-	kinds[2] = "v";//variable
+	types[5] = "object";
+	types[6] = "ident";
+
+	kinds[0] = "";//NuN
+	kinds[1] = "c";//class
+	kinds[2] = "f";//function
+	kinds[3] = "f";//constractur
+	kinds[4] = "c";//global variable
+	kinds[5] = "v";//local variable
+	kinds[6] = "v";//Argument
 }
 
 Sym *
@@ -77,44 +100,39 @@ SymTab::Lookup(std::string name)
 }
 
 bool
-SymTab::IsDeclared(Ident *id )
+SymTab::IsDeclared(Ident *id)
 {
-	if(id->symbol != NULL)
+	//string key = this->kinds[kind]+"@"+id->name;
+	string key = id->name;
+	Sym *sym = this->Lookup(key);
+	if(sym != NULL)
 	{
-		string key =kinds[id->symbol->kind]+id->name;
-		Sym *sym = this->Lookup(key);
-		if(sym != NULL)
-		{
-			id->symbol = sym;
-			return true;
-		}
-		}
-		else
-		{
-			this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
-			return false;
-		}
+		id->symbol = sym;
+		return true;
+	}
+	else
+	{
+		this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
+		return false;
+	}
 }
 
-bool
-SymTab::IsDeclared(Ident *id , int kind  ,int type )
-{
-
-		string key =kinds[kind]+id->name;
-		Sym *sym = this->Lookup(key);
-		if(sym != NULL)
-		{
-			id->symbol = sym;
-			return true;
-		}
-	
-		else
-		{
-			this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
-			return false;
-		}
-
-}
+//bool
+//SymTab::IsDeclared(Ident *id, int kind, int type)
+//{
+//	string key = this->kinds[kind]+"@"+id->name;
+//	Sym *sym = this->Lookup(key);
+//	if(sym != NULL)
+//	{
+//		id->symbol = sym;
+//		return true;
+//	}
+//	else
+//	{
+//		this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
+//		return false;
+//	}
+//}
 
 /*
 	SymTab::IsDeclared(Ident *id, ExprList *el)
@@ -124,8 +142,8 @@ SymTab::IsDeclared(Ident *id , int kind  ,int type )
 bool
 SymTab::IsDeclared(Ident *id, ExprList *el)
 {
-	string key=id->name;
-	for(int i = 0 ; i < el->exprList->size(); i++)
+	string key = id->name;
+	for(int i=0; i < el->exprList->size(); i++)
 	{
 		int t = el->exprList->at(i)->type;
 		key += "@" + types[t];
@@ -144,12 +162,10 @@ SymTab::IsDeclared(Ident *id, ExprList *el)
 }
 
 bool
-SymTab::IsDeclared(Ident *id, Deffered *def )
+SymTab::IsDeclared(Ident *id, Deffered *def)
 {
-	string key=id->name;
-	//string key = "l" + id->name;
-
-	Sym *sym = this->Lookup(key);
+	//string key = this->kinds[kind]+"@"+id->name;
+	Sym *sym = this->Lookup(id->name);
 	if(sym != NULL)
 	{
 		id->symbol = sym;
@@ -165,30 +181,8 @@ SymTab::IsDeclared(Ident *id, Deffered *def )
 bool
 SymTab::AddSym(Ident *id, int kind, int type)
 {
-	string key = " ";
-	//string key =kinds[kind]+id->name;
-	switch (kind)
-	{
-	case 1:
-			key = "c";
-			break;
-	case 2:
-			key = "f";
-			break;
-	case 3:
-			key = "con";
-			break;
-	case 4:
-			key = "g";
-			break;
-	case 5:
-			key = "l";
-			break;
-	case 6:
-			key = "a";
-	}
-	key +=id->name;
-
+	//string key = this->kinds[kind]+"@"+id->name;
+	string key = id->name;
 	if(this->Lookup(key) == NULL)
 	{
 		Sym *sym = new Sym(id->name, kind, type);
@@ -200,42 +194,42 @@ SymTab::AddSym(Ident *id, int kind, int type)
 	{
 		this->errors->AddError("Redefinition of Identifier '" + id->name + "'", id->line, id->column);
 		return false;
-		id->symbol->method=NULL;
+	}
+}
+
+bool
+SymTab::AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr)
+{
+	//string key = this->kinds[kind]+"@"+id->name;
+	string key = id->name;
+	for(int i=0; i < ps->args->size(); i++)
+	{
+		int t = ps->args->at(i)->type->type;
+		key += "@" + types[t];
+	}
+
+	if(this->Lookup(key) == NULL)
+	{
+		Sym *sym = new Sym(id->name, kind, type, ps, constr);
+		this->current->hashTab->AddKey(key, sym);
+		id->symbol = sym;
+		return true;
+	}
+	else
+	{
+		this->errors->AddError("Redefinition of Identifier '" + id->name + "'", id->line, id->column);
+		return false;
 	}
 }
 
 bool
 SymTab::AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth)
 {
-	//string key = id->name;
-		string key = " ";
-	//string key =kinds[kind]+id->name;
-	switch (kind)
-	{
-	case 1:
-			key = "c";
-			break;
-	case 2:
-			key = "f";
-			break;
-	case 3:
-			key = "con";
-			break;
-	case 4:
-			key = "g";
-			break;
-	case 5:
-			key = "l";
-			break;
-	case 6:
-			key = "a";
-	}
-	key +=id->name;
-
-	for(int i = 0; i < ps->args->size(); i++)
+	//string key = this->kinds[kind]+"@"+id->name;
+	string key = id->name;
+	for(int i=0; i < ps->args->size(); i++)
 	{
 		int t = ps->args->at(i)->type->type;
-		
 		key += "@" + types[t];
 	}
 
@@ -265,13 +259,13 @@ SymTab::OutScope()
 {
 	this->current = this->current->father;
 }
-
-void 
-SymTab::AddVars(Variables *v, Type *et)
-{
-	for(int i = 0; i < v->variables->size(); i++)
-		this->AddSym(v->variables->at(i)->name, 4, et->type);
-}
+//
+//void 
+//SymTab::AddVars(Variables *v, Type *et)
+//{
+//	for(int i=0; i < v->variables->size(); i++)
+//		this->AddSym(v->variables->at(i)->name, 4, et->type);
+//}
 
 
 //***********************************************************************
@@ -291,10 +285,10 @@ Deffered::AddIdent(Ident *id)
 void
 Deffered::CheckAll(SymTab *symtab)
 {
-	for(int i = 0; i < this->ids->size(); i++)
+	for(int i=0; i < this->ids->size(); i++)
 	{
 		Sym *sym = symtab->current->hashTab->GetMember(this->ids->at(i)->name);
-		if(sym != 0)
+		if(sym != NULL)
 			this->ids->at(i)->symbol = sym;
 		else
 			symtab->errors->AddError("Undeclared Identifier '" + this->ids->at(i)->name + "'", this->ids->at(i)->line, this->ids->at(i)->column);
@@ -333,8 +327,8 @@ Errors::Print()
 	else
 	{
 		cout << "There are " << size << " semantic errors: " << endl;
-		for(int i = 0; i < size; i++)
-		{ 
+		for(int i = 0; i<size; i++)
+		{
 			cout << this->messages->at(i)->message << " at line: "
 				<< this->messages->at(i)->line << " , column: "
 				<< this->messages->at(i)->column << endl;

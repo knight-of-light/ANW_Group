@@ -18,17 +18,19 @@ using std::string;
 class Sym
 {
 public:
-	//1:class 2: func,3: constructor, 4: global Global, , 5: Local Global, 6: Argument
+	//1: class, 2: func, 3: constructor, 4: global Global, 5: Local Global, 6: Argument
 	int kind;
 	string name;
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
+	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5: Object, 6: Ident
 	int type;
 	vector<int> *argTypes;
 	int returnType;
+	Constructor *constructor;
 	Function *method;
 
 	Sym(string n, int kind, int type);
-	Sym(std::string , int kind, int type, Args * ps, int returnType, Function *meth);	
+	Sym(std::string , int kind, int type, Args *ps, Constructor *constr);
+	Sym(std::string , int kind, int type, Args *ps, int returnType, Function *meth);	
 };
 
 //*******      HashTab		*********
@@ -50,25 +52,25 @@ public:
 class SymTab
 {
 private:
-	string types [5];
-	string kinds[5];
+	string types[7];
+	string kinds[7];
 public:
 	Scope *current;
 	Errors *errors;
 
 	SymTab(Errors *errors);
 	Sym *Lookup(string name);
-	bool IsDeclared(Ident *id );
+	bool IsDeclared(Ident *id);
 	bool IsDeclared(Ident *id, ExprList *el);
 	bool IsDeclared(Ident *id, Deffered *def);
-	bool IsDeclared(Ident *id , int kind  ,int type );
 	bool AddSym(Ident *id, int kind, int type);
+	bool AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr);
 	bool AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth);	
 
 	void AddNewScope();
 	void OutScope();
 
-	void AddVars(Variables *v, Type *et);
+	//void AddVars(Variables *v, Type *et);
 };
 
 //***********************************************************************
