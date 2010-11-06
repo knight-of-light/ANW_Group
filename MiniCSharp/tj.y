@@ -39,8 +39,6 @@
 		ExprList	*tExprList;
 		
 		ArrayIndex	*tArrayIndex;
-		QualName	*tQualName;
-		QualNArray	*tQualNArray;
 		
 		Stats		*tStats;
 		Stat		*tStat;
@@ -67,12 +65,10 @@
 %type	<tType>			type
 %type	<tNoArrayType>	noarraytype	basictype
 %type	<tArrayType>	arraytype
-%type	<tExpr>			expr	expression	expr_e
+%type	<tExpr>			expression	expr_e
 %type	<tExprList>		expr_list	expr_list_e
 
 %type	<tArrayIndex>	arrayindex
-%type	<tQualName>		qualifiedname
-%type	<tQualNArray>	qualnameorarray	qnora_without_id
 
 %type	<tStats>		statements
 %type	<tStat>			statement
@@ -89,17 +85,15 @@
 %token THIS NUL PRIVATE STATIC
 %token VOID RETURN
 
-%nonassoc EXPRESSION
-
 %nonassoc IF_PREC
 %nonassoc ELSE
 
 %right '='
+%right CAST
 %left OR
 %left AND
 %left EQ NE
 %left '>' '<' LE SE IS
-%right CAST
 %left '+' '-'
 %left '*'  '/'  '%'
 %right '!' INCREMENT DECREMENT UNARY_OP
@@ -336,25 +330,19 @@ arraytype:		  IDENT '[' ']'
 					}
 ;
 
-expression:		  expr %prec EXPRESSION
-					{$$ = $1;}
-				| qualnameorarray %prec EXPRESSION
-					{$$ = $1;}
-;
-
-expr:			  INCREMENT qualnameorarray
+expression:		  INCREMENT IDENT
 					{
 						$$ = new Incr($2, true, lin, col);
 					}
-				| DECREMENT qualnameorarray
+				| DECREMENT IDENT
 					{
 						$$ = new Decr($2, true, lin, col);
 					}
-				| qualnameorarray INCREMENT
+				| IDENT INCREMENT
 					{
 						$$ = new Incr($1, false, lin, col);
 					}
-				| qualnameorarray DECREMENT
+				| IDENT DECREMENT
 					{
 						$$ = new Decr($1, false, lin, col);
 					}
@@ -370,28 +358,27 @@ expr:			  INCREMENT qualnameorarray
 					{
 						$$ = new Plus($2, lin, col);
 					}
-				| '(' expr ')'
+				| '(' expression ')'
 					{
 						$$ = new Paren($2, lin, col);
 					}
-				| '(' IDENT ')' %prec CAST
+				| IDENT
 					{
-						$$ = new Paren($2, lin, col);
-						symtab->IsDeclared($2);
+						$$ = new IdentExpr($1, lin, col);
 					}
-				| '(' qnora_without_id ')'
+				| IDENT arrayindex
 					{
-						$$ = new Paren($2, lin, col);
+						$$ = new IdentArr($1, $2, lin, col);
 					}
-				| qualnameorarray '=' expression
+				| IDENT '=' expression
 					{
 						$$ = new Assign($1, $3, lin, col);
 					}
-				| qualifiedname '(' expr_list_e ')'
+				| IDENT '(' expr_list_e ')'
 					{
 						$$ = new Invoke($1, $3, lin, col);
 					}
-				| qualifiedname '(' expr_list_e ')' arrayindex
+				| IDENT '(' expr_list_e ')' arrayindex
 					{
 						$$ = new InvokeArr($1, $3, $5, lin, col);
 					}
@@ -407,126 +394,65 @@ expr:			  INCREMENT qualnameorarray
 						symtab->IsDeclared($2);
 						//symtab->AddSym($2, 1, -1);
 					}
-				| expr EQ expression
+				| expression EQ expression
 					{
 						$$ = new Equal($1, $3, lin, col);
 					}
-				| qualnameorarray EQ expression
-					{
-						$$ = new Equal($1, $3, lin, col);
-					}
-				| expr NE expression
+				| expression NE expression
 					{
 						$$ = new NotEq($1, $3, lin, col);
 					}
-				| qualnameorarray NE expression
-					{
-						$$ = new NotEq($1, $3, lin, col);
-					}
-				| expr '<' expression
+				| expression '<' expression
 					{
 						$$ = new Smaller($1, $3, lin, col);
 					}
-				| qualnameorarray '<' expression
-					{
-						$$ = new Smaller($1, $3, lin, col);
-					}
-				| expr SE expression
+				| expression SE expression
 					{
 						$$ = new SmallerEq($1, $3, lin, col);
 					}
-				| qualnameorarray SE expression
-					{
-						$$ = new SmallerEq($1, $3, lin, col);
-					}
-				| expr '>' expression
+				| expression '>' expression
 					{
 						$$ = new Larger($1, $3, lin, col);
 					}
-				| qualnameorarray '>' expression
-					{
-						$$ = new Larger($1, $3, lin, col);
-					}
-				| expr LE expression
+				| expression LE expression
 					{
 						$$ = new LargerEq($1, $3, lin, col);
 					}
-				| qualnameorarray LE expression
-					{
-						$$ = new LargerEq($1, $3, lin, col);
-					}
-				| expr '+' expression
+				| expression '+' expression
 					{
 						$$ = new Add($1, $3, lin, col);
 					}
-				| qualnameorarray '+' expression
-					{
-						$$ = new Add($1, $3, lin, col);
-					}
-				| expr '-' expression
+				| expression '-' expression
 					{
 						$$ = new Sub($1, $3, lin, col);
 					}
-				| qualnameorarray '-' expression
-					{
-						$$ = new Sub($1, $3, lin, col);
-					}
-				| expr '*' expression
+				| expression '*' expression
 					{
 						$$ = new Mult($1, $3, lin, col);
 					}
-				| qualnameorarray '*' expression
-					{
-						$$ = new Mult($1, $3, lin, col);
-					}
-				| expr '/' expression
+				| expression '/' expression
 					{
 						$$ = new Div($1, $3, lin, col);
 					}
-				| qualnameorarray '/' expression
-					{
-						$$ = new Div($1, $3, lin, col);
-					}
-				| expr '%' expression
+				| expression '%' expression
 					{
 						$$ = new Mod($1, $3, lin, col);
 					}
-				| qualnameorarray '%' expression
-					{
-						$$ = new Mod($1, $3, lin, col);
-					}
-				| expr AND expression
+				| expression AND expression
 					{
 						$$ = new And($1, $3, lin, col);
 					}
-				| qualnameorarray AND expression
-					{
-						$$ = new And($1, $3, lin, col);
-					}
-				| expr OR expression
+				| expression OR expression
 					{
 						$$ = new Or($1, $3, lin, col);
 					}
-				| qualnameorarray OR expression
-					{
-						$$ = new Or($1, $3, lin, col);
-					}
-				| expr IS type
+				| expression IS type
 					{
 						$$ = new Is($1, $3, lin, col);
 					}
-				| qualnameorarray IS type
-					{
-						$$ = new Is($1, $3, lin, col);
-					}
-				| '(' basictype ')' expression
+				| '(' basictype ')' expression %prec CAST
 					{
 						$$ = new Cast($2, $4, lin, col);
-					}
-				| '(' IDENT ')' expression
-					{
-						$$ = new Cast($2, $4, lin, col);
-						symtab->IsDeclared($2);
 					}
 				| INTEGER
 					{$$ = $1;}
@@ -561,82 +487,6 @@ arrayindex:		  '[' expression ']'
 				| '[' expression ',' expression ',' expression ']'
 					{
 						$$ = new ArrayIndex_3($2, $4, $6, lin, col);
-					}
-;
-
-qualifiedname:	  IDENT
-					{
-						$$ = new QualName_ID($1, lin, col);
-						symtab->IsDeclared($1);
-					}
-				| expr '.' IDENT
-					{
-						$$ = new QualName_Exp($3, $1, lin, col);
-						symtab->IsDeclared($3);
-					}
-				| qualnameorarray '.' IDENT
-					{
-						$$ = new QualName_Exp($3, $1, lin, col);
-						symtab->IsDeclared($3);
-					}
-;
-
-qualnameorarray:  IDENT
-					{
-						$$ = new QualName_ID($1, lin, col);
-						symtab->IsDeclared($1);
-					}
-				| IDENT arrayindex
-					{
-						$$ = new QualNArray_ID_Index($1, $2, lin, col);
-						symtab->IsDeclared($1);
-					}
-				| expr '.' IDENT
-					{
-						$$ = new QualName_Exp($3, $1, lin, col);
-						symtab->IsDeclared($3);
-					}
-				| qualnameorarray '.' IDENT
-					{
-						$$ = new QualName_Exp($3, $1, lin, col);
-						symtab->IsDeclared($3);
-					}
-				| expr '.' IDENT arrayindex
-					{
-						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
-						symtab->IsDeclared($3);
-					}
-				| qualnameorarray '.' IDENT arrayindex
-					{
-						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
-						symtab->IsDeclared($3);
-					}
-;
-
-qnora_without_id: IDENT arrayindex
-					{
-						$$ = new QualNArray_ID_Index($1, $2, lin, col);
-						symtab->IsDeclared($1);
-					}
-				| expr '.' IDENT
-					{
-						$$ = new QualName_Exp($3, $1, lin, col);
-						symtab->IsDeclared($3);
-					}
-				| qualnameorarray '.' IDENT
-					{
-						$$ = new QualName_Exp($3, $1, lin, col);
-						symtab->IsDeclared($3);
-					}
-				| expr '.' IDENT arrayindex
-					{
-						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
-						symtab->IsDeclared($3);
-					}
-				| qualnameorarray '.' IDENT arrayindex
-					{
-						$$ = new QualNArray_Exp_Index($3, $1, $4, lin, col);
-						symtab->IsDeclared($3);
 					}
 ;
 

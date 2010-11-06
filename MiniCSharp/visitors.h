@@ -35,6 +35,8 @@ public:
 	virtual void Visit(Minus *) = 0;
 	virtual void Visit(Plus *) = 0;
 	virtual void Visit(Paren  *) = 0;
+	virtual void Visit(IdentExpr *) = 0;
+	virtual void Visit(IdentArr *) = 0;
 	virtual void Visit(Assign *) = 0;
 	virtual void Visit(Invoke *) = 0;
 	virtual void Visit(InvokeArr *) = 0;
@@ -65,12 +67,6 @@ public:
 	virtual void Visit(ArrayIndex_1 *) = 0;
 	virtual void Visit(ArrayIndex_2 *) = 0;
 	virtual void Visit(ArrayIndex_3 *) = 0;
-	virtual void Visit(QualNArray *) = 0;
-	virtual void Visit(QualNArray_ID_Index *) = 0;
-	virtual void Visit(QualNArray_Exp_Index *) = 0;
-	virtual void Visit(QualName *) = 0;
-	virtual void Visit(QualName_ID *) = 0;
-	virtual void Visit(QualName_Exp *) = 0;
 	virtual void Visit(ExprList *) = 0;
 	virtual void Visit(Stat *) = 0;
 	virtual void Visit(Stats *) = 0;
@@ -117,6 +113,8 @@ public:
 	virtual void Visit(Minus *);
 	virtual void Visit(Plus *);
 	virtual void Visit(Paren  *);
+	virtual void Visit(IdentExpr *);
+	virtual void Visit(IdentArr *);
 	virtual void Visit(Assign *);
 	virtual void Visit(Invoke *);
 	virtual void Visit(InvokeArr *);
@@ -147,12 +145,6 @@ public:
 	virtual void Visit(ArrayIndex_1 *);
 	virtual void Visit(ArrayIndex_2 *);
 	virtual void Visit(ArrayIndex_3 *);
-	virtual void Visit(QualNArray *);
-	virtual void Visit(QualNArray_ID_Index *);
-	virtual void Visit(QualNArray_Exp_Index *);
-	virtual void Visit(QualName *);
-	virtual void Visit(QualName_ID *);
-	virtual void Visit(QualName_Exp *);
 	virtual void Visit(ExprList *);
 	virtual void Visit(Stat *);
 	virtual void Visit(Stats *);

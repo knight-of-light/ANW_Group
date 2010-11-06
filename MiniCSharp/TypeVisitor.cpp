@@ -178,10 +178,20 @@ TypeVisitor::Visit(Paren  *n)
 }
 
 void
+TypeVisitor::Visit(IdentExpr *)
+{
+}
+
+void
+TypeVisitor::Visit(IdentArr *)
+{
+}
+
+void
 TypeVisitor::Visit(Assign *n)
 {
 			n->expr->accept(this);
-			int left = n->qualNArray->ident->symbol->type;// Getting the type from the symbol table
+			int left = n->ident->symbol->type;// Getting the type from the symbol table
 			int right = n->expr->type;
 			
 			bool mismatch = false;
@@ -209,7 +219,7 @@ TypeVisitor::Visit(Assign *n)
 			}
 			if(mismatch)
 				symtab->errors->AddError("Type mismatch between \'" + types[left] + "\' and \'" + types[right] + "\'",
-				 n->qualNArray->ident->line,							
+				 n->ident->line,							
 				 n->column);
 }
 
@@ -218,7 +228,7 @@ void
 TypeVisitor::Visit(Invoke *n)
 {
 	n->exprList->accept(this);
-	this->symtab->IsDeclared(n->qualName->ident, n->exprList);
+	this->symtab->IsDeclared(n->ident, n->exprList);
 }
 
 void
@@ -403,30 +413,6 @@ TypeVisitor::Visit(ArrayIndex_2 *n)
 }
 void
 TypeVisitor::Visit(ArrayIndex_3 *n)
-{
-}
-void
-TypeVisitor::Visit(QualNArray *n)
-{
-}
-void
-TypeVisitor::Visit(QualNArray_ID_Index *n)
-{
-}
-void
-TypeVisitor::Visit(QualNArray_Exp_Index *n)
-{
-}
-void
-TypeVisitor::Visit(QualName *n)
-{
-}
-void
-TypeVisitor::Visit(QualName_ID *n)
-{
-}
-void
-TypeVisitor::Visit(QualName_Exp *n)
 {
 }
 

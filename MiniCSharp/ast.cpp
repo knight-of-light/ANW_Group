@@ -239,19 +239,19 @@ Expr::Expr(int l, int c) : Node(l, c)
 }
 
 //*******       Incr		*********
-Incr::Incr(QualNArray *qu, bool ip, int l, int c) : Expr(l, c)
+Incr::Incr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 {
-	this->qual = qu;
+	this->ident = id;
 	this->isPrev = ip;
-	qu->father = this;
+	id->father = this;
 }
 
 //*******       Decr		*********
-Decr::Decr(QualNArray *qu, bool ip, int l, int c) : Expr(l, c)
+Decr::Decr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 {
-	this->qual = qu;
+	this->ident = id;
 	this->isPrev = ip;
-	qu->father = this;
+	id->father = this;
 }
 
 //*******        Not		*********
@@ -282,38 +282,48 @@ Paren::Paren(Expr *e, int l, int c) : Expr(l, c)
 	e->father = this;
 }
 
-Paren::Paren(Ident *n, int l, int c) : Expr(l,c)
+//*******     IdentExpr		*********
+IdentExpr::IdentExpr(Ident *id, int l, int c) : Expr(l, c)
 {
-	this->name = n;
-	n->father = this->expr;
+	this->ident = id;
+	id->father = this;
+}
+
+//*******     IdentArr		*********
+IdentArr::IdentArr(Ident *id, ArrayIndex *ai, int l, int c) : Expr(l, c)
+{
+	this->ident = id;
+	this-> arrayIndex = ai;
+	id->father = this;
+	ai->father = this;
 }
 
 //*******      Assign		*********
-Assign::Assign(QualNArray *qna, Expr *e, int l, int c) : Expr(l,c)
+Assign::Assign(Ident *id, Expr *e, int l, int c) : Expr(l,c)
 {
-	this->qualNArray = qna;
+	this->ident = id;
 	this->expr = e;
-	qna->father = this;
+	id->father = this;
 	e->father = this;
 }
 
 //*******       Invoke		*********
-Invoke::Invoke(QualName *qn, ExprList *el, int l, int c) : Expr(l,c)
+Invoke::Invoke(Ident *id, ExprList *el, int l, int c) : Expr(l,c)
 {
-	this->qualName = qn;
+	this->ident = id;
 	this->exprList = el;
-	qn->father = this;
+	id->father = this;
 	el->father = this;
 }
 
 //*******     InvokeArr		*********
-InvokeArr::InvokeArr(QualName *qn, ExprList *el, ArrayIndex *ai, int l, int c) : Expr(l,c)
+InvokeArr::InvokeArr(Ident *id, ExprList *el, ArrayIndex *ai, int l, int c) : Expr(l,c)
 {
-	this->qualName = qn;
+	this->ident = id;
 	this->exprList = el;
 	this->arrayIndex = ai;
 
-	qn->father = this;
+	id->father = this;
 	el->father = this;
 	ai->father = this;
 }
@@ -488,18 +498,6 @@ Cast::Cast(Type *t, Expr *e, int l, int c) : Expr(l,c)
 	e->father = this;
 }
 
-Cast::Cast(Ident *n, Expr *e, int l, int c) : Expr(l,c)
-{
-	this->typ->type = 6;
-	this->typ->name = n;
-	this->expr = e;
-
-	n->father = this->typ;
-	typ->father = this;
-
-	e->father = this;
-}
-
 //*******      Integer		*********
 Integer::Integer(int v, int l, int c) : Expr(l,c)
 {
@@ -566,54 +564,6 @@ ArrayIndex_3::ArrayIndex_3(Expr *exp1, Expr *exp2, Expr *exp3, int l, int c) : A
 	expr1->father = this;
 	expr2->father = this;
 	expr3->father = this;
-}
-
-//*******   QualNameOrArr	*********
-QualNArray::QualNArray(int l, int c):Expr(l ,c)
-{
-	this->ident = NULL;
-}
-
-QualNArray_ID_Index::QualNArray_ID_Index(Ident *ident, ArrayIndex *index, int l, int c) : QualNArray(l,c)
-{
-	this->ident=ident;
-	this->index=index;
-
-	ident->father = this;
-	index->father = this;
-}
-
-QualNArray_Exp_Index::QualNArray_Exp_Index(Ident* ident, Expr* expr,ArrayIndex* index ,int l, int c ):QualNArray(l,c)
-{
-	this->ident=ident;
-	this->expr=expr;
-	this->index=index;
-
-	ident->father = this;
-	expr->father = this;
-	index->father = this;
-}
-
-//*******   QualifiedName	*********
-QualName::QualName(int l , int  c) : QualNArray(l,c)
-{
-	this->ident = NULL;
-}
-
-QualName_ID::QualName_ID(Ident *ident, int l, int c) : QualName(l,c)
-{
-	this->ident = ident;
-
-	ident->father = this;
-}
-
-QualName_Exp::QualName_Exp(Ident *ident, Expr *expr, int l, int c) : QualName(l,c)
-{
-	this->ident=ident;
-	this->expr=expr;
-
-	ident->father = this;
-	expr->father = this;
 }
 
 //*******     ExprList		*********
@@ -760,7 +710,6 @@ Node::accept(Visitor *v)
 void
 File::accept(Visitor *v)
 {
-	v->Visit(this);
 }
 void
 Root::accept(Visitor *v)
@@ -903,6 +852,18 @@ Plus::accept(Visitor *v)
 
 void
 Paren ::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+IdentExpr::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+IdentArr::accept(Visitor *v)
 {
 	v->Visit(this);
 }
@@ -1083,42 +1044,6 @@ ArrayIndex_2::accept(Visitor *v)
 
 void
 ArrayIndex_3::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-QualName::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-QualName_ID::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-QualName_Exp::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-QualNArray::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-QualNArray_ID_Index::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-QualNArray_Exp_Index::accept(Visitor *v)
 {
 	v->Visit(this);
 }
