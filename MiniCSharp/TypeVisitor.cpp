@@ -13,11 +13,6 @@
 //}
 
 void
-TypeVisitor::Visit(File *n)
-{
-}
-
-void
 TypeVisitor::Visit(Root *n)
 {
 }

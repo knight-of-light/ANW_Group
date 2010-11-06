@@ -16,7 +16,6 @@ using std::vector;
 using std::string;
 
 class Node;
-class File;
 class Root;
 class Class;
 class ClassInher;
@@ -107,14 +106,9 @@ public:
 	Node(int, int);
 	virtual void accept(Visitor *);
 };
-class File :public Node
-{
-public :
-	File(int, int);
-	virtual void accept(Visitor *);
-};
+
 //*******     Root		*************
-class Root : public File
+class Root : public Node
 {
 public:
 	vector<Class *>	*classes;

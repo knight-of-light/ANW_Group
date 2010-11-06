@@ -10,7 +10,6 @@
 class Visitor
 {
 public:
-	virtual void Visit(File *) = 0;
 	virtual void Visit(Root *) = 0;
 	virtual void Visit(Class *) = 0;
 	virtual void Visit(ClassInher *) = 0;
@@ -88,7 +87,6 @@ public:
 class TypeVisitor : public Visitor
 {
 public:
-	virtual void Visit(File *);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);

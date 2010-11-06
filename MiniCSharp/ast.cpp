@@ -8,13 +8,8 @@ Node::Node(int line, int column)
 	this->father = NULL;
 }
 
-//*******     File		*************
-File::File(int l, int c) : Node(l,c)
-{
-}
-
 //*******     Root		*************
-Root::Root(int l, int c) : File(l,c)
+Root::Root(int l, int c) : Node(l,c)
 {
 	this->classes = new vector<Class *>;
 }
@@ -707,10 +702,6 @@ Node::accept(Visitor *v)
 
 }
 
-void
-File::accept(Visitor *v)
-{
-}
 void
 Root::accept(Visitor *v)
 {
