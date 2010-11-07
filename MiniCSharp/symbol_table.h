@@ -18,7 +18,7 @@ using std::string;
 class Sym
 {
 public:
-	//1: class, 2: func, 3: constructor, 4: global Global, 5: Local Global, 6: Argument
+	//1: class, 2: func, 3: constructor, 4: global Global, 5: Local Global
 	int kind;
 	string name;
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5: Object, 6: Ident
@@ -61,7 +61,8 @@ public:
 	SymTab(Errors *errors);
 	Sym *Lookup(string name);
 	bool IsDeclared(Ident *id);
-	bool IsDeclared(Ident *id, ExprList *el);
+	bool IsDeclared(Ident *id, int kind);
+	bool IsDeclared(Ident *id, int kind, ExprList *el);
 	bool IsDeclared(Ident *id, Deffered *def);
 	bool AddSym(Ident *id, int kind, int type);
 	bool AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr);

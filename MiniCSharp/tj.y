@@ -128,7 +128,7 @@ class:			  CLASS IDENT '{'
 				| CLASS IDENT ':' IDENT '{'
 					{
 						symtab->AddSym($2, 1, -1);
-						symtab->IsDeclared($4);
+						symtab->IsDeclared($4, 1);
 						symtab->AddNewScope();
 					}
 					 members '}'
@@ -277,7 +277,7 @@ type:			  noarraytype
 noarraytype:	  IDENT
 					{
 						$$ = new NoArrayType($1, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, 1);
 					}
 				| basictype
 					{$$ = $1;}
@@ -304,17 +304,17 @@ basictype:		  OBJECT
 arraytype:		  IDENT '[' ']'
 					{
 						$$ = new ArrayType(1, $1, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, 1);
 					}
 				| IDENT '[' ',' ']'
 					{
 						$$ = new ArrayType(2, $1, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, 1);
 					}
 				| IDENT '[' ',' ',' ']'
 					{
 						$$ = new ArrayType(3, $1, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, 1);
 					}
 				| basictype '[' ']'
 					{
@@ -333,18 +333,22 @@ arraytype:		  IDENT '[' ']'
 expression:		  INCREMENT IDENT
 					{
 						$$ = new Incr($2, true, lin, col);
+						symtab->IsDeclared($2);
 					}
 				| DECREMENT IDENT
 					{
 						$$ = new Decr($2, true, lin, col);
+						symtab->IsDeclared($2);
 					}
 				| IDENT INCREMENT
 					{
 						$$ = new Incr($1, false, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| IDENT DECREMENT
 					{
 						$$ = new Decr($1, false, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| '!' expression
 					{
@@ -365,34 +369,32 @@ expression:		  INCREMENT IDENT
 				| IDENT
 					{
 						$$ = new IdentExpr($1, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| IDENT arrayindex
 					{
 						$$ = new IdentArr($1, $2, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| IDENT '=' expression
 					{
 						$$ = new Assign($1, $3, lin, col);
+						symtab->IsDeclared($1);
+					}
+				| IDENT arrayindex '=' expression
+					{
+						$$ = new ArrAssign($1, $2, $4, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| IDENT '(' expr_list_e ')'
 					{
 						$$ = new Invoke($1, $3, lin, col);
-					}
-				| IDENT '(' expr_list_e ')' arrayindex
-					{
-						$$ = new InvokeArr($1, $3, $5, lin, col);
+						symtab->IsDeclared($1, 2, $3);
 					}
 				| NEW IDENT '(' expr_list_e ')'
 					{
 						$$ = new NewObject($2, $4, lin, col);
-						symtab->IsDeclared($2);
-						//symtab->AddSym($2, 1, -1);
-					}
-				| NEW IDENT arrayindex
-					{
-						$$ = new NewArr($2, $3, lin, col);
-						symtab->IsDeclared($2);
-						//symtab->AddSym($2, 1, -1);
+						symtab->IsDeclared($2, 3, $4);
 					}
 				| expression EQ expression
 					{
@@ -574,10 +576,15 @@ variables_e:		  /* Empty */
 				| type variables
 					{
 						$$ = new Variables_e($1, $2, lin, col);
+						for(int i = 0; i < $2->variables->size(); i++)
+							symtab->AddSym($2->variables->at(i)->name, 5, $1->type);
 					}
-				| variable
+				| variables
 					{
-				    }
+						$$ = new Variables_e($1, lin, col);
+						for(int i = 0; i < $1->variables->size(); i++)
+							symtab->IsDeclared($1->variables->at(i)->name);
+					}
 ;
 
 expr_e:			  /* Empty */

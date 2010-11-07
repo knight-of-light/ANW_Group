@@ -77,10 +77,10 @@ SymTab::SymTab(Errors *errors)
 	kinds[0] = "";//NuN
 	kinds[1] = "c";//class
 	kinds[2] = "f";//function
-	kinds[3] = "f";//constractur
-	kinds[4] = "c";//global variable
-	kinds[5] = "v";//local variable
-	kinds[6] = "v";//Argument
+	kinds[3] = "con";//constractur
+	kinds[4] = "g";//global variable
+	kinds[5] = "l";//local variable
+	kinds[6] = "l";//Argument
 }
 
 Sym *
@@ -102,8 +102,34 @@ SymTab::Lookup(std::string name)
 bool
 SymTab::IsDeclared(Ident *id)
 {
-	//string key = this->kinds[kind]+"@"+id->name;
-	string key = id->name;
+	string key = "l@"+id->name;
+	Sym *sym = this->Lookup(key);
+	if(sym != NULL)
+	{
+		id->symbol = sym;
+		return true;
+	}
+	else
+	{
+		key = "g@"+id->name;
+		sym = this->Lookup(key);
+		if(sym != NULL)
+		{
+			id->symbol = sym;
+			return true;
+		}
+		else
+		{
+			this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
+			return false;
+		}
+	}
+}
+
+bool
+SymTab::IsDeclared(Ident *id, int kind)
+{
+	string key = this->kinds[kind]+"@"+id->name;
 	Sym *sym = this->Lookup(key);
 	if(sym != NULL)
 	{
@@ -117,32 +143,15 @@ SymTab::IsDeclared(Ident *id)
 	}
 }
 
-//bool
-//SymTab::IsDeclared(Ident *id, int kind, int type)
-//{
-//	string key = this->kinds[kind]+"@"+id->name;
-//	Sym *sym = this->Lookup(key);
-//	if(sym != NULL)
-//	{
-//		id->symbol = sym;
-//		return true;
-//	}
-//	else
-//	{
-//		this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
-//		return false;
-//	}
-//}
-
 /*
 	SymTab::IsDeclared(Ident *id, ExprList *el)
 	this function is for the case of invoking 
 	a function like func(3+2, 6 * x), there are expresions list (el)
 */
 bool
-SymTab::IsDeclared(Ident *id, ExprList *el)
+SymTab::IsDeclared(Ident *id, int kind, ExprList *el)
 {
-	string key = id->name;
+	string key = this->kinds[kind]+"@"+id->name;
 	for(int i=0; i < el->exprList->size(); i++)
 	{
 		int t = el->exprList->at(i)->type;
@@ -181,8 +190,7 @@ SymTab::IsDeclared(Ident *id, Deffered *def)
 bool
 SymTab::AddSym(Ident *id, int kind, int type)
 {
-	//string key = this->kinds[kind]+"@"+id->name;
-	string key = id->name;
+	string key = this->kinds[kind]+"@"+id->name;
 	if(this->Lookup(key) == NULL)
 	{
 		Sym *sym = new Sym(id->name, kind, type);
@@ -200,8 +208,7 @@ SymTab::AddSym(Ident *id, int kind, int type)
 bool
 SymTab::AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr)
 {
-	//string key = this->kinds[kind]+"@"+id->name;
-	string key = id->name;
+	string key = this->kinds[kind]+"@"+id->name;
 	for(int i=0; i < ps->args->size(); i++)
 	{
 		int t = ps->args->at(i)->type->type;
@@ -225,8 +232,7 @@ SymTab::AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr)
 bool
 SymTab::AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth)
 {
-	//string key = this->kinds[kind]+"@"+id->name;
-	string key = id->name;
+	string key = this->kinds[kind]+"@"+id->name;
 	for(int i=0; i < ps->args->size(); i++)
 	{
 		int t = ps->args->at(i)->type->type;

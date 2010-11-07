@@ -37,10 +37,9 @@ public:
 	virtual void Visit(IdentExpr *) = 0;
 	virtual void Visit(IdentArr *) = 0;
 	virtual void Visit(Assign *) = 0;
+	virtual void Visit(ArrAssign *) = 0;
 	virtual void Visit(Invoke *) = 0;
-	virtual void Visit(InvokeArr *) = 0;
 	virtual void Visit(NewObject *) = 0;
-	virtual void Visit(NewArr *) = 0;
 	virtual void Visit(Equal *) = 0;
 	virtual void Visit(NotEq *) = 0;
 	virtual void Visit(Smaller *) = 0;
@@ -114,10 +113,9 @@ public:
 	virtual void Visit(IdentExpr *);
 	virtual void Visit(IdentArr *);
 	virtual void Visit(Assign *);
+	virtual void Visit(ArrAssign *);
 	virtual void Visit(Invoke *);
-	virtual void Visit(InvokeArr *);
 	virtual void Visit(NewObject *);
-	virtual void Visit(NewArr *);
 	virtual void Visit(Equal *);
 	virtual void Visit(NotEq *);
 	virtual void Visit(Smaller *);

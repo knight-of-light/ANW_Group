@@ -294,11 +294,23 @@ IdentArr::IdentArr(Ident *id, ArrayIndex *ai, int l, int c) : Expr(l, c)
 }
 
 //*******      Assign		*********
-Assign::Assign(Ident *id, Expr *e, int l, int c) : Expr(l,c)
+Assign::Assign(Ident *id, Expr *e, int l, int c) : Expr(l, c)
 {
 	this->ident = id;
 	this->expr = e;
 	id->father = this;
+	e->father = this;
+}
+
+//*******     ArrAssign		*********
+ArrAssign::ArrAssign(Ident *id, ArrayIndex *ai, Expr *e, int l, int c) : Expr(l, c)
+{
+	this->ident = id;
+	this->arrayIndex = ai;
+	this->expr = e;
+
+	id->father = this;
+	ai->father = this;
 	e->father = this;
 }
 
@@ -311,18 +323,6 @@ Invoke::Invoke(Ident *id, ExprList *el, int l, int c) : Expr(l,c)
 	el->father = this;
 }
 
-//*******     InvokeArr		*********
-InvokeArr::InvokeArr(Ident *id, ExprList *el, ArrayIndex *ai, int l, int c) : Expr(l,c)
-{
-	this->ident = id;
-	this->exprList = el;
-	this->arrayIndex = ai;
-
-	id->father = this;
-	el->father = this;
-	ai->father = this;
-}
-
 //*******     NewObject		*********
 NewObject::NewObject(Ident *id, ExprList *el, int l, int c) : Expr(l,c)
 {
@@ -331,16 +331,6 @@ NewObject::NewObject(Ident *id, ExprList *el, int l, int c) : Expr(l,c)
 
 	id->father = this;
 	el->father = this;
-}
-
-//*******      NewArr		*********
-NewArr::NewArr(Ident *id, ArrayIndex *ai, int l, int c) : Expr(l,c)
-{
-	this->ident = id;
-	this->arrayIndex = ai;
-
-	id->father = this;
-	ai->father = this;
 }
 
 //*******      Equal		*********
@@ -641,7 +631,8 @@ For::For(Variables_e *vse, Expr *e_cond, Expr *e_count, Stat *s, int l, int c) :
 	this->exprCount = e_count;
 	this->stat = s;
 
-	vse->father = this;
+	if(vse != NULL)
+		vse->father = this;
 	e_cond->father = this;
 	e_count->father = this;
 	s->father = this;
@@ -683,7 +674,7 @@ Return::Return(Expr *e, int l, int c) : Stat(l,c)
 }
 
 //*******     Variable_e	*********
-Variables_e::Variables_e(Type *ty, Variables *vs, int l,int c) : Node(l,c)
+Variables_e::Variables_e(Type *ty, Variables *vs, int l, int c) : Node(l,c)
 {
 	this->type = ty;
 	this->variables = vs;
@@ -691,6 +682,19 @@ Variables_e::Variables_e(Type *ty, Variables *vs, int l,int c) : Node(l,c)
 	vs->father = this;
 }
 
+Variables_e::Variables_e(Variables *vs, int l, int c) : Node(l,c)
+{
+	this->type = new Type(l,c);
+	if(vs->variables->at(0)->name->symbol != NULL)
+		this->type->type = vs->variables->at(0)->name->symbol->type;
+	else
+		this->type->type = 0;
+
+	this->variables = vs;
+
+	vs->father = this;
+	this->type->father = this;
+}
 
 //***********************************************************************
 //					Accept
@@ -866,25 +870,19 @@ Assign::accept(Visitor *v)
 }
 
 void
+ArrAssign::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
 Invoke::accept(Visitor *v)
 {
 	v->Visit(this);
 }
 
 void
-InvokeArr::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
 NewObject::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
-NewArr::accept(Visitor *v)
 {
 	v->Visit(this);
 }

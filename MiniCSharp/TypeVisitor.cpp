@@ -15,11 +15,17 @@
 void
 TypeVisitor::Visit(Root *n)
 {
+	for(int i=0; i< n->classes->size(); i++)
+		n->classes->at(i)->accept(this);
 }
 
 void
 TypeVisitor::Visit(Class *n)
 {
+	n->name->accept(this);
+	n->members->accept(this);
+	for(int i=0; i< n->Parents->size(); i++)
+		n->Parents->at(i)->accept(this);
 }
 
 void
@@ -218,26 +224,20 @@ TypeVisitor::Visit(Assign *n)
 				 n->column);
 }
 
+void
+TypeVisitor::Visit(ArrAssign *n)
+{
+}
 
 void
 TypeVisitor::Visit(Invoke *n)
 {
 	n->exprList->accept(this);
-	this->symtab->IsDeclared(n->ident, n->exprList);
-}
-
-void
-TypeVisitor::Visit(InvokeArr *n)
-{
+	//this->symtab->IsDeclared(n->ident, n->exprList);
 }
 
 void
 TypeVisitor::Visit(NewObject *n)
-{
-}
-
-void
-TypeVisitor::Visit(NewArr *n)
 {
 }
 

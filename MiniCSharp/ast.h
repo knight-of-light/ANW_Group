@@ -43,10 +43,9 @@ class Paren;
 class IdentExpr;
 class IdentArr;
 class Assign;
+class ArrAssign;
 class Invoke;
-class InvokeArr;
 class NewObject;
-class NewArr;
 class Equal;
 class NotEq;
 class Smaller;
@@ -407,6 +406,18 @@ public:
 	virtual void accept(Visitor *);
 };
 
+//*******     ArrAssign		*********
+class ArrAssign : public Expr
+{
+public:
+	Ident		*ident;
+	ArrayIndex	*arrayIndex;
+	Expr		*expr;
+
+	ArrAssign(Ident *, ArrayIndex *, Expr *, int, int);
+	virtual void accept(Visitor *);
+};
+
 //*******       Invoke		*********
 class Invoke : public Expr
 {
@@ -418,18 +429,6 @@ public:
 	virtual void accept(Visitor *);
 };
 
-//*******     InvokeArr		*********
-class InvokeArr : public Expr
-{
-public:
-	Ident		*ident;
-	ExprList	*exprList;
-	ArrayIndex	*arrayIndex;
-
-	InvokeArr(Ident *, ExprList *, ArrayIndex *, int, int);
-	virtual void accept(Visitor *);
-};
-
 //*******     NewObject		*********
 class NewObject : public Expr
 {
@@ -438,17 +437,6 @@ public:
 	ExprList	*exprList;
 
 	NewObject(Ident *, ExprList *, int, int);
-	virtual void accept(Visitor *);
-};
-
-//*******      NewArr		*********
-class NewArr : public Expr
-{
-public:
-	Ident		*ident;
-	ArrayIndex	*arrayIndex;
-
-	NewArr(Ident *, ArrayIndex *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -839,6 +827,7 @@ public:
 	Type	*type;
 	Variables	*variables;
 	Variables_e(Type *, Variables *, int, int);
+	Variables_e(Variables *, int, int);
 	virtual void accept(Visitor *);
 };
 
