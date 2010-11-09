@@ -1,103 +1,37 @@
- // ********** .l, .y Test File **********
-class A
+class Test
 {
-// **********members Global**********           
-
-    static double c = 0.12 ;
-    static int [] d = null ;
-    int v;
-
-// ***********members Constructor***********
-
-    void e (bool f,int g)
+    /*int increment(int x)
     {
-        ;
-        { }
-        for (; ; ) { }
-        if (g >= 1)
-        {
-			int x;
-            for (x = 1; x < 10; x++)
-                x = 1;
-            for (x = 1; x < 9; )
-                x++;
-             for (x=1;;)  //Error but in PNF it should to allow this format
-               x--;
-        }
+        return x + 1;
 
-        else
-            for (int x = 1; x < 10; x++)
-                x = 1;
-        return true;
-        return ; // error
-        return 0;
-    }
+    }*/
 
-// ***********members Function***********
-
-    private void h (int i,double c)
+    /*int add1(int x1, int x2)
     {
-        int m = 1;
-        m++;
-        (double)m;
-        (double)++m;
+        return (x1 + x2);
+    }*/
+    /*void writeOdds(int x)
+    {
+        int i = 1;
+        while (i < x)
+        {
+            Write(i);
+            i = i + 2;
+        }
+    }*/
 
-        if (v = 0)
-        {
-        }
-        else
-        {
-        }
+    void main()
+    {
         int x;
-        while (x = 0)
-        {
-        }
-        if (m != 0)
-            --m;
-        while (m > 10)
-            m++;
-    }
-   
-    bool t (int i)
-    {
-        h(5, 5.9);
-        if (i == 0.1)
-        {
-            return true;
-        }
-    }
-    //h(); //Error Because ';' the true like this
-    h(){}
-}
-class B:A
-{
+        x = 1;
+        int y;
+        y = 3;
+        int z;
+        z = x + y;
+        Write(z);
 
-}
-/*class Test 
-{	
-	int func(int s, double e) 
-	{
-		int x;
-		x = true;
-		x = 7.8 + 5;
-		
-	}
-	int x2 = 4 + 8;
-	int func(double x1, int d) 
-	{
-		//func(7,5.6);
-	}
+        //writeOdds(10);
 
-}
-class Test2
-{
-    double x = 1;
-    int func2(double a,int c)
-    {
-        int x = 5; 
-        //while (x < 5)
-        //{
-        //    int i = 1;
-        //}
+        //Write(add1(5, 7));
     }
-}*/
+}

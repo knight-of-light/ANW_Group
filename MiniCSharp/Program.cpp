@@ -47,7 +47,16 @@ int main(int argsc, char **argsv)
 		TypeVisitor *tv = new TypeVisitor;
 		tv->symtab = symtab;
 		file->accept(tv);
-		errors->Print();
+		if(errors->messages->size() != 0)
+		{
+			errors->Print();
+		}
+		else
+		{
+			cout << "Semantic analysis was done successfully! " << endl;
+			CodeVisitor *cv = new CodeVisitor(file, symtab, tv->mainFunc);
+			file->accept(cv);
+		}
 	}
 	
 	

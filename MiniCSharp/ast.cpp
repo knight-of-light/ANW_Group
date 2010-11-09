@@ -104,7 +104,8 @@ Function::Function(AccessModif *am, Type *ty, Ident *n, Args *as, Stats *ss, int
 Function::Function(AccessModif *am, Ident *n, Args *as, Stats *ss, int l, int c) : Member(l,c)
 {
 	this->accessModif = am;
-	this->type = NULL;	/* +++++++++++++++=== we shuld enter value like 0 to match void ====++++++++++++++++++++++++++++++++++++++++++++ */
+	this->type = new Type(l, c);	/* +++++++++++++++=== we shuld enter value like 0 to match void ====++++++++++++++++++++++++++++++++++++++++++++ */
+	this->type->type = 4;
 	this->name = n;
 	this->args = as;
 	this->stats = ss;
@@ -193,26 +194,28 @@ Type::Type(int l, int c) : Node(l,c)
 NoArrayType::NoArrayType(int t, int l, int c) : Type(l,c)
 {
 	this->type = t;
+	this->arr_level = 0;
 }
 
 NoArrayType::NoArrayType(Ident *n, int l, int c) : Type(l,c)
 {
 	this->type = 6;
+	this->arr_level = 0;
 	this->name = n;
 	n->father = this;
 }
 
 //*******     ArrayType		*********
-ArrayType::ArrayType(int t, int at, int l, int c) : Type(l,c)
+ArrayType::ArrayType(int t, int al, int l, int c) : Type(l,c)
 {
 	this->type = t;
-	this->arrayType = at;
+	this->arr_level = al;
 }
 
-ArrayType::ArrayType(int at, Ident *n, int l, int c) : Type(l,c)
+ArrayType::ArrayType(int al, Ident *n, int l, int c) : Type(l,c)
 {
 	this->type = 6;
-	this->arrayType = at;
+	this->arr_level = al;
 	this->name = n;
 	n->father = this;
 }
@@ -236,7 +239,7 @@ Expr::Expr(int l, int c) : Node(l, c)
 //*******       Incr		*********
 Incr::Incr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 {
-	this->ident = id;
+	this->name = id;
 	this->isPrev = ip;
 	id->father = this;
 }
@@ -244,7 +247,7 @@ Incr::Incr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 //*******       Decr		*********
 Decr::Decr(Ident *id, bool ip, int l, int c) : Expr(l, c)
 {
-	this->ident = id;
+	this->name = id;
 	this->isPrev = ip;
 	id->father = this;
 }
@@ -527,12 +530,15 @@ ArrayIndex::ArrayIndex(int l, int c) : Node(l,c)
 
 ArrayIndex_1::ArrayIndex_1(Expr *exp1, int l, int c) : ArrayIndex(l,c)
 {
+	this->arr_level = 1;
 	this->expr1=exp1;
 	exp1->father = this;
 }
 
 ArrayIndex_2::ArrayIndex_2(Expr *exp1, Expr *exp2, int l, int c) : ArrayIndex(l,c)
 {
+	this->arr_level = 2;
+
 	this->expr1=exp1;
 	this->expr2=exp2;
 
@@ -542,6 +548,8 @@ ArrayIndex_2::ArrayIndex_2(Expr *exp1, Expr *exp2, int l, int c) : ArrayIndex(l,
 
 ArrayIndex_3::ArrayIndex_3(Expr *exp1, Expr *exp2, Expr *exp3, int l, int c) : ArrayIndex(l,c)
 {
+	this->arr_level = 3;
+
 	this->expr1=exp1;
 	this->expr2=exp2;
 	this->expr3=exp3;

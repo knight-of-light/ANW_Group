@@ -117,7 +117,7 @@ root:			/* empty */
 
 class:			  CLASS IDENT '{'
 					{
-						symtab->AddSym($2, 1, -1);
+						symtab->AddSym($2, 1, -1, 0);
 						symtab->AddNewScope();
 					}
 					 members '}'
@@ -127,7 +127,7 @@ class:			  CLASS IDENT '{'
 					}
 				| CLASS IDENT ':' IDENT '{'
 					{
-						symtab->AddSym($2, 1, -1);
+						symtab->AddSym($2, 1, -1, 0);
 						symtab->IsDeclared($4, 1);
 						symtab->AddNewScope();
 					}
@@ -162,7 +162,7 @@ global:			  accessmodif type variables ';'
 					{
 						$$ = new Global($1, $2, $3, lin, col);
 						for(int i=0; i < $3->variables->size(); i++)
-							symtab->AddSym($3->variables->at(i)->name, 4, $2->type);
+							symtab->AddSym($3->variables->at(i)->name, 4, $2->type, $2->arr_level);
 					}
 ;
 
@@ -186,25 +186,24 @@ function:		  accessmodif type IDENT '('
 					{
 						$$ = new Function($1, $2, $3, $6, $9, lin, col);
 						symtab->OutScope();
-						symtab->AddSym($3, 2, -1, $6, $2->type, $$);
+						symtab->AddSym($3, 2, -1, $2->arr_level, $6, $2->type, $$);
 					}
 				| accessmodif VOID IDENT '('
 					 {
-						 symtab->AddSym($3, 2, -1);
 						 symtab->AddNewScope();
 					 }
 					 args_e ')' '{' statements '}'
 					{
 						$$ = new Function($1, $3, $6, $9, lin, col);
 						symtab->OutScope();
-						symtab->AddSym($3, 2, -1, $6, 4, $$);
+						symtab->AddSym($3, 2, -1, 0, $6, 4, $$);
 					}
 ;
 
 arg :			  type IDENT
 					{
 						$$ = new Arg($1, $2, lin, col);
-						symtab->AddSym($2, 6, $1->type);
+						symtab->AddSym($2, 6, $1->type, $1->arr_level);
 					}
 ;
 
@@ -389,7 +388,7 @@ expression:		  INCREMENT IDENT
 				| IDENT '(' expr_list_e ')'
 					{
 						$$ = new Invoke($1, $3, lin, col);
-						symtab->IsDeclared($1, 2, $3);
+						//symtab->IsDeclared($1, 2, $3);
 					}
 				| NEW IDENT '(' expr_list_e ')'
 					{
@@ -537,7 +536,7 @@ statement:		  IF '(' expression ')' statement %prec IF_PREC
 					{
 						$$ = new VariablesStat($1, $2, lin, col);
 						for(int i = 0; i < $2->variables->size(); i++)
-							symtab->AddSym($2->variables->at(i)->name, 5, $1->type);
+							symtab->AddSym($2->variables->at(i)->name, 5, $1->type, $1->arr_level);
 					}
 				| ';'
 					{
@@ -577,7 +576,7 @@ variables_e:		  /* Empty */
 					{
 						$$ = new Variables_e($1, $2, lin, col);
 						for(int i = 0; i < $2->variables->size(); i++)
-							symtab->AddSym($2->variables->at(i)->name, 5, $1->type);
+							symtab->AddSym($2->variables->at(i)->name, 5, $1->type, $1->arr_level);
 					}
 				| variables
 					{

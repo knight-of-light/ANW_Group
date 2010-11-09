@@ -86,6 +86,7 @@ public:
 class TypeVisitor : public Visitor
 {
 public:
+	TypeVisitor();
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);
@@ -156,6 +157,96 @@ public:
 	virtual void Visit(Variables_e *);
 	SymTab *symtab;
 	string types [5];
+	Function *mainFunc;
+};
+
+//***********************************************************************
+//					CodeVisitor
+//***********************************************************************
+class CodeVisitor : public Visitor
+{
+public:
+	CodeVisitor(Root *, SymTab *st, Function *mainFunc);
+	virtual void Visit(Root *);
+	virtual void Visit(Class *);
+	virtual void Visit(ClassInher *);
+	virtual void Visit(Members *);
+	virtual void Visit(Member  *);
+	virtual void Visit(Global  *);
+	virtual void Visit(Constructor *);
+	virtual void Visit(Function *);
+	virtual void Visit(Arg  *);
+	virtual void Visit(Args *);
+	virtual void Visit(Variables *);
+	virtual void Visit(Variable  *);
+	virtual void Visit(AccessModif *);
+	virtual void Visit(Type *);
+	virtual void Visit(NoArrayType *);
+	virtual void Visit(ArrayType *);
+	virtual void Visit(Ident *);
+	virtual void Visit(Expr *);
+	virtual void Visit(Incr *);
+	virtual void Visit(Decr *);
+	virtual void Visit(Not *);
+	virtual void Visit(Minus *);
+	virtual void Visit(Plus *);
+	virtual void Visit(Paren  *);
+	virtual void Visit(IdentExpr *);
+	virtual void Visit(IdentArr *);
+	virtual void Visit(Assign *);
+	virtual void Visit(ArrAssign *);
+	virtual void Visit(Invoke *);
+	virtual void Visit(NewObject *);
+	virtual void Visit(Equal *);
+	virtual void Visit(NotEq *);
+	virtual void Visit(Smaller *);
+	virtual void Visit(SmallerEq *);
+	virtual void Visit(Larger *);
+	virtual void Visit(LargerEq *);
+	virtual void Visit(Add *);
+	virtual void Visit(Sub *);
+	virtual void Visit(Mult *);
+	virtual void Visit(Div *);
+	virtual void Visit(Mod *);
+	virtual void Visit(And *);
+	virtual void Visit(Or *);
+	virtual void Visit(Is *);
+	virtual void Visit(Cast *);
+	virtual void Visit(Integer *);
+	virtual void Visit(Real *);
+	virtual void Visit(True *);
+	virtual void Visit(False *);
+	virtual void Visit(This *);
+	virtual void Visit(Null *);
+	virtual void Visit(ArrayIndex *);
+	virtual void Visit(ArrayIndex_1 *);
+	virtual void Visit(ArrayIndex_2 *);
+	virtual void Visit(ArrayIndex_3 *);
+	virtual void Visit(ExprList *);
+	virtual void Visit(Stat *);
+	virtual void Visit(Stats *);
+	virtual void Visit(If *);
+	virtual void Visit(IfElse *);
+	virtual void Visit(While *);
+	virtual void Visit(For *);
+	virtual void Visit(ExprStat *);
+	virtual void Visit(VariablesStat *);
+	virtual void Visit(Semi *);
+	virtual void Visit(Block *);
+	virtual void Visit(Return *);
+	virtual void Visit(Variables_e *);
+
+	Function *mainFunc;
+	Root *root;
+	SymTab *symtab;
+	string types [5];
+	int gp ;
+	int lp;
+	int ifno;
+	int forno;
+	int whileno;
+	vector<int> lps;
+	bool isGlobal;
 };
 
 #endif

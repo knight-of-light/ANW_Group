@@ -23,14 +23,20 @@ public:
 	string name;
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5: Object, 6: Ident
 	int type;
+	// 0: no array, 1: [], 2: [][], 3: [][][]
+	int arr_level;
+
+	//
+	int location;
+	//
 	vector<int> *argTypes;
 	int returnType;
 	Constructor *constructor;
 	Function *method;
 
-	Sym(string n, int kind, int type);
+	Sym(string n, int kind, int type, int arr_level);
 	Sym(std::string , int kind, int type, Args *ps, Constructor *constr);
-	Sym(std::string , int kind, int type, Args *ps, int returnType, Function *meth);	
+	Sym(std::string , int kind, int type, int arr_level, Args *ps, int returnType, Function *meth);	
 };
 
 //*******      HashTab		*********
@@ -64,9 +70,9 @@ public:
 	bool IsDeclared(Ident *id, int kind);
 	bool IsDeclared(Ident *id, int kind, ExprList *el);
 	bool IsDeclared(Ident *id, Deffered *def);
-	bool AddSym(Ident *id, int kind, int type);
+	bool AddSym(Ident *id, int kind, int type, int arr_level);
 	bool AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr);
-	bool AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth);	
+	bool AddSym(Ident *id, int kind, int type, int arr_level, Args *ps, int returnType, Function *meth);	
 
 	void AddNewScope();
 	void OutScope();

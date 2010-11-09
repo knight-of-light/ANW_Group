@@ -6,6 +6,12 @@
 using std::cout;
 using std::endl;
 
+// CodeVisitor
+#include <fstream>
+using std::ofstream;
+using std::ios;
+//
+
 #include <sstream>
 
 
@@ -14,6 +20,10 @@ using std::vector;
 
 #include <string>
 using std::string;
+
+//
+static std::ofstream vout("code.txt", ios::out);
+//
 
 class Node;
 class Root;
@@ -259,6 +269,8 @@ class Type : public Node
 public:
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5:object, 6:ident
 	int type;
+	// 0: no arr, 1: [], 2: [][], 3: [][][]
+	int arr_level;
 	Ident *name;
 
 	Type(int, int);
@@ -279,11 +291,6 @@ public:
 class ArrayType : public Type
 {
 public:
-	// 1: a single Array []
-	// 2: Matrix of bilateral [,]
-	// 3: Matrix trilogy [,,]
-	int arrayType;
-
 	ArrayType(int, int, int, int);
 	ArrayType(int, Ident *, int, int);
 	virtual void accept(Visitor *);
@@ -316,7 +323,7 @@ public:
 class Incr  : public Expr
 {
 public:
-	Ident	*ident;
+	Ident	*name;
 	bool	isPrev;
 
 	Incr(Ident *, bool, int, int);
@@ -327,7 +334,7 @@ public:
 class Decr  : public Expr
 {
 public:
-	Ident	*ident;
+	Ident	*name;
 	bool	isPrev;
 
 	Decr(Ident *, bool, int, int);
@@ -661,6 +668,8 @@ public:
 class ArrayIndex : public Node
 {
 public:
+	// 1: [] , 2: [][] , 3: [][][]
+	int arr_level;
 	ArrayIndex(int, int);
 	virtual void accept(Visitor *);
 };

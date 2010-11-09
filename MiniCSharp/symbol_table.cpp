@@ -3,15 +3,17 @@
 //***********************************************************************
 //					Symbol
 //***********************************************************************
-Sym::Sym(string name, int kind, int type)
+Sym::Sym(string name, int kind, int type, int arr_level)
 {
 
 	this->name = name;
 	this->kind = kind;
 	this->type = type;
+	this->arr_level = arr_level;
 	this->constructor = NULL;
 	this->method = NULL;
 	this->argTypes = NULL;
+	this->location = 0;
 }
 
 Sym::Sym(string n, int kind, int type, Args *ps, Constructor *constr)
@@ -19,6 +21,7 @@ Sym::Sym(string n, int kind, int type, Args *ps, Constructor *constr)
 	this->name = n;
 	this->kind = kind;
 	this->type = type;
+	this->arr_level = 0;
 	this->constructor = constr;
 	this->method = NULL;
 	this->argTypes = new vector<int>;
@@ -28,11 +31,12 @@ Sym::Sym(string n, int kind, int type, Args *ps, Constructor *constr)
 	
 }
 
-Sym::Sym(string n, int kind, int type, Args *ps, int returnType, Function *meth)
+Sym::Sym(string n, int kind, int type, int arr_level, Args *ps, int returnType, Function *meth)
 {
 	this->name = n;
 	this->kind = kind;
 	this->type = type;
+	this->arr_level = arr_level;
 	this->constructor = NULL;
 	this->method = meth;
 	this->returnType = returnType;
@@ -69,7 +73,7 @@ SymTab::SymTab(Errors *errors)
 	types[0] = "null";
 	types[1] = "int";
 	types[2] = "double";
-	types[3] = "boolean";
+	types[3] = "bool";
 	types[4] = "void";
 	types[5] = "object";
 	types[6] = "ident";
@@ -81,6 +85,13 @@ SymTab::SymTab(Errors *errors)
 	kinds[4] = "g";//global variable
 	kinds[5] = "l";//local variable
 	kinds[6] = "l";//Argument
+
+	this->current = new Scope();
+	
+	this->current->hashTab->AddKey("f@Write@int", new Sym("Write", -1, -1, 0));
+	this->current->hashTab->AddKey("f@Write@double", new Sym("Write", -1, -1, 0));
+	this->current->hashTab->AddKey("f@Write@bool", new Sym("Write", -1, -1, 0));
+	this->current->hashTab->AddKey("f@Read", new Sym("Read", -1, -1, 0));
 }
 
 Sym *
@@ -188,12 +199,12 @@ SymTab::IsDeclared(Ident *id, Deffered *def)
 }
 
 bool
-SymTab::AddSym(Ident *id, int kind, int type)
+SymTab::AddSym(Ident *id, int kind, int type, int arr_level)
 {
 	string key = this->kinds[kind]+"@"+id->name;
 	if(this->Lookup(key) == NULL)
 	{
-		Sym *sym = new Sym(id->name, kind, type);
+		Sym *sym = new Sym(id->name, kind, type, arr_level);
 		this->current->hashTab->AddKey(key, sym);
 		id->symbol = sym;
 		return true;
@@ -230,7 +241,7 @@ SymTab::AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr)
 }
 
 bool
-SymTab::AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function *meth)
+SymTab::AddSym(Ident *id, int kind, int type, int arr_level, Args *ps, int returnType, Function *meth)
 {
 	string key = this->kinds[kind]+"@"+id->name;
 	for(int i=0; i < ps->args->size(); i++)
@@ -241,7 +252,7 @@ SymTab::AddSym(Ident *id, int kind, int type, Args *ps, int returnType, Function
 
 	if(this->Lookup(key) == NULL)
 	{
-		Sym *sym = new Sym(id->name, kind, type, ps, returnType, meth);
+		Sym *sym = new Sym(id->name, kind, type, arr_level, ps, returnType, meth);
 		this->current->hashTab->AddKey(key, sym);
 		id->symbol = sym;
 		return true;
