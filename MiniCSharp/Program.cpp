@@ -29,7 +29,7 @@ int main(int argsc, char **argsv)
 
 	errors = new Errors();
 	symtab = new SymTab(errors);
-	symtab->current = new Scope();
+	//symtab->current = new Scope();
 	def = new Deffered();
 	
 	yydebug = 0;
@@ -55,7 +55,7 @@ int main(int argsc, char **argsv)
 		{
 			cout << "Semantic analysis was done successfully! " << endl;
 			CodeVisitor *cv = new CodeVisitor(file, symtab, tv->mainFunc);
-			file->accept(cv);
+			//file->accept(cv);
 		}
 	}
 	

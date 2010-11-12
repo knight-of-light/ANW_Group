@@ -1,37 +1,14 @@
 class Test
 {
-    /*int increment(int x)
-    {
-        return x + 1;
-
-    }*/
-
-    /*int add1(int x1, int x2)
-    {
-        return (x1 + x2);
-    }*/
-    /*void writeOdds(int x)
-    {
-        int i = 1;
-        while (i < x)
-        {
-            Write(i);
-            i = i + 2;
-        }
-    }*/
-
     void main()
     {
-        int x;
-        x = 1;
-        int y;
-        y = 3;
-        int z;
-        z = x + y;
-        Write(z);
+        //Read();
+        int i = 5;
+        //double y = (double)i;
+        //(double)i;
 
-        //writeOdds(10);
+        Write(i);
 
-        //Write(add1(5, 7));
+
     }
 }

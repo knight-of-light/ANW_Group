@@ -237,10 +237,11 @@ public:
 	virtual void Visit(Variables_e *);
 
 	Function *mainFunc;
+	Class *mainClass;
 	Root *root;
 	SymTab *symtab;
 	string types [5];
-	int gp ;
+	int gp;
 	int lp;
 	int ifno;
 	int forno;

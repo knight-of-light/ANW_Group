@@ -16,9 +16,11 @@ TypeVisitor::Visit(Root *n)
 
 	for(int i=0; i< n->classes->size(); i++)
 		n->classes->at(i)->accept(this);
+
 	if(this->mainFunc == NULL)
-		this->symtab->errors->AddError("The program must have a main function "
-		, -1, -1);
+		this->symtab->errors->AddError("The program must have a main function ",
+		 -1,
+		 -1);
 }
 
 void
@@ -64,8 +66,9 @@ TypeVisitor::Visit(Function *n)
 		if(this->mainFunc == NULL)
 			this->mainFunc = n;
 		else
-			this->symtab->errors->AddError("The program must have one main only int whole Program at "
-			, n->name->line, n->name->column);
+			this->symtab->errors->AddError("The program must have one main only int whole Program at ",
+			 n->name->line,
+			 n->name->column);
 	}
 
 	n->args->accept(this);
@@ -238,7 +241,7 @@ TypeVisitor::Visit(Plus *n)
 void
 TypeVisitor::Visit(Paren  *n)
 {
-	// paren : '(' expression ')' type is the same of expression type.
+	// '(' expression ')' type is the same of expression type.
 	n->type = n->expr->type;
 }
 
@@ -344,7 +347,7 @@ TypeVisitor::Visit(Invoke *n)
 
 	if( !((n->ident->name == "Write") || (n->ident->name == "Read")) )
 		n->type = n->ident->symbol->method->type->type;
-	//n->type = n->ident->symbol->type;
+	n->type = n->ident->symbol->type;
 }
 
 void
@@ -762,42 +765,14 @@ TypeVisitor::Visit(Mod *n)
 	int left = n->left->type;
 	int right = n->right->type;
 
-	bool mismatch = false;
-
-	switch(left)
-	{
-	case 1:
-		if(right == 1)
-			n->type = 1;
-		else if(right == 2)
-		{
-			n->left->type = 2;			// note: why change type from int to double
-			n->type = 2;			
-		}
-		else
-			mismatch = true;
-		break;
-	case 2:
-		if(right == 1)
-		{
-			n->right->type = 2;			// note: why change type from int to double
-			n->type = 2;
-		}
-		else if(right == 2)
-			n->type = 2;
-		else
-			mismatch = true;
-		break;
-	default:
-		mismatch = true;
-	}
-	if(mismatch)
+	if( !((left == 1) && (right == 1)) )
 	{
 		symtab->errors->AddError("Operator \'%\' cannot be applied to operand of type \'" + types[left] + "\' and \'" + types[right] + "\'",
 		 n->line,
 		 n->column);
 		n->type = 0;
 	}
+	n->type = 1;
 }
 
 void
@@ -848,8 +823,16 @@ void
 TypeVisitor::Visit(Cast *n)
 {
 	// ( basictype ) expression, the new type is basictype type.
-
-	n->type = n->typ->type;
+	/*if( ((n->typ->type == 1) || (n->typ->type == 2)) && 
+		((n->expr->type == 1) || (n->expr->type == 2)) )
+		n->type = n->typ->type;
+	else
+	{
+		symtab->errors->AddError("Cannot convert from \'" + types[n->expr->type] + "\' to \'" + types[n->typ->type] + "\'",
+		 n->expr->line,
+		 n->column);
+	}
+	n->type = 0;*/
 }
 
 void

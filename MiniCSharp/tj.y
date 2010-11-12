@@ -365,6 +365,10 @@ expression:		  INCREMENT IDENT
 					{
 						$$ = new Paren($2, lin, col);
 					}
+				| IDENT '.' expression
+					{
+						// for call method from object .......................................
+					}
 				| IDENT
 					{
 						$$ = new IdentExpr($1, lin, col);
