@@ -26,20 +26,26 @@ Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 {
 	this->name = n;
 	this->members = ms;
+
 	this->Parents = new vector<Ident *>;
+	this->Childrens = new vector<Ident *>;
 
 	n->father = this;
 	ms->father = this;
 }
-void
-Class::AddParent(Ident *pa) 
-{
-	this->Parents->push_back(pa);
-}
+
+//void
+//Class::AddParent(Ident *pa)
+//{
+//	this->Parents->push_back(pa);
+//}
+
 ClassInher::ClassInher(Ident *n, Ident *p, Members *ms, int l, int c) : Class(n,ms,l,c)
 {
-	this->parent = p;
+	// CLASS IDENT ':' IDENT '{' Members '}'
+	this->basic = p;
 	p->father = this;
+	//this->Parents->push_back(p);
 }
 
 //*******     Members		*********
@@ -57,6 +63,7 @@ Members::AddMember(Member *m)
 
 Member::Member(int l, int c) : Node(l,c)
 {
+	// empty
 }
 
 //*******     Global		*********
@@ -104,8 +111,7 @@ Function::Function(AccessModif *am, Type *ty, Ident *n, Args *as, Stats *ss, int
 Function::Function(AccessModif *am, Ident *n, Args *as, Stats *ss, int l, int c) : Member(l,c)
 {
 	this->accessModif = am;
-	this->type = new Type(l, c);	/* +++++++++++++++=== we shuld enter value like 0 to match void ====++++++++++++++++++++++++++++++++++++++++++++ */
-	this->type->type = 4;
+	this->type = NULL;
 	this->name = n;
 	this->args = as;
 	this->stats = ss;
@@ -165,7 +171,7 @@ Variables::AddVariable(Variable *va)
 
 Variable::Variable(Ident *n, int l, int c) : Node(l,c)
 {
-	this->name = n;	
+	this->name = n;
 	n->father = this;
 	this->expr = NULL;
 }
@@ -187,6 +193,8 @@ AccessModif::AccessModif(int at, int l, int c) : Node(l,c)
 //*******       Type		*********
 Type::Type(int l, int c) : Node(l,c)
 {
+	this->type = 0;
+	this->arr_level = 0;
 	this->name = NULL;
 }
 
@@ -199,7 +207,7 @@ NoArrayType::NoArrayType(int t, int l, int c) : Type(l,c)
 
 NoArrayType::NoArrayType(Ident *n, int l, int c) : Type(l,c)
 {
-	this->type = 6;
+	this->type = 5;
 	this->arr_level = 0;
 	this->name = n;
 	n->father = this;
@@ -214,7 +222,7 @@ ArrayType::ArrayType(int t, int al, int l, int c) : Type(l,c)
 
 ArrayType::ArrayType(int al, Ident *n, int l, int c) : Type(l,c)
 {
-	this->type = 6;
+	this->type = 5;
 	this->arr_level = al;
 	this->name = n;
 	n->father = this;
@@ -233,6 +241,7 @@ Ident::Ident(string n, int l, int c) : Node(l, c)
 
 Expr::Expr(int l, int c) : Node(l, c)
 {
+	this->type = 0;
 }
 
 //*******       Incr		*********
@@ -333,6 +342,38 @@ NewObject::NewObject(Ident *id, ExprList *el, int l, int c) : Expr(l,c)
 
 	id->father = this;
 	el->father = this;
+}
+
+//*******     NewArray		*********
+NewArray::NewArray(Type *ty, ArrayIndex *ai, int l, int c) : Expr(l,c)
+{
+	this->type = ty;
+	this->arrayIndex = ai;
+	
+	ty->father = this;
+	ai->father = this;
+}
+
+//*******     IdentCall		*********
+IdentCall::IdentCall(Ident *id, Expr *e, int l, int c) : Expr(l,c)
+{
+	this->ident = id;
+	this->expr = e;
+
+	id->father = this;
+	e->father = this;
+}
+
+//*******   IdentArrCall	*********
+IdentArrCall::IdentArrCall(Ident *id, ArrayIndex *ai, Expr *e, int l, int c) : Expr(l,c)
+{
+	this->ident = id;
+	this->arrayIndex = ai;
+	this->expr = e;
+
+	id->father = this;
+	ai->father = this;
+	e->father = this;
 }
 
 //*******      Equal		*********
@@ -525,6 +566,7 @@ Null::Null(int l, int c) : Expr(l,c)
 //*******     ArrayIndex	*********
 ArrayIndex::ArrayIndex(int l, int c) : Node(l,c)
 {
+	this->arr_level = 0;
 }
 
 ArrayIndex_1::ArrayIndex_1(Expr *exp1, int l, int c) : ArrayIndex(l,c)
@@ -583,6 +625,7 @@ ExprList::AddExpr(Expr *e)
 
 Stat::Stat(int l, int c) : Node(l,c)
 {
+	// empty
 }
 
 Stats::Stats(int l, int c) : Node(l,c)
@@ -691,16 +734,17 @@ Variables_e::Variables_e(Type *ty, Variables *vs, int l, int c) : Node(l,c)
 
 Variables_e::Variables_e(Variables *vs, int l, int c) : Node(l,c)
 {
-	this->type = new Type(l,c);
-	if(vs->variables->at(0)->name->symbol != NULL)
-		this->type->type = vs->variables->at(0)->name->symbol->type;
-	else
-		this->type->type = 0;
+	//this->type = new Type(l,c);
+	//if(vs->variables->at(0)->name->symbol != NULL)
+	//	this->type->type = vs->variables->at(0)->name->symbol->type;
+	//else
+	//	this->type->type = 0;
 
+	this->type = NULL;
 	this->variables = vs;
 
 	vs->father = this;
-	this->type->father = this;
+	//this->type->father = this;
 }
 
 //***********************************************************************
@@ -710,7 +754,7 @@ Variables_e::Variables_e(Variables *vs, int l, int c) : Node(l,c)
 void
 Node::accept(Visitor *v)
 {
-
+	// empty
 }
 
 void
@@ -890,6 +934,24 @@ Invoke::accept(Visitor *v)
 
 void
 NewObject::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+NewArray::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+IdentCall::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+IdentArrCall::accept(Visitor *v)
 {
 	v->Visit(this);
 }

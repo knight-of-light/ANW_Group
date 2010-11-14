@@ -40,6 +40,9 @@ public:
 	virtual void Visit(ArrAssign *) = 0;
 	virtual void Visit(Invoke *) = 0;
 	virtual void Visit(NewObject *) = 0;
+	virtual void Visit(NewArray *) = 0;
+	virtual void Visit(IdentCall *) = 0;
+	virtual void Visit(IdentArrCall *) = 0;
 	virtual void Visit(Equal *) = 0;
 	virtual void Visit(NotEq *) = 0;
 	virtual void Visit(Smaller *) = 0;
@@ -81,12 +84,12 @@ public:
 };
 
 //***********************************************************************
-//					TypeVisitor
+//					PrintVisitor
 //***********************************************************************
-class TypeVisitor : public Visitor
+class PrintVisitor : public Visitor
 {
 public:
-	TypeVisitor();
+	PrintVisitor(Root *file, bool debug);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);
@@ -117,6 +120,105 @@ public:
 	virtual void Visit(ArrAssign *);
 	virtual void Visit(Invoke *);
 	virtual void Visit(NewObject *);
+	virtual void Visit(NewArray *);
+	virtual void Visit(IdentCall *);
+	virtual void Visit(IdentArrCall *);
+	virtual void Visit(Equal *);
+	virtual void Visit(NotEq *);
+	virtual void Visit(Smaller *);
+	virtual void Visit(SmallerEq *);
+	virtual void Visit(Larger *);
+	virtual void Visit(LargerEq *);
+	virtual void Visit(Add *);
+	virtual void Visit(Sub *);
+	virtual void Visit(Mult *);
+	virtual void Visit(Div *);
+	virtual void Visit(Mod *);
+	virtual void Visit(And *);
+	virtual void Visit(Or *);
+	virtual void Visit(Is *);
+	virtual void Visit(Cast *);
+	virtual void Visit(Integer *);
+	virtual void Visit(Real *);
+	virtual void Visit(True *);
+	virtual void Visit(False *);
+	virtual void Visit(This *);
+	virtual void Visit(Null *);
+	virtual void Visit(ArrayIndex *);
+	virtual void Visit(ArrayIndex_1 *);
+	virtual void Visit(ArrayIndex_2 *);
+	virtual void Visit(ArrayIndex_3 *);
+	virtual void Visit(ExprList *);
+	virtual void Visit(Stat *);
+	virtual void Visit(Stats *);
+	virtual void Visit(If *);
+	virtual void Visit(IfElse *);
+	virtual void Visit(While *);
+	virtual void Visit(For *);
+	virtual void Visit(ExprStat *);
+	virtual void Visit(VariablesStat *);
+	virtual void Visit(Semi *);
+	virtual void Visit(Block *);
+	virtual void Visit(Return *);
+	virtual void Visit(Variables_e *);
+
+private:
+	SymTab *symtab;
+	string acctype [4];
+	string types [5];
+	string arr_level [4];
+	string Id;
+	int dashes;
+	int spaces;
+	int count;
+	
+	string PrintId(string);
+	void PrintDashes(void);
+	void PrintSpaces(void);
+	void PrintBar(void);
+	void PrintBars(int);
+};
+
+//***********************************************************************
+//					TypeVisitor
+//***********************************************************************
+class TypeVisitor : public Visitor
+{
+public:
+	TypeVisitor(Root *file, SymTab *st, bool debug);
+	virtual void Visit(Root *);
+	virtual void Visit(Class *);
+	virtual void Visit(ClassInher *);
+	virtual void Visit(Members *);
+	virtual void Visit(Member  *);
+	virtual void Visit(Global  *);
+	virtual void Visit(Constructor *);
+	virtual void Visit(Function *);
+	virtual void Visit(Arg  *);
+	virtual void Visit(Args *);
+	virtual void Visit(Variables *);
+	virtual void Visit(Variable  *);
+	virtual void Visit(AccessModif *);
+	virtual void Visit(Type *);
+	virtual void Visit(NoArrayType *);
+	virtual void Visit(ArrayType *);
+	virtual void Visit(Ident *);
+	virtual void Visit(Expr *);
+	virtual void Visit(Incr *);
+	virtual void Visit(Decr *);
+	virtual void Visit(Not *);
+	virtual void Visit(Minus *);
+	virtual void Visit(Plus *);
+	virtual void Visit(Paren  *);
+	virtual void Visit(IdentExpr *);
+	virtual void Visit(IdentArr *);
+	virtual void Visit(Assign *);
+	virtual void Visit(ArrAssign *);
+	virtual void Visit(Invoke *);
+	virtual void Visit(NewObject *);
+	virtual void Visit(NewArray *);
+	virtual void Visit(IdentCall *);
+	virtual void Visit(IdentArrCall *);
 	virtual void Visit(Equal *);
 	virtual void Visit(NotEq *);
 	virtual void Visit(Smaller *);
@@ -156,8 +258,9 @@ public:
 	virtual void Visit(Return *);
 	virtual void Visit(Variables_e *);
 	SymTab *symtab;
-	string types [5];
+	string types [7];
 	Function *mainFunc;
+
 };
 
 //***********************************************************************
@@ -166,7 +269,7 @@ public:
 class CodeVisitor : public Visitor
 {
 public:
-	CodeVisitor(Root *, SymTab *st, Function *mainFunc);
+	CodeVisitor(Root *, SymTab *st, Function *mainFunc, bool debug);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);
@@ -197,6 +300,9 @@ public:
 	virtual void Visit(ArrAssign *);
 	virtual void Visit(Invoke *);
 	virtual void Visit(NewObject *);
+	virtual void Visit(NewArray *);
+	virtual void Visit(IdentCall *);
+	virtual void Visit(IdentArrCall *);
 	virtual void Visit(Equal *);
 	virtual void Visit(NotEq *);
 	virtual void Visit(Smaller *);

@@ -1,8 +1,11 @@
 #include "visitors.h"
 
-TypeVisitor::TypeVisitor()
+TypeVisitor::TypeVisitor(Root *file, SymTab *st, bool debug)
 {
 	this->mainFunc = NULL;
+	this->symtab = st;
+	if(debug)
+		file->accept(this);
 }
 
 void
@@ -32,6 +35,20 @@ TypeVisitor::Visit(Class *n)
 void
 TypeVisitor::Visit(ClassInher *n)
 {
+	if(n->basic->symbol != NULL)
+	{
+		Class *par = n->basic->symbol->clas;
+		if(par != NULL)
+		{
+			// Add all of Parents of this->parent to this->vector of Parents
+			for(int i=0; i< par->Parents->size(); i++)
+				n->Parents->push_back(par->Parents->at(i));
+
+			 //Add all of this->Childrens of this to this->parent
+			/*for(int i=0; i< n->Childrens->size(); i++)
+				par->Childrens->push_back(n->Childrens->at(i));*/
+		}
+	}
 }
 
 void
@@ -61,7 +78,7 @@ TypeVisitor::Visit(Constructor *n)
 void
 TypeVisitor::Visit(Function *n)
 {
-	if( (n->name->name == "main") && (n->type->type == 4) && (n->args->args->size() == 0) )
+	if( (n->name->name == "main") && (n->type == NULL) && (n->args->args->size() == 0) )
 	{
 		if(this->mainFunc == NULL)
 			this->mainFunc = n;
@@ -356,6 +373,24 @@ TypeVisitor::Visit(NewObject *n)
 	// NEW IDENT '(' expr_list_e ')' , done in symbol table.
 
 	n->type = n->ident->symbol->type;
+}
+
+void
+TypeVisitor::Visit(NewArray *n)
+{
+	// NEW noarraytype arrayindex.
+}
+
+void
+TypeVisitor::Visit(IdentCall *n)
+{
+	// Ident '.' expression.
+}
+
+void
+TypeVisitor::Visit(IdentArrCall *n)
+{
+	// Ident arrayindex '.' expression.
 }
 
 void

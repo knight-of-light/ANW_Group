@@ -5,41 +5,55 @@
 //***********************************************************************
 Sym::Sym(string name, int kind, int type, int arr_level)
 {
-
 	this->name = name;
 	this->kind = kind;
 	this->type = type;
 	this->arr_level = arr_level;
+	this->location = 0;
+	this->clas = NULL;
 	this->constructor = NULL;
 	this->method = NULL;
 	this->argTypes = NULL;
+}
+Sym::Sym(string name, int kind, int arr_level, Class *clas)
+{
+	this->name = name;
+	this->kind = kind;
+	this->type = 0;
+	this->arr_level = arr_level;
 	this->location = 0;
+	this->clas = clas;
+	this->constructor = NULL;
+	this->method = NULL;
+	this->argTypes = NULL;
 }
 
-Sym::Sym(string n, int kind, int type, Args *ps, Constructor *constr)
+Sym::Sym(string n, int kind, Args *ps, Constructor *constr)
 {
 	this->name = n;
 	this->kind = kind;
-	this->type = type;
+	this->type = 0;
 	this->arr_level = 0;
+	this->location = 0;
+	this->clas = NULL;
 	this->constructor = constr;
 	this->method = NULL;
 	this->argTypes = new vector<int>;
-
 	for(int i=0; i< ps->args->size(); i++)
 		this->argTypes->push_back(ps->args->at(i)->type->type);
 	
 }
 
-Sym::Sym(string n, int kind, int type, int arr_level, Args *ps, int returnType, Function *meth)
+Sym::Sym(string n, int kind, int returnType, int arr_level, Args *ps, Function *meth)
 {
 	this->name = n;
 	this->kind = kind;
-	this->type = type;
+	this->type = returnType;
 	this->arr_level = arr_level;
+	this->location = 0;
+	this->clas = NULL;
 	this->constructor = NULL;
 	this->method = meth;
-	this->returnType = returnType;
 	this->argTypes = new vector<int>;
 
 	for(int i = 0; i < ps->args->size(); i++)
@@ -70,13 +84,14 @@ Scope::AddChild()
 SymTab::SymTab(Errors *errors)
 {
 	this->errors = errors;
+
 	types[0] = "null";
 	types[1] = "int";
 	types[2] = "double";
 	types[3] = "bool";
-	types[4] = "void";
-	types[5] = "object";
-	types[6] = "ident";
+	types[4] = "object";
+	types[5] = "ident";
+	types[6] = "void";
 
 	kinds[0] = "";//NuN
 	kinds[1] = "c";//class
@@ -88,10 +103,10 @@ SymTab::SymTab(Errors *errors)
 
 	this->current = new Scope();
 	
-	this->current->hashTab->AddKey("f@Write@int", new Sym("Write", -1, -1, 0));
-	this->current->hashTab->AddKey("f@Write@double", new Sym("Write", -1, -1, 0));
-	this->current->hashTab->AddKey("f@Write@bool", new Sym("Write", -1, -1, 0));
-	this->current->hashTab->AddKey("f@Read", new Sym("Read", -1, -1, 0));
+	this->current->hashTab->AddKey("f@Write@int", new Sym("Write", 2, 0, 0));
+	this->current->hashTab->AddKey("f@Write@double", new Sym("Write", 2, 0, 0));
+	this->current->hashTab->AddKey("f@Write@bool", new Sym("Write", 2, 0, 0));
+	this->current->hashTab->AddKey("f@Read", new Sym("Read", 2, 0, 0));
 }
 
 Sym *
@@ -182,7 +197,7 @@ SymTab::IsDeclared(Ident *id, int kind, ExprList *el)
 }
 
 bool
-SymTab::IsDeclared(Ident *id, Deffered *def)
+SymTab::IsDeclared(Ident *id, int kind, Deffered *def)
 {
 	//string key = this->kinds[kind]+"@"+id->name;
 	Sym *sym = this->Lookup(id->name);
@@ -193,7 +208,7 @@ SymTab::IsDeclared(Ident *id, Deffered *def)
 	}
 	else
 	{
-		def->AddIdent(id);
+		def->AddIdent(id,kind);
 		return false;
 	}
 }
@@ -217,18 +232,12 @@ SymTab::AddSym(Ident *id, int kind, int type, int arr_level)
 }
 
 bool
-SymTab::AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr)
+SymTab::AddSym(Ident *id, int kind, int arr_level, Class *clas)
 {
 	string key = this->kinds[kind]+"@"+id->name;
-	for(int i=0; i < ps->args->size(); i++)
-	{
-		int t = ps->args->at(i)->type->type;
-		key += "@" + types[t];
-	}
-
 	if(this->Lookup(key) == NULL)
 	{
-		Sym *sym = new Sym(id->name, kind, type, ps, constr);
+		Sym *sym = new Sym(id->name, kind, arr_level, clas);
 		this->current->hashTab->AddKey(key, sym);
 		id->symbol = sym;
 		return true;
@@ -241,7 +250,7 @@ SymTab::AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr)
 }
 
 bool
-SymTab::AddSym(Ident *id, int kind, int type, int arr_level, Args *ps, int returnType, Function *meth)
+SymTab::AddSym(Ident *id, int kind, Args *ps, Constructor *constr)
 {
 	string key = this->kinds[kind]+"@"+id->name;
 	for(int i=0; i < ps->args->size(); i++)
@@ -252,7 +261,31 @@ SymTab::AddSym(Ident *id, int kind, int type, int arr_level, Args *ps, int retur
 
 	if(this->Lookup(key) == NULL)
 	{
-		Sym *sym = new Sym(id->name, kind, type, arr_level, ps, returnType, meth);
+		Sym *sym = new Sym(id->name, kind, ps, constr);
+		this->current->hashTab->AddKey(key, sym);
+		id->symbol = sym;
+		return true;
+	}
+	else
+	{
+		this->errors->AddError("Redefinition of Identifier '" + id->name + "'", id->line, id->column);
+		return false;
+	}
+}
+
+bool
+SymTab::AddSym(Ident *id, int kind, int returnType, int arr_level, Args *ps, Function *meth)
+{
+	string key = this->kinds[kind]+"@"+id->name;
+	for(int i=0; i < ps->args->size(); i++)
+	{
+		int t = ps->args->at(i)->type->type;
+		key += "@" + types[t];
+	}
+
+	if(this->Lookup(key) == NULL)
+	{
+		Sym *sym = new Sym(id->name, kind, returnType, arr_level, ps, meth);
 		this->current->hashTab->AddKey(key, sym);
 		id->symbol = sym;
 		return true;
@@ -290,13 +323,24 @@ SymTab::OutScope()
 //***********************************************************************
 Deffered::Deffered()
 {
+	
+	kindArr[0] = "";//NuN
+	kindArr[1] = "c";//class
+	kindArr[2] = "f";//function
+	kindArr[3] = "con";//constractur
+	kindArr[4] = "g";//global variable
+	kindArr[5] = "l";//local variable
+	kindArr[6] = "l";//Argument
+
 	this->ids = new vector<Ident *>;
+	this->kinds = new vector<int>;
 }
 
 void
-Deffered::AddIdent(Ident *id)
+Deffered::AddIdent(Ident *id, int kind)
 {
 	this->ids->push_back(id);
+	this->kinds->push_back(kind);
 }
 
 void
@@ -304,7 +348,9 @@ Deffered::CheckAll(SymTab *symtab)
 {
 	for(int i=0; i < this->ids->size(); i++)
 	{
-		Sym *sym = symtab->current->hashTab->GetMember(this->ids->at(i)->name);
+		string key = this->kindArr[this->kinds->at(i)]+"@"+this->ids->at(i)->name;
+		//Sym *sym = symtab->current->hashTab->GetMember(key);
+		Sym *sym = symtab->Lookup(key);
 		if(sym != NULL)
 			this->ids->at(i)->symbol = sym;
 		else

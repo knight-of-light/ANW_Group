@@ -117,25 +117,25 @@ root:			/* empty */
 
 class:			  CLASS IDENT '{'
 					{
-						symtab->AddSym($2, 1, -1, 0);
 						symtab->AddNewScope();
 					}
 					 members '}'
 					{
 						$$ = new Class($2, $5, lin, col);
 						symtab->OutScope();
+						symtab->AddSym($2, 1, 0, $$);
 					}
 				| CLASS IDENT ':' IDENT '{'
 					{
-						symtab->AddSym($2, 1, -1, 0);
-						symtab->IsDeclared($4, 1);
 						symtab->AddNewScope();
 					}
 					 members '}'
 					{
 						$$ = new ClassInher($2, $4, $7, lin, col);
-						$$->AddParent($4);
+						//$$->AddParent($4);
 						symtab->OutScope();
+						symtab->AddSym($2, 1, 0, $$);
+						symtab->IsDeclared($4, 1, def);
 					}
 ;
 
@@ -174,7 +174,7 @@ constructor:	  accessmodif IDENT '('
 					{
 						$$ = new Constructor($1, $2, $5, $8, lin, col);
 						symtab->OutScope();
-						symtab->AddSym($2, 3, -1, $5, $$);
+						symtab->AddSym($2, 3, $5, $$);
 					}
 ;
 
@@ -186,7 +186,7 @@ function:		  accessmodif type IDENT '('
 					{
 						$$ = new Function($1, $2, $3, $6, $9, lin, col);
 						symtab->OutScope();
-						symtab->AddSym($3, 2, -1, $2->arr_level, $6, $2->type, $$);
+						symtab->AddSym($3, 2, $2->type, $2->arr_level, $6, $$);
 					}
 				| accessmodif VOID IDENT '('
 					 {
@@ -196,7 +196,7 @@ function:		  accessmodif type IDENT '('
 					{
 						$$ = new Function($1, $3, $6, $9, lin, col);
 						symtab->OutScope();
-						symtab->AddSym($3, 2, -1, 0, $6, 4, $$);
+						symtab->AddSym($3, 2, 6, 0, $6, $$);
 					}
 ;
 
@@ -251,19 +251,19 @@ variable:		  IDENT
 
 accessmodif:	  /* empty */
 					{
-						$$ = new AccessModif(1, lin, col);
+						$$ = new AccessModif(0, lin, col);
 					}
 				| PRIVATE
 					{
-						$$ = new AccessModif(2, lin, col);
+						$$ = new AccessModif(0, lin, col);
 					}
 				| STATIC
 					{
-						$$ = new AccessModif(3, lin, col);
+						$$ = new AccessModif(2, lin, col);
 					}
 				| PRIVATE STATIC
 					{
-						$$ = new AccessModif(4, lin, col);
+						$$ = new AccessModif(3, lin, col);
 					}
 ;
 
@@ -282,21 +282,21 @@ noarraytype:	  IDENT
 					{$$ = $1;}
 ;
 
-basictype:		  OBJECT
-					{
-						$$ = new NoArrayType(5, lin, col);
-					}
-				| BOOL
-					{
-						$$ = new NoArrayType(3, lin, col);
-					}
-				| INT
+basictype:		  INT
 					{
 						$$ = new NoArrayType(1, lin, col);
 					}
 				| DOUBLE
 					{
 						$$ = new NoArrayType(2, lin, col);
+					}
+				| BOOL
+					{
+						$$ = new NoArrayType(3, lin, col);
+					}
+				| OBJECT
+					{
+						$$ = new NoArrayType(4, lin, col);
 					}
 ;
 
@@ -365,10 +365,6 @@ expression:		  INCREMENT IDENT
 					{
 						$$ = new Paren($2, lin, col);
 					}
-				| IDENT '.' expression
-					{
-						// for call method from object .......................................
-					}
 				| IDENT
 					{
 						$$ = new IdentExpr($1, lin, col);
@@ -398,6 +394,20 @@ expression:		  INCREMENT IDENT
 					{
 						$$ = new NewObject($2, $4, lin, col);
 						symtab->IsDeclared($2, 3, $4);
+					}
+				| NEW noarraytype arrayindex
+					{
+						$$ = new NewArray($2, $3, lin, col);
+					}
+				| IDENT '.' expression
+					{
+						$$ = new IdentCall($1, $3, lin, col);
+						symtab->IsDeclared($1);
+					}
+				| IDENT arrayindex '.' expression
+					{
+						$$ = new IdentArrCall($1, $2, $4, lin, col);
+						symtab->IsDeclared($1);
 					}
 				| expression EQ expression
 					{

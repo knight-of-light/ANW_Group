@@ -6,11 +6,9 @@
 using std::cout;
 using std::endl;
 
-// CodeVisitor
 #include <fstream>
 using std::ofstream;
 using std::ios;
-//
 
 #include <sstream>
 
@@ -21,9 +19,7 @@ using std::vector;
 #include <string>
 using std::string;
 
-//
 static std::ofstream vout("code.txt", ios::out);
-//
 
 class Node;
 class Root;
@@ -56,6 +52,9 @@ class Assign;
 class ArrAssign;
 class Invoke;
 class NewObject;
+class NewArray;
+class IdentCall;
+class IdentArrCall;
 class Equal;
 class NotEq;
 class Smaller;
@@ -133,19 +132,22 @@ class Class : public Node		// Class without Inheritance
 public:
 	Ident	*name;
 	Members	*members;
-	vector<Ident *>	*Parents;
 
-	void AddParent(Ident * );
+	vector<Ident *>	*Parents;
+	vector<Ident *>	*Childrens;
+
 	Class(Ident *, Members *, int, int);
+	//void AddParent(Ident *);
 	virtual void accept(Visitor *);
 };
 
 class ClassInher : public Class	// Class with Inheritance
 {
 public:
-	Ident	*parent;
+	Ident	*basic;
 
 	ClassInher(Ident *, Ident *, Members *, int, int);
+	//void AddParent(Ident *);
 	virtual void accept(Visitor *);
 };
 
@@ -256,7 +258,7 @@ public:
 class AccessModif : public Node
 {
 public:
-	// 1: no AccessModif , 2: private , 3: static , 4: private static
+	// 0: no AccessModif(public) , 1: private , 2: static(public static) , 3: private static
 	int acctype;
 
 	AccessModif(int, int, int);
@@ -267,9 +269,9 @@ public:
 class Type : public Node
 {
 public:
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5:object, 6:ident
+	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4:object, 5:ident
 	int type;
-	// 0: no arr, 1: [], 2: [][], 3: [][][]
+	// 0: no arr, 1: [], 2: [,], 3: [,,]
 	int arr_level;
 	Ident *name;
 
@@ -302,6 +304,7 @@ class Ident : public Node
 public:
 	string	name;
 	Sym *symbol;
+
 	Ident(string, int, int);
 	virtual void accept(Visitor *);
 };
@@ -444,6 +447,40 @@ public:
 	ExprList	*exprList;
 
 	NewObject(Ident *, ExprList *, int, int);
+	virtual void accept(Visitor *);
+};
+
+//*******     NewArray		*********
+class NewArray : public Expr
+{
+public:
+	Type		*type;
+	ArrayIndex	*arrayIndex;
+
+	NewArray(Type *, ArrayIndex *, int, int);
+	virtual void accept(Visitor *);
+};
+
+//*******     IdentCall		*********
+class IdentCall : public Expr
+{
+public:
+	Ident	*ident;
+	Expr	*expr;
+
+	IdentCall(Ident *, Expr *, int, int);
+	virtual void accept(Visitor *);
+};
+
+//*******   IdentArrCall	*********
+class IdentArrCall : public Expr
+{
+public:
+	Ident		*ident;
+	ArrayIndex	*arrayIndex;
+	Expr		*expr;
+
+	IdentArrCall(Ident *, ArrayIndex *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -668,7 +705,7 @@ public:
 class ArrayIndex : public Node
 {
 public:
-	// 1: [] , 2: [][] , 3: [][][]
+	// 1: [] , 2: [,] , 3: [,,]
 	int arr_level;
 	ArrayIndex(int, int);
 	virtual void accept(Visitor *);
@@ -825,6 +862,7 @@ class Return : public Stat
 {
 public:
 	Expr	*expr;
+
 	Return(Expr *, int, int);
 	virtual void accept(Visitor *);
 };

@@ -1,14 +1,31 @@
+class A : C
+{
+    //A()
+    //{
+    //    test();
+    //}
+}
+class B : A
+{
+    //void test()
+    //{
+    //}
+}
+class C : B
+{
+}
+
 class Test
 {
     void main()
     {
-        //Read();
+        Read();
         int i = 5;
         //double y = (double)i;
         //(double)i;
-
-        Write(i);
-
-
+        //int t = 2;
+        //int v = i * t;
+        //Write(v);
+        Write(4);
     }
 }

@@ -21,22 +21,22 @@ public:
 	//1: class, 2: func, 3: constructor, 4: global Global, 5: Local Global
 	int kind;
 	string name;
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void, 5: Object, 6: Ident
+	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: Object, 5: Ident
 	int type;
-	// 0: no array, 1: [], 2: [][], 3: [][][]
+	// 0: no array, 1: [], 2: [,], 3: [,,]
 	int arr_level;
-
-	//
+	// to spicific number in memory
 	int location;
-	//
+
 	vector<int> *argTypes;
-	int returnType;
+	Class *clas;
 	Constructor *constructor;
 	Function *method;
 
 	Sym(string n, int kind, int type, int arr_level);
-	Sym(std::string , int kind, int type, Args *ps, Constructor *constr);
-	Sym(std::string , int kind, int type, int arr_level, Args *ps, int returnType, Function *meth);	
+	Sym(string n, int kind, int arr_level, Class *clas);
+	Sym(std::string , int kind, Args *ps, Constructor *constr);
+	Sym(std::string , int kind, int returnType, int arr_level, Args *ps, Function *meth);	
 };
 
 //*******      HashTab		*********
@@ -69,10 +69,11 @@ public:
 	bool IsDeclared(Ident *id);
 	bool IsDeclared(Ident *id, int kind);
 	bool IsDeclared(Ident *id, int kind, ExprList *el);
-	bool IsDeclared(Ident *id, Deffered *def);
+	bool IsDeclared(Ident *id, int kind, Deffered *def);
 	bool AddSym(Ident *id, int kind, int type, int arr_level);
-	bool AddSym(Ident *id, int kind, int type, Args *ps, Constructor *constr);
-	bool AddSym(Ident *id, int kind, int type, int arr_level, Args *ps, int returnType, Function *meth);	
+	bool AddSym(Ident *id, int kind, int arr_level, Class *clas);
+	bool AddSym(Ident *id, int kind, Args *ps, Constructor *constr);
+	bool AddSym(Ident *id, int kind, int returnType, int arr_level, Args *ps, Function *meth);	
 
 	void AddNewScope();
 	void OutScope();
@@ -87,10 +88,12 @@ public:
 class Deffered
 {
 public:
+	string kindArr[7];
 	vector<Ident *> *ids;
+	vector<int> *kinds;
 	//vector<Sym *> *syms;
 	Deffered();
-	void AddIdent(Ident *);
+	void AddIdent(Ident *, int);
 	void CheckAll(SymTab *symtab);
 };
 
@@ -117,70 +120,5 @@ public:
 	void AddError(string message, int line, int column);
 	void Print();
 };
-/*
-#ifndef	SYMBOL_TABLE_H
-#define	SYMBOL_TABLE_H
 
-#include <string>
-using std::string;
-
-#include <vector>
-using std::vector;
-
-#include "hash_table.h"
-
-#include "headers.h"
-
-class Sym;
-class Scope;
-class SymTab;
-
-class Sym
-{
-public:
-	//1: func, 2: args, 3: variable, 
-	int kind;
-	string name;
-	int type;
-	vector<int> *argTypes;
-	int returnType;
-	Sym(std::string , int kind, int type, Args * ps, int returnType);
-	Sym(string n, int kind, int type);
-	
-};
-
-typedef CHashTable<Sym> HashTab;
-
-class Scope
-{
-public:
-	Scope *father;
-	vector<Scope *> *children;
-	HashTab	*hashTab;
-
-	Scope();
-	void AddChild();
-
-	
-};
-
-class SymTab
-{
-public:
-	Scope *current;
-	Errors *errors;
-
-	SymTab(Errors *errors);
-
-	void AddNewScope();
-	void OutScope();
-
-	Sym Lookup(string name);
-	bool AddSym(Ident *id, int kind, int type);
-	bool AddSym(Ident *id, int kind, int type, Args *ps, int returnType);	
-};
-
-#endif
-
-*/
 #endif
