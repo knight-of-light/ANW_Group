@@ -502,16 +502,52 @@ PrintVisitor::Visit(NewObject *n)
 void
 PrintVisitor::Visit(NewArray *n)
 {
+	cout << "NewArray" << endl;
+
+	count++;
+
+	PrintBars(count);
+	n->typ->accept(this);
+
+	PrintBars(count);
+	n->arrayIndex->accept(this);
+
+	count--;
 }
 
 void
 PrintVisitor::Visit(IdentCall *n)
 {
+	cout << "IdentCall" << endl;
+
+	count++;
+
+	PrintBars(count);
+	n->ident->accept(this);
+
+	PrintBars(count);
+	n->expr->accept(this);
+
+	count--;
 }
 
 void
 PrintVisitor::Visit(IdentArrCall *n)
 {
+	cout << "IdentArrCall" << endl;
+
+	count++;
+
+	PrintBars(count);
+	n->ident->accept(this);
+
+	PrintBars(count);
+	n->arrayIndex->accept(this);
+
+	PrintBars(count);
+	n->expr->accept(this);
+
+	count--;
 }
 
 void

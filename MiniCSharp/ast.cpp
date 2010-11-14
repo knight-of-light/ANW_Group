@@ -347,7 +347,7 @@ NewObject::NewObject(Ident *id, ExprList *el, int l, int c) : Expr(l,c)
 //*******     NewArray		*********
 NewArray::NewArray(Type *ty, ArrayIndex *ai, int l, int c) : Expr(l,c)
 {
-	this->type = ty;
+	this->typ = ty;
 	this->arrayIndex = ai;
 	
 	ty->father = this;

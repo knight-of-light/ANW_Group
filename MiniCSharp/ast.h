@@ -454,7 +454,7 @@ public:
 class NewArray : public Expr
 {
 public:
-	Type		*type;
+	Type		*typ;
 	ArrayIndex	*arrayIndex;
 
 	NewArray(Type *, ArrayIndex *, int, int);

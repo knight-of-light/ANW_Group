@@ -8,6 +8,7 @@ Sym::Sym(string name, int kind, int type, int arr_level)
 	this->name = name;
 	this->kind = kind;
 	this->type = type;
+	this->classType = "";
 	this->arr_level = arr_level;
 	this->location = 0;
 	this->clas = NULL;
@@ -15,11 +16,27 @@ Sym::Sym(string name, int kind, int type, int arr_level)
 	this->method = NULL;
 	this->argTypes = NULL;
 }
+
+Sym::Sym(string name, int kind, string type, int arr_level)
+{
+	this->name = name;
+	this->kind = kind;
+	this->type = 5;
+	this->classType = type;
+	this->arr_level = arr_level;
+	this->location = 0;
+	this->clas = NULL;
+	this->constructor = NULL;
+	this->method = NULL;
+	this->argTypes = NULL;
+}
+
 Sym::Sym(string name, int kind, int arr_level, Class *clas)
 {
 	this->name = name;
 	this->kind = kind;
 	this->type = 0;
+	this->classType = "";
 	this->arr_level = arr_level;
 	this->location = 0;
 	this->clas = clas;
@@ -33,6 +50,7 @@ Sym::Sym(string n, int kind, Args *ps, Constructor *constr)
 	this->name = n;
 	this->kind = kind;
 	this->type = 0;
+	this->classType = "";
 	this->arr_level = 0;
 	this->location = 0;
 	this->clas = NULL;
@@ -49,6 +67,7 @@ Sym::Sym(string n, int kind, int returnType, int arr_level, Args *ps, Function *
 	this->name = n;
 	this->kind = kind;
 	this->type = returnType;
+	this->classType = "";
 	this->arr_level = arr_level;
 	this->location = 0;
 	this->clas = NULL;
@@ -83,8 +102,6 @@ Scope::AddChild()
 //***********************************************************************
 SymTab::SymTab(Errors *errors)
 {
-	this->errors = errors;
-
 	types[0] = "null";
 	types[1] = "int";
 	types[2] = "double";
@@ -100,9 +117,11 @@ SymTab::SymTab(Errors *errors)
 	kinds[4] = "g";//global variable
 	kinds[5] = "l";//local variable
 	kinds[6] = "l";//Argument
-
-	this->current = new Scope();
 	
+	this->classType = new vector<string>;
+	this->current = new Scope();
+	this->errors = errors;
+
 	this->current->hashTab->AddKey("f@Write@int", new Sym("Write", 2, 0, 0));
 	this->current->hashTab->AddKey("f@Write@double", new Sym("Write", 2, 0, 0));
 	this->current->hashTab->AddKey("f@Write@bool", new Sym("Write", 2, 0, 0));
@@ -125,6 +144,7 @@ SymTab::Lookup(std::string name)
 	return NULL;
 }
 
+//**********  IsDeclared Functions  *************
 bool
 SymTab::IsDeclared(Ident *id)
 {
@@ -213,6 +233,7 @@ SymTab::IsDeclared(Ident *id, int kind, Deffered *def)
 	}
 }
 
+//**********  AddSym Functions  *************
 bool
 SymTab::AddSym(Ident *id, int kind, int type, int arr_level)
 {

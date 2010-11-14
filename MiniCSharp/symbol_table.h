@@ -23,6 +23,7 @@ public:
 	string name;
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: Object, 5: Ident
 	int type;
+	string classType;
 	// 0: no array, 1: [], 2: [,], 3: [,,]
 	int arr_level;
 	// to spicific number in memory
@@ -33,10 +34,11 @@ public:
 	Constructor *constructor;
 	Function *method;
 
-	Sym(string n, int kind, int type, int arr_level);
-	Sym(string n, int kind, int arr_level, Class *clas);
-	Sym(std::string , int kind, Args *ps, Constructor *constr);
-	Sym(std::string , int kind, int returnType, int arr_level, Args *ps, Function *meth);	
+	Sym(string n, int kind, int type, int arr_level); // Ident
+	Sym(string n, int kind, string type, int arr_level); // Ident type is class
+	Sym(string n, int kind, int arr_level, Class *clas); // Class Ident
+	Sym(string n, int kind, Args *ps, Constructor *constr); // Constructor Ident
+	Sym(string n, int kind, int returnType, int arr_level, Args *ps, Function *meth); // Function Ident
 };
 
 //*******      HashTab		*********
@@ -60,16 +62,19 @@ class SymTab
 private:
 	string types[7];
 	string kinds[7];
+	vector<string> *classType;
 public:
 	Scope *current;
 	Errors *errors;
 
 	SymTab(Errors *errors);
 	Sym *Lookup(string name);
-	bool IsDeclared(Ident *id);
+
+	bool IsDeclared(Ident *id); // local and global Ident.
 	bool IsDeclared(Ident *id, int kind);
 	bool IsDeclared(Ident *id, int kind, ExprList *el);
 	bool IsDeclared(Ident *id, int kind, Deffered *def);
+
 	bool AddSym(Ident *id, int kind, int type, int arr_level);
 	bool AddSym(Ident *id, int kind, int arr_level, Class *clas);
 	bool AddSym(Ident *id, int kind, Args *ps, Constructor *constr);
