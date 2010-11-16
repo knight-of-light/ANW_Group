@@ -123,7 +123,7 @@ class:			  CLASS IDENT '{'
 					{
 						$$ = new Class($2, $5, lin, col);
 						symtab->OutScope();
-						symtab->AddSym($2, 1, 0, $$);
+						symtab->AddSym($2, 1, $$);
 					}
 				| CLASS IDENT ':' IDENT '{'
 					{
@@ -134,7 +134,7 @@ class:			  CLASS IDENT '{'
 						$$ = new ClassInher($2, $4, $7, lin, col);
 						//$$->AddParent($4);
 						symtab->OutScope();
-						symtab->AddSym($2, 1, 0, $$);
+						symtab->AddSym($2, 1, $$);
 						symtab->IsDeclared($4, 1, def);
 					}
 ;
@@ -162,7 +162,7 @@ global:			  accessmodif type variables ';'
 					{
 						$$ = new Global($1, $2, $3, lin, col);
 						for(int i=0; i < $3->variables->size(); i++)
-							symtab->AddSym($3->variables->at(i)->name, 4, $2->type, $2->arr_level);
+							symtab->AddSym($3->variables->at(i)->name, 4, $1->acctype, $2);
 					}
 ;
 
@@ -174,7 +174,7 @@ constructor:	  accessmodif IDENT '('
 					{
 						$$ = new Constructor($1, $2, $5, $8, lin, col);
 						symtab->OutScope();
-						symtab->AddSym($2, 3, $5, $$);
+						symtab->AddSym($2, 3, $1->acctype, $5, $$);
 					}
 ;
 
@@ -186,7 +186,7 @@ function:		  accessmodif type IDENT '('
 					{
 						$$ = new Function($1, $2, $3, $6, $9, lin, col);
 						symtab->OutScope();
-						symtab->AddSym($3, 2, $2->type, $2->arr_level, $6, $$);
+						symtab->AddSym($3, 2, $1->acctype, $2, $6, $$);
 					}
 				| accessmodif VOID IDENT '('
 					 {
@@ -196,14 +196,14 @@ function:		  accessmodif type IDENT '('
 					{
 						$$ = new Function($1, $3, $6, $9, lin, col);
 						symtab->OutScope();
-						symtab->AddSym($3, 2, 6, 0, $6, $$);
+						symtab->AddSym($3, 2, $1->acctype, NULL, $6, $$);
 					}
 ;
 
 arg :			  type IDENT
 					{
 						$$ = new Arg($1, $2, lin, col);
-						symtab->AddSym($2, 6, $1->type, $1->arr_level);
+						symtab->AddSym($2, 6, 0, $1);
 					}
 ;
 
@@ -251,19 +251,19 @@ variable:		  IDENT
 
 accessmodif:	  /* empty */
 					{
-						$$ = new AccessModif(0, lin, col);
+						$$ = new AccessModif(1, lin, col);
 					}
 				| PRIVATE
 					{
-						$$ = new AccessModif(0, lin, col);
+						$$ = new AccessModif(2, lin, col);
 					}
 				| STATIC
 					{
-						$$ = new AccessModif(2, lin, col);
+						$$ = new AccessModif(3, lin, col);
 					}
 				| PRIVATE STATIC
 					{
-						$$ = new AccessModif(3, lin, col);
+						$$ = new AccessModif(4, lin, col);
 					}
 ;
 
@@ -276,7 +276,7 @@ type:			  noarraytype
 noarraytype:	  IDENT
 					{
 						$$ = new NoArrayType($1, lin, col);
-						symtab->IsDeclared($1, 1);
+						symtab->IsDeclared($1, 1, def);
 					}
 				| basictype
 					{$$ = $1;}
@@ -284,36 +284,36 @@ noarraytype:	  IDENT
 
 basictype:		  INT
 					{
-						$$ = new NoArrayType(1, lin, col);
+						$$ = new NoArrayType(2, lin, col);
 					}
 				| DOUBLE
 					{
-						$$ = new NoArrayType(2, lin, col);
+						$$ = new NoArrayType(3, lin, col);
 					}
 				| BOOL
 					{
-						$$ = new NoArrayType(3, lin, col);
+						$$ = new NoArrayType(4, lin, col);
 					}
 				| OBJECT
 					{
-						$$ = new NoArrayType(4, lin, col);
+						$$ = new NoArrayType(5, lin, col);
 					}
 ;
 
 arraytype:		  IDENT '[' ']'
 					{
 						$$ = new ArrayType(1, $1, lin, col);
-						symtab->IsDeclared($1, 1);
+						symtab->IsDeclared($1, 1, def);
 					}
 				| IDENT '[' ',' ']'
 					{
 						$$ = new ArrayType(2, $1, lin, col);
-						symtab->IsDeclared($1, 1);
+						symtab->IsDeclared($1, 1, def);
 					}
 				| IDENT '[' ',' ',' ']'
 					{
 						$$ = new ArrayType(3, $1, lin, col);
-						symtab->IsDeclared($1, 1);
+						symtab->IsDeclared($1, 1, def);
 					}
 				| basictype '[' ']'
 					{
@@ -332,22 +332,22 @@ arraytype:		  IDENT '[' ']'
 expression:		  INCREMENT IDENT
 					{
 						$$ = new Incr($2, true, lin, col);
-						symtab->IsDeclared($2);
+						symtab->IsDeclared($2, def);
 					}
 				| DECREMENT IDENT
 					{
 						$$ = new Decr($2, true, lin, col);
-						symtab->IsDeclared($2);
+						symtab->IsDeclared($2, def);
 					}
 				| IDENT INCREMENT
 					{
 						$$ = new Incr($1, false, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, def);
 					}
 				| IDENT DECREMENT
 					{
 						$$ = new Decr($1, false, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, def);
 					}
 				| '!' expression
 					{
@@ -368,32 +368,32 @@ expression:		  INCREMENT IDENT
 				| IDENT
 					{
 						$$ = new IdentExpr($1, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, def);
 					}
 				| IDENT arrayindex
 					{
 						$$ = new IdentArr($1, $2, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, def);
 					}
 				| IDENT '=' expression
 					{
 						$$ = new Assign($1, $3, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, def);
 					}
 				| IDENT arrayindex '=' expression
 					{
 						$$ = new ArrAssign($1, $2, $4, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, def);
 					}
 				| IDENT '(' expr_list_e ')'
 					{
 						$$ = new Invoke($1, $3, lin, col);
-						//symtab->IsDeclared($1, 2, $3);
+						//symtab->IsDeclared($1, 2, $3, def);
 					}
 				| NEW IDENT '(' expr_list_e ')'
 					{
 						$$ = new NewObject($2, $4, lin, col);
-						symtab->IsDeclared($2, 3, $4);
+						//symtab->IsDeclared($2, 3, $4, def);
 					}
 				| NEW noarraytype arrayindex
 					{
@@ -402,12 +402,12 @@ expression:		  INCREMENT IDENT
 				| IDENT '.' expression
 					{
 						$$ = new IdentCall($1, $3, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, def);
 					}
 				| IDENT arrayindex '.' expression
 					{
 						$$ = new IdentArrCall($1, $2, $4, lin, col);
-						symtab->IsDeclared($1);
+						symtab->IsDeclared($1, def);
 					}
 				| expression EQ expression
 					{
@@ -550,7 +550,7 @@ statement:		  IF '(' expression ')' statement %prec IF_PREC
 					{
 						$$ = new VariablesStat($1, $2, lin, col);
 						for(int i = 0; i < $2->variables->size(); i++)
-							symtab->AddSym($2->variables->at(i)->name, 5, $1->type, $1->arr_level);
+							symtab->AddSym($2->variables->at(i)->name, 5, 0, $1);
 					}
 				| ';'
 					{
@@ -590,13 +590,13 @@ variables_e:		  /* Empty */
 					{
 						$$ = new Variables_e($1, $2, lin, col);
 						for(int i = 0; i < $2->variables->size(); i++)
-							symtab->AddSym($2->variables->at(i)->name, 5, $1->type, $1->arr_level);
+							symtab->AddSym($2->variables->at(i)->name, 5, 0, $1);
 					}
 				| variables
 					{
 						$$ = new Variables_e($1, lin, col);
 						for(int i = 0; i < $1->variables->size(); i++)
-							symtab->IsDeclared($1->variables->at(i)->name);
+							symtab->IsDeclared($1->variables->at(i)->name, def);
 					}
 ;
 

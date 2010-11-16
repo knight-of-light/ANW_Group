@@ -207,7 +207,7 @@ NoArrayType::NoArrayType(int t, int l, int c) : Type(l,c)
 
 NoArrayType::NoArrayType(Ident *n, int l, int c) : Type(l,c)
 {
-	this->type = 5;
+	this->type = 6;
 	this->arr_level = 0;
 	this->name = n;
 	n->father = this;
@@ -222,7 +222,7 @@ ArrayType::ArrayType(int t, int al, int l, int c) : Type(l,c)
 
 ArrayType::ArrayType(int al, Ident *n, int l, int c) : Type(l,c)
 {
-	this->type = 5;
+	this->type = 6;
 	this->arr_level = al;
 	this->name = n;
 	n->father = this;
@@ -242,6 +242,7 @@ Ident::Ident(string n, int l, int c) : Node(l, c)
 Expr::Expr(int l, int c) : Node(l, c)
 {
 	this->type = 0;
+	this->TYPE = new Type(l,c);
 }
 
 //*******       Incr		*********
@@ -530,26 +531,30 @@ Cast::Cast(Type *t, Expr *e, int l, int c) : Expr(l,c)
 Integer::Integer(int v, int l, int c) : Expr(l,c)
 {
 	this->value = v;
-	this->type = 1;
+	this->type = 2;
+	this->TYPE->type = 2;
 }
 
 //*******       Real		*********
 Real::Real(double v, int l, int c) : Expr(l,c)
 {
 	this->value = v;
-	this->type = 2;
+	this->type = 3;
+	this->TYPE->type = 3;
 }
 
 //*******       True		*********
 True::True(int l, int c) : Expr(l,c)
 {
-	this->type = 3;
+	this->type = 4;
+	this->TYPE->type = 4;
 }
 
 //*******      False		*********
 False::False(int l, int c) : Expr(l,c)
 {
-	this->type = 3;
+	this->type = 4;
+	this->TYPE->type = 4;
 }
 
 //*******       This		*********
@@ -560,7 +565,8 @@ This::This(int l, int c) : Expr(l,c)
 //*******       Null		*********
 Null::Null(int l, int c) : Expr(l,c)
 {
-	this->type = 0;
+	this->type = 1;
+	this->TYPE->type = 1;
 }
 
 //*******     ArrayIndex	*********

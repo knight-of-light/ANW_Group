@@ -258,7 +258,7 @@ public:
 class AccessModif : public Node
 {
 public:
-	// 0: no AccessModif(public) , 1: private , 2: static(public static) , 3: private static
+	// 0: no AccessModif, 1: public, 2: private, 3: static(public static), 4: private static
 	int acctype;
 
 	AccessModif(int, int, int);
@@ -269,7 +269,7 @@ public:
 class Type : public Node
 {
 public:
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4:object, 5:ident
+	// 0: no type, 1: Null, 2: int , 3: double , 4: boolean, 5: object, 6: ident
 	int type;
 	// 0: no arr, 1: [], 2: [,], 3: [,,]
 	int arr_level;
@@ -318,6 +318,7 @@ class Expr : public Node
 public:
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
 	int type;
+	Type *TYPE;
 	Expr(int, int);
 	virtual void accept(Visitor *);
 };

@@ -1,9 +1,10 @@
 #include "visitors.h"
 
-TypeVisitor::TypeVisitor(Root *file, SymTab *st, bool debug)
+TypeVisitor::TypeVisitor(Root *file, SymTab *st, Deffered *def, bool debug)
 {
 	this->mainFunc = NULL;
 	this->symtab = st;
+	this->def = def;
 	if(debug)
 		file->accept(this);
 }
@@ -11,11 +12,14 @@ TypeVisitor::TypeVisitor(Root *file, SymTab *st, bool debug)
 void
 TypeVisitor::Visit(Root *n)
 {
-	types[0] = "null";
-	types[1] = "int";
-	types[2] = "double";
-	types[3] = "boolean";
-	types[4] = "void";
+	types[0] = "no type";
+	types[1] = "null";
+	types[2] = "int";
+	types[3] = "double";
+	types[4] = "boolean";
+	types[5] = "object";
+	types[6] = "Ident";
+	types[7] = "void";
 
 	for(int i=0; i< n->classes->size(); i++)
 		n->classes->at(i)->accept(this);
@@ -123,27 +127,27 @@ TypeVisitor::Visit(Variable *n)
 	if(n->expr != NULL)
 	{
 		n->expr->accept(this);
-		int left = n->name->symbol->type;// Getting the type from the symbol table
+		int left = n->name->symbol->type->type;// Getting the type from the symbol table
 		int right = n->expr->type;
 		
 		bool mismatch = false;
 
 		switch(left)
 		{
-		case 1:
-			if(right != 1)
+		case 2:
+			if(right != 2)
 				mismatch = true;
 			break;
-		case 2:
-			if(!((right == 1)||(right == 2)))
+		case 3:
+			if(!((right == 2)||(right == 3)))
 			{
 				mismatch = true;
-				n->expr->type = 2;
+				n->expr->type = 3;
 			}
 
 			break;
-		case 3:
-			if(right != 3)
+		case 4:
+			if(right != 4)
 				mismatch = true;
 			break;
 		default:
@@ -191,8 +195,8 @@ void
 TypeVisitor::Visit(Incr *n)
 {
 	// INCREMENT IDENT, check if IDENT type is integer or double.
-	int ty = n->name->symbol->type;
-	if( (ty != 1) && (ty != 2) )
+	int ty = n->name->symbol->type->type;
+	if( (ty != 2) && (ty != 3) )
 		symtab->errors->AddError("Operator \'++\' cannot be applied to operand of type \'" + types[ty],
 			 n->name->line,
 			 n->column);
@@ -204,8 +208,8 @@ void
 TypeVisitor::Visit(Decr *n)
 {
 	// DECREMENT IDENT, check if IDENT type is integer or double.
-	int ty = n->name->symbol->type;
-	if( (ty != 1) && (ty != 2) )
+	int ty = n->name->symbol->type->type;
+	if( (ty != 2) && (ty != 3) )
 		symtab->errors->AddError("Operator \'--\' cannot be applied to operand of type \'" + types[ty],
 			 n->name->line,
 			 n->column);
@@ -219,7 +223,7 @@ TypeVisitor::Visit(Not *n)
 	// ! expression, check if expression type is bool.
 	n->expr->accept(this);
 	int ty = n->expr->type;
-	if(ty != 3)
+	if(ty != 4)
 		symtab->errors->AddError("Operator \'!\' cannot be applied to operand of type \'" + types[ty],
 			n->expr->line,
 			n->column);
@@ -233,7 +237,7 @@ TypeVisitor::Visit(Minus *n)
 	// - expression, check if expression type is integer or double.
 	n->expr->accept(this);
 	int ty = n->expr->type;
-	if( (ty != 1) && (ty != 2) )
+	if( (ty != 2) && (ty != 3) )
 		symtab->errors->AddError("Operator \'-\' cannot be applied to operand of type \'" + types[ty],
 			 n->expr->line,
 			 n->column);
@@ -247,7 +251,7 @@ TypeVisitor::Visit(Plus *n)
 	// - expression, check if expression type is integer or double.
 	n->expr->accept(this);
 	int ty = n->expr->type;
-	if( (ty != 1) && (ty != 2) )
+	if( (ty != 2) && (ty != 3) )
 		symtab->errors->AddError("Operator \'+\' cannot be applied to operand of type \'" + types[ty],
 			 n->expr->line,
 			 n->column);
@@ -266,7 +270,7 @@ void
 TypeVisitor::Visit(IdentExpr *n)
 {
 	// IdentExpr type is the Ident type.
-	n->type = n->ident->symbol->type;
+	n->type = n->ident->symbol->type->type;
 }
 
 void
@@ -274,7 +278,7 @@ TypeVisitor::Visit(IdentArr *n)
 {
 	//X IDENT arrayIndex , check if arrayIndex the same array_level of IDENT array_level.
 
-	n->type = n->ident->symbol->type;
+	n->type = n->ident->symbol->type->type;
 }
 
 void
@@ -282,26 +286,26 @@ TypeVisitor::Visit(Assign *n)
 {
 	// IDENT = expression, check if IDENT type is same of expression type.
 	n->expr->accept(this);
-	int left = n->ident->symbol->type;// Getting the type from the symbol table
+	int left = n->ident->symbol->type->type;// Getting the type from the symbol table
 	int right = n->expr->type;
 	
 	bool mismatch = false;
 
 	switch(left)
 	{
-	case 1:
-		if(right != 1)
-			mismatch = true;
-		break;
 	case 2:
-		if( !((right == 1) || (right == 2)) )
-		{
+		if(right != 2)
 			mismatch = true;
-			n->expr->type = 2;			// note: why change type from int to double
-		}
 		break;
 	case 3:
-		if(right != 3)
+		if( !((right == 2) || (right == 3)) )
+		{
+			mismatch = true;
+			n->expr->type = 3;			// note: why change type from int to double
+		}
+		break;
+	case 4:
+		if(right != 4)
 			mismatch = true;
 		break;
 	default:
@@ -322,26 +326,26 @@ TypeVisitor::Visit(ArrAssign *n)
 	//								 , check if IDENT type is same of expression type.
 	n->arrayIndex->accept(this);
 	n->expr->accept(this);
-	int left = n->ident->symbol->type;// Getting the type from the symbol table
+	int left = n->ident->symbol->type->type;// Getting the type from the symbol table
 	int right = n->expr->type;
 	
 	bool mismatch = false;
 
 	switch(left)
 	{
-	case 1:
-		if(right != 1)
-			mismatch = true;
-		break;
 	case 2:
-		if( !((right == 1) || (right == 2)) )
-		{
+		if(right != 2)
 			mismatch = true;
-			n->expr->type = 2;			// note: why change type from int to double
-		}
 		break;
 	case 3:
-		if(right != 3)
+		if( !((right == 2) || (right == 3)) )
+		{
+			mismatch = true;
+			n->expr->type = 3;			// note: why change type from int to double
+		}
+		break;
+	case 4:
+		if(right != 4)
 			mismatch = true;
 		break;
 	default:
@@ -358,21 +362,28 @@ TypeVisitor::Visit(ArrAssign *n)
 void
 TypeVisitor::Visit(Invoke *n)
 {
-	// IDENT '(' expr_list_e ')' , done in symbol table.
+	cout << "Start_Invoke" << endl;
+	// IDENT '(' expr_list_e ')'.
 	n->exprList->accept(this);
-	this->symtab->IsDeclared(n->ident, 2, n->exprList);
+	bool tt = this->symtab->IsDeclared(n->ident, 2, n->exprList, def);
 
 	if( !((n->ident->name == "Write") || (n->ident->name == "Read")) )
-		n->type = n->ident->symbol->method->type->type;
-	n->type = n->ident->symbol->type;
+	{
+		if(tt)
+			n->type = n->ident->symbol->method->type->type;
+	}
+	n->type = 7;
+	cout << "End_Invoke" << endl;
 }
 
 void
 TypeVisitor::Visit(NewObject *n)
 {
-	// NEW IDENT '(' expr_list_e ')' , done in symbol table.
+	// NEW IDENT '(' expr_list_e ')'.
 
-	n->type = n->ident->symbol->type;
+	n->exprList->accept(this);
+	this->symtab->IsDeclared(n->ident, 3, n->exprList, def);
+	n->type = n->ident->symbol->type->type;
 }
 
 void
@@ -407,16 +418,16 @@ TypeVisitor::Visit(Equal *n)
 	
 	switch(left)
 	{
-	case 1:
-		if( !((right == 1) || (right == 2)) )
-			mismatch = true;
-		break;
 	case 2:
-		if( !((right == 1) || (right == 2)) )
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
 	case 3:
-		if(right != 3)
+		if( !((right == 2) || (right == 3)) )
+			mismatch = true;
+		break;
+	case 4:
+		if(right != 4)
 			mismatch = true;
 		break;
 	default:
@@ -427,7 +438,7 @@ TypeVisitor::Visit(Equal *n)
 		 n->left->line,
 		 n->column);
 
-	n->type = 3;
+	n->type = 4;
 }
 
 void
@@ -444,16 +455,16 @@ TypeVisitor::Visit(NotEq *n)
 	
 	switch(left)
 	{
-	case 1:
-		if( !((right == 1) || (right == 2)) )
-			mismatch = true;
-		break;
 	case 2:
-		if( !((right == 1) || (right == 2)) )
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
 	case 3:
-		if(right != 3)
+		if( !((right == 2) || (right == 3)) )
+			mismatch = true;
+		break;
+	case 4:
+		if(right != 4)
 			mismatch = true;
 		break;
 	default:
@@ -464,7 +475,7 @@ TypeVisitor::Visit(NotEq *n)
 		 n->left->line,
 		 n->column);
 
-	n->type = 3;
+	n->type = 4;
 }
 
 void
@@ -481,12 +492,12 @@ TypeVisitor::Visit(Smaller *n)
 	
 	switch(left)
 	{
-	case 1:
-		if( !((right == 1) || (right == 2)) )
+	case 2:
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
-	case 2:
-		if( !((right == 1) || (right == 2)) )
+	case 3:
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
 	default:
@@ -497,7 +508,7 @@ TypeVisitor::Visit(Smaller *n)
 		 n->left->line,
 		 n->column);
 
-	n->type = 3;
+	n->type = 4;
 }
 
 void
@@ -514,12 +525,12 @@ TypeVisitor::Visit(SmallerEq *n)
 	
 	switch(left)
 	{
-	case 1:
-		if( !((right == 1) || (right == 2)) )
+	case 2:
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
-	case 2:
-		if( !((right == 1) || (right == 2)) )
+	case 3:
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
 	default:
@@ -530,7 +541,7 @@ TypeVisitor::Visit(SmallerEq *n)
 		 n->left->line,
 		 n->column);
 
-	n->type = 3;
+	n->type = 4;
 }
 
 void
@@ -547,12 +558,12 @@ TypeVisitor::Visit(Larger *n)
 	
 	switch(left)
 	{
-	case 1:
-		if( !((right == 1) || (right == 2)) )
+	case 2:
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
-	case 2:
-		if( !((right == 1) || (right == 2)) )
+	case 3:
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
 	default:
@@ -563,7 +574,7 @@ TypeVisitor::Visit(Larger *n)
 		 n->left->line,
 		 n->column);
 
-	n->type = 3;
+	n->type = 4;
 }
 
 void
@@ -580,12 +591,12 @@ TypeVisitor::Visit(LargerEq *n)
 	
 	switch(left)
 	{
-	case 1:
-		if( !((right == 1) || (right == 2)) )
+	case 2:
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
-	case 2:
-		if( !((right == 1) || (right == 2)) )
+	case 3:
+		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
 		break;
 	default:
@@ -596,7 +607,7 @@ TypeVisitor::Visit(LargerEq *n)
 		 n->left->line,
 		 n->column);
 
-	n->type = 3;
+	n->type = 4;
 }
  
 void
@@ -612,25 +623,25 @@ TypeVisitor::Visit(Add *n)
 
 	switch(left)
 	{
-	case 1:
-		if(right == 1)
-			n->type = 1;
-		else if(right == 2)
+	case 2:
+		if(right == 2)
+			n->type = 2;
+		else if(right == 3)
 		{
-			n->left->type = 2;			// note: why change type from int to double
-			n->type = 2;			
+			n->left->type = 3;			// note: why change type from int to double
+			n->type = 3;			
 		}
 		else
 			mismatch = true;
 		break;
-	case 2:
-		if(right == 1)
+	case 3:
+		if(right == 2)
 		{
-			n->right->type = 2;			// note: why change type from int to double
-			n->type = 2;
+			n->right->type = 3;			// note: why change type from int to double
+			n->type = 3;
 		}
-		else if(right == 2)
-			n->type = 2;
+		else if(right == 3)
+			n->type = 3;
 		else
 			mismatch = true;
 		break;
@@ -642,7 +653,7 @@ TypeVisitor::Visit(Add *n)
 		symtab->errors->AddError("Operator \'+\' cannot be applied to operand of type \'" + types[left] + "\' and \'" + types[right] + "\'",
 		 n->line,
 		 n->column);
-		n->type = 0;
+		n->type = 1;
 	}
 }
 
@@ -660,25 +671,25 @@ TypeVisitor::Visit(Sub *n)
 
 	switch(left)
 	{
-	case 1:
-		if(right == 1)
-			n->type = 1;
-		else if(right == 2)
+	case 2:
+		if(right == 2)
+			n->type = 2;
+		else if(right == 3)
 		{
-			n->left->type = 2;			// note: why change type from int to double
-			n->type = 2;			
+			n->left->type = 3;			// note: why change type from int to double
+			n->type = 3;			
 		}
 		else
 			mismatch = true;
 		break;
-	case 2:
-		if(right == 1)
+	case 3:
+		if(right == 2)
 		{
-			n->right->type = 2;			// note: why change type from int to double
-			n->type = 2;
+			n->right->type = 3;			// note: why change type from int to double
+			n->type = 3;
 		}
-		else if(right == 2)
-			n->type = 2;
+		else if(right == 3)
+			n->type = 3;
 		else
 			mismatch = true;
 		break;
@@ -690,7 +701,7 @@ TypeVisitor::Visit(Sub *n)
 		symtab->errors->AddError("Operator \'-\' cannot be applied to operand of type \'" + types[left] + "\' and \'" + types[right] + "\'",
 		 n->line,
 		 n->column);
-		n->type = 0;
+		n->type = 1;
 	}
 }
 
@@ -708,25 +719,25 @@ TypeVisitor::Visit(Mult *n)
 
 	switch(left)
 	{
-	case 1:
-		if(right == 1)
-			n->type = 1;
-		else if(right == 2)
+	case 2:
+		if(right == 2)
+			n->type = 2;
+		else if(right == 3)
 		{
-			n->left->type = 2;			// note: why change type from int to double
-			n->type = 2;			
+			n->left->type = 3;			// note: why change type from int to double
+			n->type = 3;			
 		}
 		else
 			mismatch = true;
 		break;
-	case 2:
-		if(right == 1)
+	case 3:
+		if(right == 2)
 		{
-			n->right->type = 2;			// note: why change type from int to double
-			n->type = 2;
+			n->right->type = 3;			// note: why change type from int to double
+			n->type = 3;
 		}
-		else if(right == 2)
-			n->type = 2;
+		else if(right == 3)
+			n->type = 3;
 		else
 			mismatch = true;
 		break;
@@ -738,7 +749,7 @@ TypeVisitor::Visit(Mult *n)
 		symtab->errors->AddError("Operator \'*\' cannot be applied to operand of type \'" + types[left] + "\' and \'" + types[right] + "\'",
 		 n->line,
 		 n->column);
-		n->type = 0;
+		n->type = 1;
 	}
 }
 
@@ -756,25 +767,25 @@ TypeVisitor::Visit(Div *n)
 
 	switch(left)
 	{
-	case 1:
-		if(right == 1)
-			n->type = 2;
-		else if(right == 2)
+	case 2:
+		if(right == 2)
+			n->type = 3;
+		else if(right == 3)
 		{
-			n->left->type = 2;			// note: why change type from int to double
-			n->type = 2;			
+			n->left->type = 3;			// note: why change type from int to double
+			n->type = 3;			
 		}
 		else
 			mismatch = true;
 		break;
-	case 2:
-		if(right == 1)
+	case 3:
+		if(right == 2)
 		{
-			n->right->type = 2;			// note: why change type from int to double
-			n->type = 2;
+			n->right->type = 3;			// note: why change type from int to double
+			n->type = 3;
 		}
-		else if(right == 2)
-			n->type = 2;
+		else if(right == 3)
+			n->type = 3;
 		else
 			mismatch = true;
 		break;
@@ -786,7 +797,7 @@ TypeVisitor::Visit(Div *n)
 		symtab->errors->AddError("Operator \'/\' cannot be applied to operand of type \'" + types[left] + "\' and \'" + types[right] + "\'",
 		 n->line,
 		 n->column);
-		n->type = 0;
+		n->type = 1;
 	}
 }
 
@@ -800,14 +811,14 @@ TypeVisitor::Visit(Mod *n)
 	int left = n->left->type;
 	int right = n->right->type;
 
-	if( !((left == 1) && (right == 1)) )
+	if( !((left == 2) && (right == 3)) )
 	{
 		symtab->errors->AddError("Operator \'%\' cannot be applied to operand of type \'" + types[left] + "\' and \'" + types[right] + "\'",
 		 n->line,
 		 n->column);
-		n->type = 0;
+		n->type = 1;
 	}
-	n->type = 1;
+	n->type = 2;
 }
 
 void
@@ -820,12 +831,12 @@ TypeVisitor::Visit(And *n)
 	int left = n->left->type;
 	int right = n->right->type;
 
-	if( (left != 3) || (right != 3) )
+	if( (left != 4) || (right != 4) )
 		symtab->errors->AddError("Operator \'&&\' cannot be applied to operands of type \'" + types[left] + "\' and \'" + types[right] + "\'",
 		 n->left->line,
 		 n->column);
 
-	n->type = 3;
+	n->type = 4;
 }
 
 void
@@ -838,12 +849,12 @@ TypeVisitor::Visit(Or *n)
 	int left = n->left->type;
 	int right = n->right->type;
 
-	if( (left != 3) || (right != 3) )
+	if( (left != 4) || (right != 4) )
 		symtab->errors->AddError("Operator \'||\' cannot be applied to operands of type \'" + types[left] + "\' and \'" + types[right] + "\'",
 		 n->left->line,
 		 n->column);
 
-	n->type = 3;
+	n->type = 4;
 }
 
 void
@@ -851,15 +862,15 @@ TypeVisitor::Visit(Is *n)
 {
 	//X expression IS type, check if expression and type have the same type and return bool.
 	
-	n->type = 3;
+	n->type = 4;
 }
 
 void
 TypeVisitor::Visit(Cast *n)
 {
 	// ( basictype ) expression, the new type is basictype type.
-	/*if( ((n->typ->type == 1) || (n->typ->type == 2)) && 
-		((n->expr->type == 1) || (n->expr->type == 2)) )
+	/*if( ((n->typ->type == 2) || (n->typ->type == 3)) && 
+		((n->expr->type == 2) || (n->expr->type == 3)) )
 		n->type = n->typ->type;
 	else
 	{
@@ -867,43 +878,43 @@ TypeVisitor::Visit(Cast *n)
 		 n->expr->line,
 		 n->column);
 	}
-	n->type = 0;*/
+	n->type = 1;*/
 }
 
 void
 TypeVisitor::Visit(Integer *n)
 {
-	n->type = 1;
+	n->type = 2;
 }
 
 void
 TypeVisitor::Visit(Real *n)
 {
-	n->type = 2;
+	n->type = 3;
 }
 
 void
 TypeVisitor::Visit(True *n)
 {
-	n->type = 3;
+	n->type = 4;
 }
 
 void
 TypeVisitor::Visit(False *n)
 {
-	n->type = 3;
+	n->type = 4;
 }
 
 void
 TypeVisitor::Visit(This *n)
 {
-	n->type = -1;
+	n->type = 0;
 }
 
 void
 TypeVisitor::Visit(Null *n)
 {
-	n->type = 0;
+	n->type = 1;
 }
 
 
@@ -919,7 +930,7 @@ TypeVisitor::Visit(ArrayIndex_1 *n)
 	n->expr1->accept(this);
 	int index_1 = n->expr1->type;
 
-	if(index_1 != 1)
+	if(index_1 != 2)
 		symtab->errors->AddError("Array index cannot be \'" + types[index_1],
 			 n->expr1->line,
 			 n->column);
@@ -934,12 +945,12 @@ TypeVisitor::Visit(ArrayIndex_2 *n)
 	int index_1 = n->expr1->type;
 	int index_2 = n->expr2->type;
 
-	if(index_1 != 1)
+	if(index_1 != 2)
 		symtab->errors->AddError("Array index cannot be \'" + types[index_1],
 			 n->expr1->line,
 			 n->column);
 
-	if(index_2 != 1)
+	if(index_2 != 2)
 		symtab->errors->AddError("Array index cannot be \'" + types[index_2],
 			 n->expr2->line,
 			 n->column);
@@ -956,17 +967,17 @@ TypeVisitor::Visit(ArrayIndex_3 *n)
 	int index_2 = n->expr2->type;
 	int index_3 = n->expr3->type;
 
-	if(index_1 != 1)
+	if(index_1 != 2)
 		symtab->errors->AddError("Array index cannot be \'" + types[index_1],
 			 n->expr1->line,
 			 n->column);
 
-	if(index_2 != 1)
+	if(index_2 != 2)
 		symtab->errors->AddError("Array index cannot be \'" + types[index_2],
 			 n->expr2->line,
 			 n->column);
 
-	if(index_3 != 1)
+	if(index_3 != 2)
 		symtab->errors->AddError("Array index cannot be \'" + types[index_3],
 			 n->expr3->line,
 			 n->column);
@@ -997,7 +1008,7 @@ TypeVisitor::Visit(If *n)
 {
 	n->expr->accept(this);
 	int ty = n->expr->type;
-	if(ty != 3)
+	if(ty != 4)
 		symtab->errors->AddError("Type mismatch between \'" + types[ty] + "\' and \'bool\'",
 		 n->expr->line,
 		 n->column);
@@ -1010,7 +1021,7 @@ TypeVisitor::Visit(IfElse *n)
 {
 	n->expr->accept(this);
 	int ty = n->expr->type;
-	if(ty != 3)
+	if(ty != 4)
 		symtab->errors->AddError("Type mismatch between \'" + types[ty] + "\' and \'bool\'",
 		 n->expr->line,
 		 n->column);
@@ -1024,7 +1035,7 @@ TypeVisitor::Visit(While *n)
 {
 	n->expr->accept(this);
 	int ty = n->expr->type;
-	if(ty != 3)
+	if(ty != 4)
 		symtab->errors->AddError("Type mismatch between \'" + types[ty] + "\' and \'bool\'",
 		 n->expr->line,
 		 n->column);
@@ -1047,15 +1058,15 @@ TypeVisitor::Visit(For *n)
 	int cond = n->exprCond->type;
 	int count = n->exprCount->type;
 	
-	if(cond != 3)
+	if(cond != 4)
 		symtab->errors->AddError("Type mismatch between \'" + types[cond] + "\' and \'bool\'",
 		 n->exprCond->line,
 		 n->column);
-	if(count != 1)
+	if(count != 2)
 		symtab->errors->AddError("Type mismatch between \'" + types[count] + "\' and \'int\'",
 		 n->exprCount->line,
 		 n->column);
-	if(count != 2)
+	if(count != 3)
 		symtab->errors->AddError("Type mismatch between \'" + types[count] + "\' and \'double\'",
 		 n->exprCount->line,
 		 n->column);*/
@@ -1098,20 +1109,20 @@ TypeVisitor::Visit(Return *n)
 
 	switch(left)
 	{
-	case 1:
-		if(right != 1)
+	case 2:
+		if(right != 2)
 			mismatch = true;
 		break;
-	case 2:
-		if(!((right == 1)||(right == 2)))
+	case 3:
+		if(!((right == 2)||(right == 3)))
 		{
 			mismatch = true;
-			n->expr->type = 2;
+			n->expr->type = 3;
 		}
 
 		break;
-	case 3:
-		if(right != 3)
+	case 4:
+		if(right != 4)
 			mismatch = true;
 		break;
 	default:

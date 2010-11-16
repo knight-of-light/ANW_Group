@@ -1,15 +1,20 @@
-class A : C
+class A : C // error
 {
-    //A()
-    //{
-    //    test();
-    //}
+    A()
+    {
+        test();
+        nnnnn(); // error
+    }
 }
 class B : A
 {
-    //void test()
-    //{
-    //}
+    void test(C y)
+    {
+        nana(); // error
+        x++; // OK
+    }
+    A x;
+    C t;
 }
 class C : B
 {
@@ -17,8 +22,10 @@ class C : B
 
 class Test
 {
+    void nana() { /*x++;*/ }
     void main()
     {
+        nana();
         Read();
         int i = 5;
         //double y = (double)i;

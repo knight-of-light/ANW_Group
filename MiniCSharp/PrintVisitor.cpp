@@ -9,13 +9,14 @@ PrintVisitor::PrintVisitor(Root *file, bool debug)
 		this->acctype[2] = " \\static\\";
 		this->acctype[3] = " \\private static\\";
 
-		this->types[0] = " \\NULL\\";
-		this->types[1] = " \\int\\";
-		this->types[2] = " \\double\\";
-		this->types[3] = " \\bool\\";
-		this->types[4] = " \\object\\";
-		this->types[5] = " \\Ident\\";
-		this->types[6] = " \\void\\";
+		this->types[0] = " \\no type\\";
+		this->types[1] = " \\NULL\\";
+		this->types[2] = " \\int\\";
+		this->types[3] = " \\double\\";
+		this->types[4] = " \\bool\\";
+		this->types[5] = " \\object\\";
+		this->types[6] = " \\Ident\\";
+		this->types[7] = " \\void\\";
 
 		this->arr_level[0] = "";
 		this->arr_level[1] = "[]";

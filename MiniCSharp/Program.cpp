@@ -39,6 +39,9 @@ int main(int argsc, char **argsv)
     yyparse();
 	cout << "Syntactical analysis was done successfully! " << endl;
 	
+	for(int i=0; i<symtab->classType->size(); i++)
+		cout << symtab->classType->at(i) << endl;
+
 	PrintVisitor *pv = new PrintVisitor(file, pvdebug);
 
 	def->CheckAll(symtab);
@@ -48,7 +51,7 @@ int main(int argsc, char **argsv)
 	}
 	else
 	{
-		TypeVisitor *tv = new TypeVisitor(file, symtab, tvdebug);
+		TypeVisitor *tv = new TypeVisitor(file, symtab, def, tvdebug);
 		if(errors->messages->size() != 0){
 			errors->Print();
 		}

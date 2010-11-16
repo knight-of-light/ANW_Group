@@ -165,7 +165,7 @@ public:
 private:
 	SymTab *symtab;
 	string acctype [4];
-	string types [5];
+	string types [8];
 	string arr_level [4];
 	string Id;
 	int dashes;
@@ -185,7 +185,7 @@ private:
 class TypeVisitor : public Visitor
 {
 public:
-	TypeVisitor(Root *file, SymTab *st, bool debug);
+	TypeVisitor(Root *file, SymTab *st, Deffered *def, bool debug);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);
@@ -258,7 +258,8 @@ public:
 	virtual void Visit(Return *);
 	virtual void Visit(Variables_e *);
 	SymTab *symtab;
-	string types [7];
+	Deffered *def;
+	string types [8];
 	Function *mainFunc;
 
 };

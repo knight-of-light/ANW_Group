@@ -18,27 +18,36 @@ using std::string;
 class Sym
 {
 public:
-	//1: class, 2: func, 3: constructor, 4: global Global, 5: Local Global
-	int kind;
 	string name;
-	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: Object, 5: Ident
-	int type;
-	string classType;
-	// 0: no array, 1: [], 2: [,], 3: [,,]
-	int arr_level;
-	// to spicific number in memory
+
+	// 1: class, 2: func, 3: constructor, 4: global Global, 5: Local Global.
+	int kind;
+
+	// 0: no accessModef, 1: public, 2: private, 3: static, 4: private static.
+	int acctype;
+	
+	//// 0: no type, 1: Null, 2: int , 3: double , 4: boolean, 5: Object, 6: Ident, 7: void.
+	//int type;
+	//
+	//// 0: no array, 1: [], 2: [,], 3: [,,].
+	//int arr_level;
+
+	// to spicific number in memory use in CodeVisitor.
 	int location;
 
-	vector<int> *argTypes;
+	Type *type;
 	Class *clas;
+	//// if type is 6 (Ident)
+	//string classType;
+
 	Constructor *constructor;
 	Function *method;
+	Args *args;
 
-	Sym(string n, int kind, int type, int arr_level); // Ident
-	Sym(string n, int kind, string type, int arr_level); // Ident type is class
-	Sym(string n, int kind, int arr_level, Class *clas); // Class Ident
-	Sym(string n, int kind, Args *ps, Constructor *constr); // Constructor Ident
-	Sym(string n, int kind, int returnType, int arr_level, Args *ps, Function *meth); // Function Ident
+	Sym(string n, int kind, int acctype, Type *type); // Ident
+	Sym(string n, int kind, Class *clas); // Class Ident
+	Sym(string n, int kind, int acctype, Args *args, Constructor *constr); // Constructor Ident
+	Sym(string n, int kind, int acctype, Type *type, Args *args, Function *meth); // Function Ident
 };
 
 //*******      HashTab		*********
@@ -60,25 +69,26 @@ public:
 class SymTab
 {
 private:
-	string types[7];
+	string acctype[5];
+	string types[8];
 	string kinds[7];
-	vector<string> *classType;
 public:
+	vector<string> *classType;
 	Scope *current;
 	Errors *errors;
 
 	SymTab(Errors *errors);
 	Sym *Lookup(string name);
 
-	bool IsDeclared(Ident *id); // local and global Ident.
-	bool IsDeclared(Ident *id, int kind);
-	bool IsDeclared(Ident *id, int kind, ExprList *el);
+	bool IsDeclared(Ident *id, Deffered *def); // local and global Ident.
+	bool IsDeclared(Ident *id, int kind); // Class
+	bool IsDeclared(Ident *id, int kind, ExprList *el, Deffered *def);
 	bool IsDeclared(Ident *id, int kind, Deffered *def);
 
-	bool AddSym(Ident *id, int kind, int type, int arr_level);
-	bool AddSym(Ident *id, int kind, int arr_level, Class *clas);
-	bool AddSym(Ident *id, int kind, Args *ps, Constructor *constr);
-	bool AddSym(Ident *id, int kind, int returnType, int arr_level, Args *ps, Function *meth);	
+	bool AddSym(Ident *id, int kind, int acctype, Type *type);
+	bool AddSym(Ident *id, int kind, Class *clas);
+	bool AddSym(Ident *id, int kind, int acctype, Args *args, Constructor *constr);
+	bool AddSym(Ident *id, int kind, int acctype, Type *type, Args *args, Function *meth);	
 
 	void AddNewScope();
 	void OutScope();
@@ -93,12 +103,14 @@ public:
 class Deffered
 {
 public:
+	string types[7];
 	string kindArr[7];
 	vector<Ident *> *ids;
 	vector<int> *kinds;
+	vector<ExprList *> *exprLists;
 	//vector<Sym *> *syms;
 	Deffered();
-	void AddIdent(Ident *, int);
+	void AddIdent(Ident *, int, ExprList *);
 	void CheckAll(SymTab *symtab);
 };
 
