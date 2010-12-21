@@ -11,6 +11,7 @@
 	extern int yyerror(const char *);
 	extern int lin;
 	extern int col;
+	bool IsError = false;
 	
 	extern SymTab *symtab;
 	Root *file;
@@ -82,7 +83,7 @@
 %token IF ELSE WHILE FOR
 %token FALSE TRUE
 %token NEW
-%token THIS NUL PRIVATE STATIC
+%token THIS NUL PRIVATE PUBLIC STATIC
 %token VOID RETURN
 
 %nonassoc IF_PREC
@@ -251,15 +252,23 @@ variable:		  IDENT
 
 accessmodif:	  /* empty */
 					{
+						$$ = new AccessModif(2, lin, col);
+					}
+				| PUBLIC
+					{
 						$$ = new AccessModif(1, lin, col);
 					}
 				| PRIVATE
 					{
 						$$ = new AccessModif(2, lin, col);
 					}
-				| STATIC
+				| PUBLIC STATIC
 					{
 						$$ = new AccessModif(3, lin, col);
+					}
+				| STATIC
+					{
+						$$ = new AccessModif(4, lin, col);
 					}
 				| PRIVATE STATIC
 					{
@@ -388,12 +397,13 @@ expression:		  INCREMENT IDENT
 				| IDENT '(' expr_list_e ')'
 					{
 						$$ = new Invoke($1, $3, lin, col);
-						//symtab->IsDeclared($1, 2, $3, def);
+						symtab->AddInvokeScopeNum();
+						//symtab->IsDeclared($1, 2, $3, def); // Used in Type Checking.
 					}
 				| NEW IDENT '(' expr_list_e ')'
 					{
 						$$ = new NewObject($2, $4, lin, col);
-						//symtab->IsDeclared($2, 3, $4, def);
+						//symtab->IsDeclared($2, 3, $4, def); // Used in Type Checking.
 					}
 				| NEW noarraytype arrayindex
 					{
@@ -590,7 +600,7 @@ variables_e:		  /* Empty */
 					{
 						$$ = new Variables_e($1, $2, lin, col);
 						for(int i = 0; i < $2->variables->size(); i++)
-							symtab->AddSym($2->variables->at(i)->name, 5, 0, $1);
+							symtab->AddSym($2->variables->at(i)->name, 6, 0, $1);
 					}
 				| variables
 					{
@@ -613,6 +623,7 @@ expr_e:			  /* Empty */
 %%
 int yyerror(const char *s)
 {
+	IsError = true;
 	printf("parser error at line %d and column %d \n", lin, col);
-	return 0;
+	return 1;
 }

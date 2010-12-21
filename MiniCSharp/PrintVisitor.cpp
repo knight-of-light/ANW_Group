@@ -1,34 +1,32 @@
 #include "visitors.h"
 
-PrintVisitor::PrintVisitor(Root *file, bool debug)
+PrintVisitor::PrintVisitor(Root *file)
 {
-	if(debug)
-	{
-		this->acctype[0] = " \\public\\";
-		this->acctype[1] = " \\private\\";
-		this->acctype[2] = " \\static\\";
-		this->acctype[3] = " \\private static\\";
+	this->acctype[0] = " \\no acctype\\";
+	this->acctype[1] = " \\public\\";
+	this->acctype[2] = " \\private\\";
+	this->acctype[3] = " \\public static\\";
+	this->acctype[4] = " \\static (private static)\\";
 
-		this->types[0] = " \\no type\\";
-		this->types[1] = " \\NULL\\";
-		this->types[2] = " \\int\\";
-		this->types[3] = " \\double\\";
-		this->types[4] = " \\bool\\";
-		this->types[5] = " \\object\\";
-		this->types[6] = " \\Ident\\";
-		this->types[7] = " \\void\\";
+	this->types[0] = " \\no type\\";
+	this->types[1] = " \\NULL\\";
+	this->types[2] = " \\int\\";
+	this->types[3] = " \\double\\";
+	this->types[4] = " \\bool\\";
+	this->types[5] = " \\object\\";
+	this->types[6] = " \\Ident\\";
+	this->types[7] = " \\void\\";
 
-		this->arr_level[0] = "";
-		this->arr_level[1] = "[]";
-		this->arr_level[2] = "[,]";
-		this->arr_level[3] = "[,,]";
+	this->arr_level[0] = "";
+	this->arr_level[1] = "[]";
+	this->arr_level[2] = "[,]";
+	this->arr_level[3] = "[,,]";
 
-		this->count = 0;
-		this->dashes = 0;
-		this->spaces = 0;
-		file->accept(this);
-		cout << endl;
-	}
+	this->count = 0;
+	this->dashes = 0;
+	this->spaces = 0;
+	file->accept(this);
+	cout << endl;
 }
 
 string
@@ -271,6 +269,7 @@ PrintVisitor::Visit(Variable  *n)
 		PrintBars(count);
 		n->expr->accept(this);
 	}
+	count--;
 }
 
 void

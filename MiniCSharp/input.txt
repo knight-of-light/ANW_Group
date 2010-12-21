@@ -1,38 +1,63 @@
-class A : C // error
+class A //: C // error, Fixed
 {
     A()
     {
-        test();
-        nnnnn(); // error
+        //test(z); // error, Fixed
+        //nnnnn(); // error, Fixed
+        //x++; // error, Fixed
     }
+    int jk;
+    void nana() { }
+    //int z;
 }
 class B : A
 {
-    void test(C y)
+	double z; // error redefintion , change lookup function to fix this problem after add stracture to save class fathers and sons
+    public void test(A zz)
     {
-        nana(); // error
-        x++; // OK
+        z = 2;
+        //nana(); // error, Fixed
+        //x++; // error, Fixed
+
+        //jk++; // error, Fixed
+
+        C pp;
+        //pp.jk; // error, Helf Fixed
+        //t.nana(); // error, Helf Fixed
     }
-    A x;
-    C t;
+    public A x;
+    Test t;
+    public int jk;
 }
 class C : B
 {
+    C()
+    {
+		//C n = new C();
+		/*t; /*error, Fixed*/
+		test(x); // error, Fixed
+        jk++;
+	}
+    //B() {} // error, Fixed
+    //void C() { } // error, Fixed
+    //C(int x, int x) { } // error, Fixed
 }
 
 class Test
 {
-    void nana() { /*x++;*/ }
+    void nana1() { /*x++;*/ }
     void main()
     {
-        nana();
+        return ;
+        A x;
+        nana1();
         Read();
         int i = 5;
-        //double y = (double)i;
-        //(double)i;
-        //int t = 2;
-        //int v = i * t;
-        //Write(v);
+        /*double y = (double)i;
+        (double)i;
+        int t = 2;
+        int v = i * t;
+        Write(v); */
         Write(4);
     }
 }

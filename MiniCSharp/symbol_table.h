@@ -18,36 +18,28 @@ using std::string;
 class Sym
 {
 public:
-	string name;
+	string name; // Ident name.
 
-	// 1: class, 2: func, 3: constructor, 4: global Global, 5: Local Global.
-	int kind;
+	// 1: class, 2: func, 3: constructor, 4: Global, 5: Local Global.
+	int kind; // Ident kind.
 
 	// 0: no accessModef, 1: public, 2: private, 3: static, 4: private static.
-	int acctype;
-	
-	//// 0: no type, 1: Null, 2: int , 3: double , 4: boolean, 5: Object, 6: Ident, 7: void.
-	//int type;
-	//
-	//// 0: no array, 1: [], 2: [,], 3: [,,].
-	//int arr_level;
+	int acctype; // if Global, Constructor or Function.
 
-	// to spicific number in memory use in CodeVisitor.
-	int location;
+	int location; // Ident location where is stored in memory, used in CodeVisitor.
+	Scope *scope; // scope where the Ident Declared (not where it used).
 
-	Type *type;
-	Class *clas;
-	//// if type is 6 (Ident)
-	//string classType;
+	Type *type; // Type of Ident, contain type, array level and Ident if its type is class.
 
-	Constructor *constructor;
-	Function *method;
-	Args *args;
+	Class *clas; // If the Ident is a Class name, pointer to its class.
+	Constructor *constructor; // If the Ident is a Constructor name, pointer to its Constructor.
+	Function *method; // If the Ident is a Function name, pointer to its Function.
+	Args *args; // If the Ident is a Constructor or a Function, pointer to its Arguments.
 
-	Sym(string n, int kind, int acctype, Type *type); // Ident
-	Sym(string n, int kind, Class *clas); // Class Ident
-	Sym(string n, int kind, int acctype, Args *args, Constructor *constr); // Constructor Ident
-	Sym(string n, int kind, int acctype, Type *type, Args *args, Function *meth); // Function Ident
+	Sym(string n, int kind, int acctype, Scope *scope, Type *type); // If the Ident is not Class, Constructor and Function use this Constructor.
+	Sym(string n, int kind, Scope *scope, Class *clas); // If the Ident is a Class name use this Constructor.
+	Sym(string n, int kind, int acctype, Scope *scope, Args *args, Constructor *constr); // If the Ident is a Constructor name use this Constructor.
+	Sym(string n, int kind, int acctype, Scope *scope, Type *type, Args *args, Function *meth); // If the Ident is a Function Ident use this Constructor.
 };
 
 //*******      HashTab		*********
@@ -60,9 +52,10 @@ public:
 	Scope *father;
 	vector<Scope *> *children;
 	HashTab	*hashTab;
+	int number; // Number of Scope.
 
 	Scope();
-	void AddChild();	
+	void AddChild();
 };
 
 //*******   Symbol Table	*********
@@ -72,28 +65,42 @@ private:
 	string acctype[5];
 	string types[8];
 	string kinds[7];
+	int scope_counter; // counter used to add number to each scope in symbol table.
 public:
-	vector<string> *classType;
-	Scope *current;
+	vector<string> *classType; //?
+
+	Scope *current; // the current scope.
 	Errors *errors;
 
-	SymTab(Errors *errors);
-	Sym *Lookup(string name);
+	vector<Class *> *classes;
+	vector<Scope *> *scopes;
 
-	bool IsDeclared(Ident *id, Deffered *def); // local and global Ident.
-	bool IsDeclared(Ident *id, int kind); // Class
-	bool IsDeclared(Ident *id, int kind, ExprList *el, Deffered *def);
-	bool IsDeclared(Ident *id, int kind, Deffered *def);
+	vector<int> *Invoke_scope_num;	// number of scope of Ident of Invoke.
 
-	bool AddSym(Ident *id, int kind, int acctype, Type *type);
-	bool AddSym(Ident *id, int kind, Class *clas);
-	bool AddSym(Ident *id, int kind, int acctype, Args *args, Constructor *constr);
-	bool AddSym(Ident *id, int kind, int acctype, Type *type, Args *args, Function *meth);	
+	SymTab(Errors *errors); // The Constructor.
+	Sym *Lookup(string key);
+	
+	bool AddSym(Ident *id, int kind, int acctype, Type *type); // Add Symbol to Ident and add it to hashTable, used for Ident.
+	bool AddSym(Ident *id, int kind, Class *clas); // Add Symbol to Ident and add it to hashTable, used for Ident of Class.
+	bool AddSym(Ident *id, int kind, int acctype, Args *args, Constructor *constr); // Add Symbol to Ident and add it to hashTable, used for Ident of Constructor.
+	bool AddSym(Ident *id, int kind, int acctype, Type *type, Args *args, Function *meth); // Add Symbol to Ident and add it to hashTable, used for Ident of Function.
+
+	bool IsDeclared(Ident *id, Deffered *def); // Check if the Ident is Declared, used for local and global Ident.
+	bool IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope); // Check if the Ident is Declared, used for Invoke and NewObject Ident.
+	bool IsDeclared(Ident *id, int kind, Deffered *def); // Check if the Idnet is Declared, used for ClassInhert and IdentType.
 
 	void AddNewScope();
 	void OutScope();
+	void AddInvokeScopeNum(); // Add Invoke scope number to vector, used when used Invoke Ident.
+	
+	void FillingRelations(Root *file);
 
-	//void AddVars(Variables *v, Type *et);
+	int FatherScopeNum(int NumOfSubScope); // input sub scope number, return the number of father of this scope.
+	bool CheckScopes(int num_of_scope_of_declaration, int num_of_scope_of_used); // Check if the two number are from the same class scope.
+	
+	Scope* IntToScope(int num); // From Father scope number to Father scope.
+	Scope* ClassToScope(Class *clas); // From Class to Scope.
+	Class* ScopeToClass(Scope *scope); // From Scope to Class.
 };
 
 //***********************************************************************
@@ -105,12 +112,14 @@ class Deffered
 public:
 	string types[7];
 	string kindArr[7];
-	vector<Ident *> *ids;
-	vector<int> *kinds;
-	vector<ExprList *> *exprLists;
-	//vector<Sym *> *syms;
+	vector<Ident *> *ids; // Pointer to Ident.
+	vector<int> *kinds; // Add kind of Idnet.
+	vector<int> *scope_num; // Add number of scope where the Ident used.
+
 	Deffered();
-	void AddIdent(Ident *, int, ExprList *);
+	void AddIdent(Ident *id, int kind, int scope_num);
+	void CheckClass(SymTab *symtab);
+	void CheckCircular(SymTab *symtab);
 	void CheckAll(SymTab *symtab);
 };
 

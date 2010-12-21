@@ -25,6 +25,7 @@ Root::AddClass(Class *cd)
 Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 {
 	this->name = n;
+	this->basic = NULL;
 	this->members = ms;
 
 	this->Parents = new vector<Ident *>;
@@ -34,18 +35,39 @@ Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 	ms->father = this;
 }
 
-//void
-//Class::AddParent(Ident *pa)
-//{
-//	this->Parents->push_back(pa);
-//}
+bool
+Class::AddParent(Ident *parent_ID)
+{
+	/* Add Parent Ident to this class Parents and return true, if:
+	** Parent class Ident doesn't added to this class Parents all ready.
+	** or this class Parents is empty.
+	*/
+	for(int i=0; i<this->Parents->size(); i++)
+		if(this->Parents->at(i)->name == parent_ID->name)
+			return false;
+	this->Parents->push_back(parent_ID);
+	return true;
+}
+
+bool
+Class::AddChild(Ident *child_ID)
+{
+	/* Add Child Ident to this class Childrens and return true, if:
+	** Child class Ident doesn't added to this class Childrens all ready.
+	** or this class Childrens is empty.
+	*/
+	for(int i=0; i<this->Childrens->size(); i++)
+		if(this->Childrens->at(i)->name == child_ID->name)
+			return false;
+	this->Childrens->push_back(child_ID);
+	return true;
+}
 
 ClassInher::ClassInher(Ident *n, Ident *p, Members *ms, int l, int c) : Class(n,ms,l,c)
 {
 	// CLASS IDENT ':' IDENT '{' Members '}'
 	this->basic = p;
 	p->father = this;
-	//this->Parents->push_back(p);
 }
 
 //*******     Members		*********
@@ -241,8 +263,8 @@ Ident::Ident(string n, int l, int c) : Node(l, c)
 
 Expr::Expr(int l, int c) : Node(l, c)
 {
-	this->type = 0;
-	this->TYPE = new Type(l,c);
+	//this->type = 0;
+	this->type = new Type(l,c);
 }
 
 //*******       Incr		*********
@@ -531,30 +553,26 @@ Cast::Cast(Type *t, Expr *e, int l, int c) : Expr(l,c)
 Integer::Integer(int v, int l, int c) : Expr(l,c)
 {
 	this->value = v;
-	this->type = 2;
-	this->TYPE->type = 2;
+	this->type->type = 2;
 }
 
 //*******       Real		*********
 Real::Real(double v, int l, int c) : Expr(l,c)
 {
 	this->value = v;
-	this->type = 3;
-	this->TYPE->type = 3;
+	this->type->type = 3;
 }
 
 //*******       True		*********
 True::True(int l, int c) : Expr(l,c)
 {
-	this->type = 4;
-	this->TYPE->type = 4;
+	this->type->type = 4;
 }
 
 //*******      False		*********
 False::False(int l, int c) : Expr(l,c)
 {
-	this->type = 4;
-	this->TYPE->type = 4;
+	this->type->type = 4;
 }
 
 //*******       This		*********
@@ -565,8 +583,7 @@ This::This(int l, int c) : Expr(l,c)
 //*******       Null		*********
 Null::Null(int l, int c) : Expr(l,c)
 {
-	this->type = 1;
-	this->TYPE->type = 1;
+	this->type->type = 1;
 }
 
 //*******     ArrayIndex	*********

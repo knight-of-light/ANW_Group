@@ -89,7 +89,7 @@ public:
 class PrintVisitor : public Visitor
 {
 public:
-	PrintVisitor(Root *file, bool debug);
+	PrintVisitor(Root *file);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);
@@ -164,7 +164,7 @@ public:
 
 private:
 	SymTab *symtab;
-	string acctype [4];
+	string acctype [5];
 	string types [8];
 	string arr_level [4];
 	string Id;
@@ -185,7 +185,7 @@ private:
 class TypeVisitor : public Visitor
 {
 public:
-	TypeVisitor(Root *file, SymTab *st, Deffered *def, bool debug);
+	TypeVisitor(Root *file, SymTab *st, Deffered *def);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);
@@ -261,7 +261,9 @@ public:
 	Deffered *def;
 	string types [8];
 	Function *mainFunc;
-
+	int InvokeNum;
+	bool NeedReturn; // use this ident to know if we allowed to use return or not, (true: we need, false: we don't need).
+	int NumReturns;
 };
 
 //***********************************************************************
@@ -270,7 +272,7 @@ public:
 class CodeVisitor : public Visitor
 {
 public:
-	CodeVisitor(Root *, SymTab *st, Function *mainFunc, bool debug);
+	CodeVisitor(Root *, SymTab *st, Function *mainFunc);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);

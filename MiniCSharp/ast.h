@@ -131,23 +131,22 @@ class Class : public Node		// Class without Inheritance
 {
 public:
 	Ident	*name;
+	Ident	*basic;
 	Members	*members;
 
 	vector<Ident *>	*Parents;
 	vector<Ident *>	*Childrens;
 
 	Class(Ident *, Members *, int, int);
-	//void AddParent(Ident *);
+	bool AddParent(Ident *parent_ID);
+	bool AddChild(Ident *child_ID);
 	virtual void accept(Visitor *);
 };
 
 class ClassInher : public Class	// Class with Inheritance
 {
 public:
-	Ident	*basic;
-
 	ClassInher(Ident *, Ident *, Members *, int, int);
-	//void AddParent(Ident *);
 	virtual void accept(Visitor *);
 };
 
@@ -258,7 +257,7 @@ public:
 class AccessModif : public Node
 {
 public:
-	// 0: no AccessModif, 1: public, 2: private, 3: static(public static), 4: private static
+	// 0: no AccessModif, 1: public, 2: private, 3: public static, 4: static (private static)
 	int acctype;
 
 	AccessModif(int, int, int);
@@ -317,8 +316,8 @@ class Expr : public Node
 {
 public:
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
-	int type;
-	Type *TYPE;
+	// int type;
+	Type *type;
 	Expr(int, int);
 	virtual void accept(Visitor *);
 };
