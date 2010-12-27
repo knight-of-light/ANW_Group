@@ -119,7 +119,7 @@ int main(int argsc, char **argsv)
 		///
 
 		// Lexical & Syntactical Analysis
-		yydebug = parse_debug;// Allow parser Debug (0: false, 1: true)
+		yydebug = 0;//parse_debug;// Allow parser Debug (0: false, 1: true)
 		yyparse();
 		if(!IsError)
 			cout << "Syntactical analysis was done successfully! " << endl;
@@ -131,27 +131,29 @@ int main(int argsc, char **argsv)
 				PrintVisitor *pv = new PrintVisitor(file);
 
 			def->CheckClass(symtab);
-			if(errors->messages->size() == 0)
-				symtab->FillingRelations(file);
-
-			def->CheckCircular(symtab);
-			def->CheckAll(symtab);
 
 			if(errors->messages->size() != 0)
 				IsError = true;
 			else
 			{
-				//symtab->FillingRelations(file);
-				TypeVisitor *tv = new TypeVisitor(file, symtab, def);
-
-				if(errors->messages->size() != 0)
-					IsError = true;
-				else
+				symtab->FillingRelations(file);
+				def->CheckCircular(symtab);
+				def->CheckAll(symtab);
+				if(errors->messages->size() == 0)
 				{
-					cout << "Semantic analysis was done successfully! " << endl;
-					if(!type_only)
-						CodeVisitor *cv = new CodeVisitor(file, symtab, tv->mainFunc);
+					TypeVisitor *tv = new TypeVisitor(file, symtab, def);
+
+					if(errors->messages->size() != 0)
+						IsError = true;
+					else
+					{
+						cout << "Semantic analysis was done successfully! " << endl;
+						if(!type_only)
+							CodeVisitor *cv = new CodeVisitor(file, symtab, tv->mainFunc);
+					}
 				}
+				else
+					IsError = true;
 			}
 		}
 		if(IsError)

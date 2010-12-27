@@ -261,7 +261,9 @@ public:
 	Deffered *def;
 	string types [8];
 	Function *mainFunc;
-	int InvokeNum;
+	int scopeNum;
+	int callNum;
+	bool IsStatic;
 	bool NeedReturn; // use this ident to know if we allowed to use return or not, (true: we need, false: we don't need).
 	int NumReturns;
 };

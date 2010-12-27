@@ -71,6 +71,7 @@ public:
 
 	Scope *current; // the current scope.
 	Errors *errors;
+	Scope *firstFather;
 
 	vector<Class *> *classes;
 	vector<Scope *> *scopes;
@@ -78,7 +79,7 @@ public:
 	vector<int> *Invoke_scope_num;	// number of scope of Ident of Invoke.
 
 	SymTab(Errors *errors); // The Constructor.
-	Sym *Lookup(string key);
+	Sym *Lookup(string key, Scope *Current);
 	
 	bool AddSym(Ident *id, int kind, int acctype, Type *type); // Add Symbol to Ident and add it to hashTable, used for Ident.
 	bool AddSym(Ident *id, int kind, Class *clas); // Add Symbol to Ident and add it to hashTable, used for Ident of Class.
@@ -86,19 +87,20 @@ public:
 	bool AddSym(Ident *id, int kind, int acctype, Type *type, Args *args, Function *meth); // Add Symbol to Ident and add it to hashTable, used for Ident of Function.
 
 	bool IsDeclared(Ident *id, Deffered *def); // Check if the Ident is Declared, used for local and global Ident.
-	bool IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope); // Check if the Ident is Declared, used for Invoke and NewObject Ident.
+	bool IsDeclared(Ident *id, int ScopeNum, bool CheckClassName, bool IsCall); // Check if Ident is declared in spacific scope or his fathers ( and in class if CheckClassName is true).
+	bool IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope, bool IsCall); // Check if the Ident is Declared, used for Invoke and NewObject Ident.
 	bool IsDeclared(Ident *id, int kind, Deffered *def); // Check if the Idnet is Declared, used for ClassInhert and IdentType.
 
 	void AddNewScope();
 	void OutScope();
-	void AddInvokeScopeNum(); // Add Invoke scope number to vector, used when used Invoke Ident.
 	
 	void FillingRelations(Root *file);
 
 	int FatherScopeNum(int NumOfSubScope); // input sub scope number, return the number of father of this scope.
 	bool CheckScopes(int num_of_scope_of_declaration, int num_of_scope_of_used); // Check if the two number are from the same class scope.
 	
-	Scope* IntToScope(int num); // From Father scope number to Father scope.
+	Scope* IntToScope(int ScopeNumber); // From scope number to scope.
+	Scope* IntToScope(int ScopeNumber, Scope *Current); // From scope number in spicific scope to scope.
 	Scope* ClassToScope(Class *clas); // From Class to Scope.
 	Class* ScopeToClass(Scope *scope); // From Scope to Class.
 };

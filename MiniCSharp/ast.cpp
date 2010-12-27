@@ -38,12 +38,12 @@ Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 bool
 Class::AddParent(Ident *parent_ID)
 {
-	/* Add Parent Ident to this class Parents and return true, if:
-	** Parent class Ident doesn't added to this class Parents all ready.
-	** or this class Parents is empty.
+	/* Add Parent Ident to this class Parents.
+	** if ident was been added to class then retrun false and don't add it again.
+	** if not add it and return true.
 	*/
 	for(int i=0; i<this->Parents->size(); i++)
-		if(this->Parents->at(i)->name == parent_ID->name)
+		if(this->Parents->at(i)->name == parent_ID->name) // if this ident was been added to class.
 			return false;
 	this->Parents->push_back(parent_ID);
 	return true;
@@ -52,12 +52,12 @@ Class::AddParent(Ident *parent_ID)
 bool
 Class::AddChild(Ident *child_ID)
 {
-	/* Add Child Ident to this class Childrens and return true, if:
-	** Child class Ident doesn't added to this class Childrens all ready.
-	** or this class Childrens is empty.
+	/* Add Child Ident to this class Childrens.
+	** if ident was been added to class then retrun false and don't add it again.
+	** if not add it and return true.
 	*/
 	for(int i=0; i<this->Childrens->size(); i++)
-		if(this->Childrens->at(i)->name == child_ID->name)
+		if(this->Childrens->at(i)->name == child_ID->name) // if this ident was been added to class.
 			return false;
 	this->Childrens->push_back(child_ID);
 	return true;

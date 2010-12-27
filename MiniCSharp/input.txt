@@ -1,20 +1,25 @@
 class A //: C // error, Fixed
 {
-    A()
+    public A()
     {
         //test(z); // error, Fixed
         //nnnnn(); // error, Fixed
         //x++; // error, Fixed
     }
-    int jk;
-    void nana() { }
+    public int jk;
+    public static void nana() { }
+    public B b;
     //int z;
+    private static int callTest;
 }
 class B : A
 {
+    public B() { }
 	double z; // error redefintion , change lookup function to fix this problem after add stracture to save class fathers and sons
+    private static void jjjojo() { }
     public void test(A zz)
     {
+        jjjojo();
         z = 2;
         //nana(); // error, Fixed
         //x++; // error, Fixed
@@ -25,17 +30,19 @@ class B : A
         //pp.jk; // error, Helf Fixed
         //t.nana(); // error, Helf Fixed
     }
-    public A x;
+    //public A a;
     Test t;
     public int jk;
 }
 class C : B
 {
-    C()
+    int B;
+    private A a;
+    public C()
     {
 		//C n = new C();
 		/*t; /*error, Fixed*/
-		test(x); // error, Fixed
+		test(a); // error, Fixed
         jk++;
 	}
     //B() {} // error, Fixed
@@ -49,10 +56,22 @@ class Test
     void main()
     {
         return ;
-        A x;
+        //A.b;
+        //B.jjjojo(); // error.
+        B b = new B();
+        A a = new A();
+        //A.callTest;
+        b.test(a);
+        
+        b.a = b;
+        //b.a.b;
+        //b.x.nana();
+        A.nana();
+        int[] arr;
+        int i = 5;
+        //arr = new int [5];
         nana1();
         Read();
-        int i = 5;
         /*double y = (double)i;
         (double)i;
         int t = 2;

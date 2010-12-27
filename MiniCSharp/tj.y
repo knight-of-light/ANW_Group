@@ -377,7 +377,7 @@ expression:		  INCREMENT IDENT
 				| IDENT
 					{
 						$$ = new IdentExpr($1, lin, col);
-						symtab->IsDeclared($1, def);
+						//symtab->IsDeclared($1, def);
 					}
 				| IDENT arrayindex
 					{
@@ -397,12 +397,13 @@ expression:		  INCREMENT IDENT
 				| IDENT '(' expr_list_e ')'
 					{
 						$$ = new Invoke($1, $3, lin, col);
-						symtab->AddInvokeScopeNum();
+						//symtab->AddInvokeScopeNum();
 						//symtab->IsDeclared($1, 2, $3, def); // Used in Type Checking.
 					}
 				| NEW IDENT '(' expr_list_e ')'
 					{
 						$$ = new NewObject($2, $4, lin, col);
+						//symtab->AddInvokeScopeNum();
 						//symtab->IsDeclared($2, 3, $4, def); // Used in Type Checking.
 					}
 				| NEW noarraytype arrayindex
@@ -412,7 +413,7 @@ expression:		  INCREMENT IDENT
 				| IDENT '.' expression
 					{
 						$$ = new IdentCall($1, $3, lin, col);
-						symtab->IsDeclared($1, def);
+						//symtab->IsDeclared($1, def);
 					}
 				| IDENT arrayindex '.' expression
 					{

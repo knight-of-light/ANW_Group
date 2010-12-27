@@ -119,9 +119,9 @@ SymTab::SymTab(Errors *errors)
 }
 
 Sym *
-SymTab::Lookup(std::string key)
+SymTab::Lookup(std::string key, Scope *Current)
 {
-	Scope *scope = this->current;
+	Scope *scope = Current;
 	Sym  *sym = NULL;
 	while(scope != NULL)
 	{
@@ -140,10 +140,10 @@ SymTab::Lookup(std::string key)
 bool
 SymTab::AddSym(Ident *id, int kind, int acctype, Type *type)
 {
-	// Add Global and Lockal(stat var, for var) Ident.
+	// Add Global and Lockal(stat var, for var, Arg) Ident.
 
 	string key = this->kinds[kind]+"@"+id->name;
-	if(this->Lookup(key) == NULL) // if there is no id have same key, then OK.
+	if(this->Lookup(key, this->current) == NULL) // if there is no id have same key, then OK.
 	{
 		Sym *sym = new Sym(id->name, kind, acctype, this->current, type);
 		this->current->hashTab->AddKey(key, sym);
@@ -163,7 +163,7 @@ SymTab::AddSym(Ident *id, int kind, Class *clas)
 	// Add Class Symbol to hash table.
 
 	string key = this->kinds[kind]+"@"+id->name;
-	if(this->Lookup(key) == NULL) // if there is no id have same key, then OK.
+	if(this->Lookup(key, this->current) == NULL) // if there is no id have same key, then OK.
 	{
 		Sym *sym = new Sym(id->name, kind, this->current, clas);
 		this->current->hashTab->AddKey(key, sym);
@@ -183,7 +183,7 @@ SymTab::AddSym(Ident *id, int kind, int acctype, Args *args, Constructor *constr
 {
 	// Add Constructor Symbol to hash table.
 
-	if( acctype != 4) // check if acctype didn't contain "private static".
+	if(acctype != 3 && acctype != 4) // check if acctype didn't contain "static".
 	{
 		string key = this->kinds[kind]+"@"+id->name;
 		for(int i=0; i < args->args->size(); i++)
@@ -196,7 +196,7 @@ SymTab::AddSym(Ident *id, int kind, int acctype, Args *args, Constructor *constr
 				key += "@" + types[t];
 		}
 
-		if(this->Lookup(key) == NULL) // if there is no id have same key, then OK.
+		if(this->Lookup(key, this->current) == NULL) // if there is no id have same key, then OK.
 		{
 			Sym *sym = new Sym(id->name, kind, acctype, this->current, args, constr);
 			this->current->hashTab->AddKey(key, sym);
@@ -232,7 +232,7 @@ SymTab::AddSym(Ident *id, int kind, int acctype, Type *type, Args *args, Functio
 			key += "@" + types[t];
 	}
 
-	if(this->Lookup(key) == NULL) // if there is no id have same key, then OK.
+	if(this->Lookup(key, this->current) == NULL) // if there is no id have same key, then OK.
 	{
 		Sym *sym = new Sym(id->name, kind, acctype, this->current, type, args, meth);
 		this->current->hashTab->AddKey(key, sym);
@@ -257,13 +257,13 @@ SymTab::IsDeclared(Ident *id, Deffered *def)
 	**		if not add to deffared as global.
 	** used by: (Increment Ident), (Ident Increment),
 	**			(Decrement Ident), (Ident Decrement),
-	**			(IdentExpr), (IdentArr), (Assign), (ArrAssign),
-	**			(IdentCall), (IdentArrCall), (Variables_e variables).
+	**			 (IdentArr), (Assign), (ArrAssign),
+	**			(IdentArrCall), (Variables_e variables).
 	*/
 
 	// Check if Local.
 	string key = "l@"+id->name;
-	Sym *sym = this->Lookup(key);
+	Sym *sym = this->Lookup(key, this->current);
 	if(sym != NULL)
 	{
 		id->symbol = sym;
@@ -273,7 +273,7 @@ SymTab::IsDeclared(Ident *id, Deffered *def)
 	{
 		// Check if Global.
 		key = "g@"+id->name;
-		sym = this->Lookup(key);
+		sym = this->Lookup(key, this->current);
 		if(sym != NULL)
 		{
 			id->symbol = sym;
@@ -289,7 +289,87 @@ SymTab::IsDeclared(Ident *id, Deffered *def)
 }
 
 bool
-SymTab::IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope)
+SymTab::IsDeclared(Ident *id, int CurrentScope, bool CheckClasses, bool IsCall)
+{
+	/*	this function is for: Call loops and check if local ident and global in custome scope.
+	**	How: check if Ident is Declared in custome scope as local,
+	**		 if not check in custome scope as global,
+	**		 if not check in Parents class as global,
+	**		 if not and CheckClasses is true then check in scope num 1 as class name.
+	**	used by: (IdentCall),
+	**			 (IdentExpr).
+	*/
+	
+	// check if local.
+	string key = "l@"+id->name;
+	Scope *Current = this->IntToScope(CurrentScope);
+	Sym *sym = NULL;
+	sym = this->Lookup(key, Current);
+	if(sym != NULL)
+	{
+		id->symbol = sym;
+		return true;
+	}
+	else // if not local.
+	{
+		// check if global in same class scope.
+		key = "g@"+id->name;
+		sym = this->IntToScope(this->FatherScopeNum(CurrentScope))->hashTab->GetMember(key);
+		if(sym != NULL)
+		{
+			if(!IsCall) // if not used by call don't check privacy.
+			{
+				id->symbol = sym;
+				return true;
+			}
+
+			if(sym->acctype == 1 || sym->acctype == 3) // if used by call check privacy.
+			{
+				id->symbol = sym;
+				return true;
+			}
+			else
+				sym = NULL;
+		}
+		if(sym == NULL) // if not global in same class scope.
+		{
+			// check if global in Parents classes.
+			Class *clas = this->ScopeToClass(this->IntToScope(this->FatherScopeNum(CurrentScope)));
+			for(int i=0; i<clas->Parents->size(); i++)
+			{
+				sym = this->ClassToScope(clas->Parents->at(i)->symbol->clas)->hashTab->GetMember(key);
+				if(sym != NULL)
+				{
+					if(sym->acctype == 1 || sym->acctype == 3)
+					{
+						id->symbol = sym;
+						return true;
+					}
+					else
+						sym = NULL;
+				}
+			}
+			if(sym == NULL) // if not global at all.
+			{
+				if(CheckClasses)
+				{
+					key = "c@"+id->name;
+					sym = this->current->hashTab->GetMember(key);
+					if(sym != NULL)
+					{
+						id->symbol = sym;
+						return true;
+					}
+				}
+				this->errors->AddError("Undeclared Identifier '" + id->name , id->line, id->column);
+				return false;
+			}
+		}
+	}
+}
+
+bool
+SymTab::IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope, bool IsCall)
 {
 	/*	this function is for: Function Ident and Constructor Ident.
 	**	How: check if Ident is Declared as Function or as Constructor,
@@ -312,58 +392,84 @@ SymTab::IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope)
 		else
 			key += "@" + types[t];
 	}
-
-	sym = this->IntToScope(CurrentScope)->hashTab->GetMember(key);
-	if(sym == NULL)
+	// function.
+	if(kind == 2)
 	{
-		Class *clas = this->ScopeToClass(this->IntToScope(CurrentScope));
-		for(int i=0; i<clas->Parents->size(); i++)
+		sym = this->IntToScope(this->FatherScopeNum(CurrentScope))->hashTab->GetMember(key);
+		if(sym != NULL)
 		{
-			sym = this->ClassToScope(clas->Parents->at(i)->symbol->clas)->hashTab->GetMember(key);
+			if(!IsCall) // if not used by Call don't check privacy.
+			{
+				id->symbol = sym;
+				return true;
+			}
+
+			if(sym->acctype == 1 || sym->acctype == 3) // if used by Call check privacy.
+			{
+				id->symbol = sym;
+				return true;
+			}
+			else
+				sym = NULL;
+		}
+		if(sym == NULL)
+		{
+			Class *clas = this->ScopeToClass(this->IntToScope(this->FatherScopeNum(CurrentScope)));
+			for(int i=0; i<clas->Parents->size(); i++)
+			{
+				sym = this->ClassToScope(clas->Parents->at(i)->symbol->clas)->hashTab->GetMember(key);
+				if(sym != NULL)
+				{
+					if(sym->acctype == 1 || sym->acctype == 3)
+					{
+						id->symbol = sym;
+						return true;
+					}
+					else
+					{
+						this->errors->AddError("Cannot Access Function '" + id->name + "' from this scope", id->line, id->column);
+						return false;
+					}
+				}
+			}
+			this->errors->AddError("Undeclared Identifier '" + id->name + "' from this scope", id->line, id->column);
+			return false;
+		}
+	}
+	// Constructor.
+	else if(kind == 3)
+	{
+		for(int i=0; i<scope->children->size(); i++)
+		{
+			sym = scope->children->at(i)->hashTab->GetMember(key);
 			if(sym != NULL)
 			{
-				if(sym->acctype == 1 || sym->acctype == 3)
+				if(scope->children->at(i)->number == this->FatherScopeNum(CurrentScope))
 				{
 					id->symbol = sym;
 					return true;
 				}
 				else
 				{
-					this->errors->AddError("Cannot Access Identifier '" + id->name + "' from this scope", id->line, id->column);
-					return false;
+					if(sym->acctype == 1)
+					{
+						id->symbol = sym;
+						return true;
+					}
+					else
+					{
+						this->errors->AddError("Cannot Access Constructor '" + id->name + "' from this scope", id->line, id->column);
+						return false;
+					}
 				}
 			}
 		}
-	}
-	if(sym == NULL)
-	{
-		this->errors->AddError("Undeclared Identifier '" + id->name + "' from this scope", id->line, id->column);
-		return false;
-	}
-
-	/*for(int i=0; i<scope->children->size(); i++)
-	{
-		sym = scope->children->at(i)->hashTab->GetMember(key);
-		if(sym != NULL)
+		if(sym == NULL)
 		{
-			if( this->CheckScopes(sym->scope->number,CurrentScope) )
-			{
-				id->symbol = sym;
-				return true;
-			}
-			else
-			{
-				this->errors->AddError("Cannot Access this Identifier '" + id->name + "' from this scope", id->line, id->column);
-				return false;
-			}
+			this->errors->AddError("Undeclared Identifier '" + id->name + "' from this scope", id->line, id->column);
+			return false;
 		}
 	}
-
-	if(sym == NULL)
-	{
-		this->errors->AddError("Undeclared Identifier '" + id->name + "'", id->line, id->column);
-		return false;
-	}*/
 }
 
 bool
@@ -377,7 +483,7 @@ SymTab::IsDeclared(Ident *id, int kind, Deffered *def)
 	**			(ArrayType Ident[], Ident[,], Ident[,,]),
 	*/
 	string key = this->kinds[kind]+"@"+id->name;
-	Sym *sym = this->Lookup(key);
+	Sym *sym = this->Lookup(key, this->current);
 	if(sym != NULL)
 	{
 		id->symbol = sym;
@@ -401,19 +507,16 @@ SymTab::AddNewScope()
 	this->current->AddChild();
 	this->current = this->current->children->at(this->current->children->size() - 1);
 	this->current->number = this->scope_counter;
+	
+	// Add FirstFather (Scope num 1).
+	if(this->current->number == 1)
+		this->firstFather = this->current;
 }
 
 void
 SymTab::OutScope()
 {
 	this->current = this->current->father;
-}
-
-void
-SymTab::AddInvokeScopeNum()
-{
-	// to know the number of scope where Invoke called or used.
-	this->Invoke_scope_num->push_back(this->current->number);
 }
 
 void
@@ -510,14 +613,33 @@ SymTab::CheckScopes(int num_of_scope_of_declaration, int num_of_scope_of_used)
 }
 
 Scope*
-SymTab::IntToScope(int num)
+SymTab::IntToScope(int ScopeNumber)
 {
 	// From Father scope num to Father Scope.
+	Scope *scope = IntToScope(ScopeNumber, this->firstFather);
+	return scope;
+}
+
+Scope*
+SymTab::IntToScope(int ScopeNumber, Scope *Current)
+{
 	Scope *scope = NULL;
-	int fatherNumber = this->FatherScopeNum(num);
-	for(int i=0; i<this->scopes->size(); i++)
-		if(this->scopes->at(i)->number == fatherNumber)
-			scope = this->scopes->at(i);
+	if(Current->number == ScopeNumber)
+		return Current;
+	for(int i=0; i<Current->children->size(); i++)
+	{
+		if(Current->children->at(i)->number == ScopeNumber)
+		{
+			scope = Current->children->at(i);
+			return scope;
+		}
+		else
+		{
+			scope = IntToScope(ScopeNumber, Current->children->at(i));
+			if(scope != NULL)
+				return scope;
+		}
+	}
 
 	return scope;
 }
@@ -641,35 +763,12 @@ Deffered::CheckAll(SymTab *symtab)
 		{
 			string key = this->kindArr[this->kinds->at(i)]+"@"+this->ids->at(i)->name;
 
-			//for(int j=0; j<scope->children->size(); j++)
-			//{
-			//	sym = scope->children->at(j)->hashTab->GetMember(key);
-			//	if(sym != NULL) // If id is declared.
-			//	{
-			//		if( symtab->CheckScopes(sym->scope->number, this->scope_num->at(i)) ) // If id is declared in same scope of used.
-			//			this->ids->at(i)->symbol = sym;
-			//		else
-			//		{
-			//			Class *clas = symtab->ScopeToClass(symtab->IntToScope(this->scope_num->at(i)));
-			//			for(int k=0; k<clas->Parents->size(); k++)
-			//				if(symtab->ClassToScope(clas->Parents->at(k)->symbol->clas)->number == symtab->FatherScopeNum(sym->scope->number))
-			//					if(sym->acctype == 1 || sym->acctype == 3)
-			//						this->ids->at(i)->symbol = sym;
-			//		}
-			//	}
-			//}
-			//if(this->ids->at(i)->symbol == NULL)
-			//{
-			//	if(sym == NULL)
-			//		symtab->errors->AddError("Undeclared Identifier '" + this->ids->at(i)->name + "'", this->ids->at(i)->line, this->ids->at(i)->column);
-			//	else
-			//		symtab->errors->AddError("Cannot Access Identifier '" + this->ids->at(i)->name + "' from this scope", this->ids->at(i)->line, this->ids->at(i)->column);
-			//}
-
 			sym = symtab->IntToScope(symtab->FatherScopeNum(this->scope_num->at(i)))->hashTab->GetMember(key);
-			if(sym == NULL)
+			if(sym != NULL)
+				this->ids->at(i)->symbol = sym;
+			else
 			{
-				Class *clas = symtab->ScopeToClass(symtab->IntToScope(this->scope_num->at(i)));
+				Class *clas = symtab->ScopeToClass(symtab->IntToScope(symtab->FatherScopeNum(this->scope_num->at(i))));
 				for(int j=0; j<clas->Parents->size(); j++)
 				{
 					sym = symtab->ClassToScope(clas->Parents->at(j)->symbol->clas)->hashTab->GetMember(key);
@@ -682,9 +781,9 @@ Deffered::CheckAll(SymTab *symtab)
 						break;
 					}
 				}
+				if(sym == NULL)
+					symtab->errors->AddError("Undeclared Identifier '" + this->ids->at(i)->name + "' from this scope", this->ids->at(i)->line, this->ids->at(i)->column);
 			}
-			if(sym == NULL)
-				symtab->errors->AddError("Undeclared Identifier '" + this->ids->at(i)->name + "' from this scope", this->ids->at(i)->line, this->ids->at(i)->column);
 		}
 	}
 }

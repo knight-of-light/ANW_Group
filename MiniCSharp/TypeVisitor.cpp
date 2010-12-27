@@ -5,7 +5,9 @@ TypeVisitor::TypeVisitor(Root *file, SymTab *st, Deffered *def)
 	this->mainFunc = NULL;
 	this->symtab = st;
 	this->def = def;
-	this->InvokeNum = 0;
+	this->scopeNum = 0;
+	this->callNum = 0;
+	this->IsStatic = false;
 	this->NeedReturn = false; // In default, Cannot use return.
 	this->NumReturns = 0;
 	file->accept(this);
@@ -24,6 +26,7 @@ TypeVisitor::Visit(Root *n)
 	types[6] = "Ident";
 	types[7] = "void";
 
+	this->scopeNum++;
 	for(int i=0; i< n->classes->size(); i++)
 		n->classes->at(i)->accept(this);
 
@@ -36,6 +39,7 @@ TypeVisitor::Visit(Root *n)
 void
 TypeVisitor::Visit(Class *n)
 {
+	this->scopeNum++;
 	n->members->accept(this);
 
 	// Check if Members are Right
@@ -56,12 +60,22 @@ TypeVisitor::Visit(Class *n)
 			if(n->name->name == F->name->name)
 				this->symtab->errors->AddError("Member names cannot be the same as their enclosing type", F->name->line, F->name->column);
 		}
+
+		// Check if name of Global ARE NOT the same as name of class.
+		else if(dynamic_cast<Global*>(n->members->members->at(i)) != NULL)
+		{
+			Global *G = dynamic_cast<Global*>(n->members->members->at(i));
+			for(int j=0; j<G->variables->variables->size(); j++)
+				if(n->name->name == G->variables->variables->at(j)->name->name)
+					this->symtab->errors->AddError("Member names cannot be the same as their enclosing type", G->variables->variables->at(j)->line, G->variables->variables->at(j)->column);
+		}
 	}
 }
 
 void
 TypeVisitor::Visit(ClassInher *n)
 {
+	this->scopeNum++;
 	n->members->accept(this);
 
 	// Check if Members are Right
@@ -81,6 +95,15 @@ TypeVisitor::Visit(ClassInher *n)
 			Function *F = dynamic_cast<Function*>(n->members->members->at(i));
 			if(n->name->name == F->name->name)
 				this->symtab->errors->AddError("Member names cannot be the same as their enclosing type", F->name->line, F->name->column);
+		}
+
+		// Check if name of Global ARE NOT the same as name of class.
+		else if(dynamic_cast<Global*>(n->members->members->at(i)) != NULL)
+		{
+			Global *G = dynamic_cast<Global*>(n->members->members->at(i));
+			for(int j=0; j<G->variables->variables->size(); j++)
+				if(n->name->name == G->variables->variables->at(j)->name->name)
+					this->symtab->errors->AddError("Member names cannot be the same as their enclosing type", G->variables->variables->at(j)->line, G->variables->variables->at(j)->column);
 		}
 	}
 }
@@ -106,6 +129,7 @@ TypeVisitor::Visit(Global *n)
 void
 TypeVisitor::Visit(Constructor *n)
 {
+	this->scopeNum++;
 	n->args->accept(this);
 	n->stats->accept(this);
 }
@@ -123,6 +147,7 @@ TypeVisitor::Visit(Function *n)
 			 n->name->column);
 	}
 
+	this->scopeNum++;
 	n->args->accept(this);
 
 	if(n->type != NULL)
@@ -197,13 +222,43 @@ TypeVisitor::Visit(Variable *n)
 			if(right != 4)
 				mismatch = true;
 			break;
+		case 6:
+			if(right == 6)
+			{
+				if(n->name->symbol->type->name->name == n->expr->type->name->name) // if ident type of left == ident type of right.
+					break;
+				else
+				{
+					mismatch = true;
+
+					// see if left is father of right.
+					Class *c = n->name->symbol->type->name->symbol->clas; // class type of left.
+					for(int i=0; i<c->Childrens->size(); i++)
+					{
+						if(c->Childrens->at(i)->name == n->expr->type->name->name)
+						{
+							mismatch = false;
+							break;
+						}
+					}
+				}
+			}
+			break;
 		default:
 			mismatch = true;
 		}
 		if(mismatch)
-			symtab->errors->AddError("Type mismatch between \'" + types[left] + "\' and \'" + types[right] + "\'",
+		{
+			string typeLeft = types[left];
+			string typeRight = types[right];
+			if(left == 6)
+				typeLeft = n->name->symbol->type->name->name;
+			if(right == 6)
+				typeRight = n->expr->type->name->name;
+			symtab->errors->AddError("Type mismatch between \'" + typeLeft + "\' and \'" + typeRight + "\'",
 			 n->name->line,
 			 n->column);
+		}
 	}
 }
 
@@ -248,7 +303,7 @@ TypeVisitor::Visit(Incr *n)
 			 n->name->line,
 			 n->column);
 	
-	n->type->type = ty;
+	n->type = n->name->symbol->type;
 }
 
 void
@@ -261,7 +316,7 @@ TypeVisitor::Visit(Decr *n)
 			 n->name->line,
 			 n->column);
 
-	n->type->type = ty;
+	n->type = n->name->symbol->type;
 }
 
 void
@@ -275,7 +330,7 @@ TypeVisitor::Visit(Not *n)
 			n->expr->line,
 			n->column);
 
-	n->type->type = ty;
+	n->type = n->expr->type;
 }
 
 void
@@ -289,13 +344,13 @@ TypeVisitor::Visit(Minus *n)
 			 n->expr->line,
 			 n->column);
 
-	n->type->type = ty;
+	n->type = n->expr->type;
 }
 
 void
 TypeVisitor::Visit(Plus *n)
 {
-	// - expression, check if expression type is integer or double.
+	// + expression, check if expression type is integer or double.
 	n->expr->accept(this);
 	int ty = n->expr->type->type;
 	if( (ty != 2) && (ty != 3) )
@@ -303,13 +358,14 @@ TypeVisitor::Visit(Plus *n)
 			 n->expr->line,
 			 n->column);
 
-	n->type->type = ty;
+	n->type = n->expr->type;
 }
 
 void
 TypeVisitor::Visit(Paren  *n)
 {
 	// '(' expression ')' type is the same of expression type.
+	n->expr->accept(this);
 	n->type = n->expr->type;
 }
 
@@ -317,7 +373,24 @@ void
 TypeVisitor::Visit(IdentExpr *n)
 {
 	// IdentExpr type is the Ident type.
-	n->type = n->ident->symbol->type;
+	if(this->callNum == 0)
+	{
+		if(this->symtab->IsDeclared(n->ident, this->scopeNum, false, false))
+			n->type = n->ident->symbol->type;
+	}
+	else
+	{
+		if(this->symtab->IsDeclared(n->ident, this->callNum, false, true))
+		{
+			// Check from static protection level.
+			int acctype = n->ident->symbol->acctype;
+			if( ( (!this->IsStatic) &&  (acctype != 3) && (acctype != 4) )	// if func must be not static and it is not static.
+			 || ( ( this->IsStatic) && ((acctype == 3) || (acctype == 4)) ) )	// if func must be static and it is static.
+				n->type = n->ident->symbol->type;
+			else
+				this->symtab->errors->AddError("Member " + n->ident->name + " cannot be accessed with an instance reference", n->ident->line, n->ident->column);
+		}
+	}
 }
 
 void
@@ -355,15 +428,43 @@ TypeVisitor::Visit(Assign *n)
 		if(right != 4)
 			mismatch = true;
 		break;
+	case 6:
+		if(right == 6)
+		{
+			if(n->ident->symbol->type->name->name != n->expr->type->name->name) // if ident type of left != ident type of right.
+			{
+				mismatch = true;
+
+				// see if left is father of right.
+				Class *c = n->ident->symbol->type->name->symbol->clas; // class type of left.
+				for(int i=0; i<c->Childrens->size(); i++)
+				{
+					if(c->Childrens->at(i)->name == n->expr->type->name->name)
+					{
+						mismatch = false;
+						break;
+					}
+				}
+			}
+		}
+		break;
 	default:
 		mismatch = true;
 	}
 	if(mismatch)
-		symtab->errors->AddError("Type mismatch between \'" + types[left] + "\' and \'" + types[right] + "\'",
+	{
+		string typeLeft = types[left];
+		string typeRight = types[right];
+		if(left == 6)
+			typeLeft = n->ident->symbol->type->name->name;
+		if(right == 6)
+			typeRight = n->expr->type->name->name;
+		symtab->errors->AddError("Type mismatch between \'" + typeLeft + "\' and \'" + typeRight + "\'",
 		 n->ident->line,
 		 n->column);
+	}
 
-	n->type->type = left;
+	n->type = n->ident->symbol->type;
 }
 
 void
@@ -410,20 +511,45 @@ void
 TypeVisitor::Visit(Invoke *n)
 {
 	// IDENT '(' expr_list_e ')'.
-	int CurrentScopeNum = symtab->Invoke_scope_num->at(this->InvokeNum);
-	n->exprList->accept(this);
 
-	if( !((n->ident->name == "Write") || (n->ident->name == "Read")) )
+	// Because <Invoke exprList> if callNum still != 0, the IdentExpr will don't do right check.
+	// so set callNum = 0, and after finish <exprList accept>, will return callNum to its value.
+	int num = 0;
+	if(this->callNum != 0)
 	{
-		if(this->symtab->IsDeclared(n->ident, 2, n->exprList, CurrentScopeNum))
-			n->type->type = 7;//n->ident->symbol->method->type->type;
-		else
-			n->type->type = 0;
+		num = this->callNum;
+		this->callNum = 0;
 	}
-	else
-		n->type->type = 7;
+	n->exprList->accept(this);
+	this->callNum = num;
 
-	this->InvokeNum = this->InvokeNum + 1;
+
+	if( !((n->ident->name == "Write") || (n->ident->name == "Read")) ) // if Not Write or Read func.
+	{
+		if(this->callNum == 0) // if Not Called by IdentCall.
+		{
+			if(this->symtab->IsDeclared(n->ident, 2, n->exprList, scopeNum, false))
+				n->type = n->ident->symbol->method->type;
+		}
+		else // if function Called by IdentCall.
+			if(this->symtab->IsDeclared(n->ident, 2, n->exprList, callNum, true)) // if function was declared.
+			{
+				// Check from static protection level.
+				int acctype = n->ident->symbol->acctype;
+				if( ( (!this->IsStatic) &&  (acctype != 3) && (acctype != 4) )	// if func must be not static and it is not static.
+				 || ( ( this->IsStatic) && ((acctype == 3) || (acctype == 4)) ) )	// if func must be static and it is static.
+					n->type = n->ident->symbol->method->type;
+				else
+					this->symtab->errors->AddError("Member " + n->ident->name + " cannot be accessed with an instance reference", n->ident->line, n->ident->column);
+			}
+	}
+	else // if Write or Read func.
+	{
+		if(this->callNum == 0)
+			n->type->type = 7;
+		else
+			this->symtab->errors->AddError("Undeclared Identifier '" + n->ident->name , n->ident->line, n->ident->column);
+	}
 }
 
 void
@@ -432,36 +558,65 @@ TypeVisitor::Visit(NewObject *n)
 	// NEW IDENT '(' expr_list_e ')'.
 
 	n->exprList->accept(this);
-	this->symtab->IsDeclared(n->ident, 3, n->exprList, this->InvokeNum);
-	n->type->type = n->ident->symbol->type->type;
 
-	this->InvokeNum = this->InvokeNum + 1;
+	if(this->symtab->IsDeclared(n->ident, 3, n->exprList, this->scopeNum))
+	{
+		n->type->type = 6;
+		n->type->name = n->ident;
+	}
+	else
+		n->type->type = 0;
+
 }
 
 void
 TypeVisitor::Visit(NewArray *n)
 {
 	// NEW noarraytype arrayindex.
+
+	n->typ->accept(this);
+	n->arrayIndex->accept(this);
+	
 }
 
 void
 TypeVisitor::Visit(IdentCall *n)
 {
 	// Ident '.' expression.
-	int CurrentScopeNum = symtab->Invoke_scope_num->at(this->InvokeNum);
-	n->expr->accept(this);
 
-	if( (dynamic_cast<IdentExpr *>(n->expr)) != NULL )
+	int num = this->callNum;
+
+	if(this->callNum == 0)
 	{
-		IdentExpr *id = dynamic_cast<IdentExpr *>(n->expr);
-		if( !(this->symtab->CheckScopes(n->ident->symbol->type->name->symbol->scope->number,id->ident->symbol->scope->number)) )
-			symtab->errors->AddError("Cannot Access this Identifier '" + id->ident->name + "' from this scope", id->ident->line, id->ident->column);
+		if(this->symtab->IsDeclared(n->ident, this->scopeNum, true, false))
+		{
+			Class *C;
+			if(n->ident->symbol->clas == NULL) // if ident not found as class name.
+				C = n->ident->symbol->type->name->symbol->clas;
+			else // if ident found as class name.
+			{
+				C = n->ident->symbol->clas;
+				this->IsStatic = true;
+			}
+			this->callNum = this->symtab->ClassToScope(C)->number;
+		}
 	}
-	else if( (dynamic_cast<Invoke *>(n->expr)) != NULL )
+	else
 	{
-		Invoke *invoke = dynamic_cast<Invoke *>(n->expr);
-		if( !(this->symtab->CheckScopes(n->ident->symbol->type->name->symbol->scope->number,CurrentScopeNum)) )
-			symtab->errors->AddError("Cannot Access this Identifier '" + invoke->ident->name + "' from this scope", invoke->ident->line, invoke->ident->column);
+		if(this->symtab->IsDeclared(n->ident, this->callNum, false, true))
+		{
+			Class *C = n->ident->symbol->type->name->symbol->clas;
+			this->callNum = this->symtab->ClassToScope(C)->number;
+		}
+	}
+	
+	n->expr->accept(this);
+	n->type = n->expr->type;
+
+	if(num == 0)
+	{
+		this->callNum = 0;
+		this->IsStatic = false;
 	}
 }
 
@@ -878,13 +1033,11 @@ TypeVisitor::Visit(Mod *n)
 	int left = n->left->type->type;
 	int right = n->right->type->type;
 
-	if( !((left == 2) && (right == 3)) )
-	{
+	if( !((left == 2) && (right == 2)) )
 		symtab->errors->AddError("Operator \'%\' cannot be applied to operand of type \'" + types[left] + "\' and \'" + types[right] + "\'",
 		 n->line,
 		 n->column);
-		n->type->type = 1;
-	}
+
 	n->type->type = 2;
 }
 
@@ -1195,6 +1348,7 @@ TypeVisitor::Visit(Semi *n)
 void
 TypeVisitor::Visit(Block *n)
 {
+	this->scopeNum++;
 	n->stats->accept(this);
 }
 
