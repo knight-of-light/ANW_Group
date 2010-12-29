@@ -141,7 +141,7 @@ int main(int argsc, char **argsv)
 				def->CheckAll(symtab);
 				if(errors->messages->size() == 0)
 				{
-					TypeVisitor *tv = new TypeVisitor(file, symtab, def);
+					TypeVisitor *tv = new TypeVisitor(file, symtab);
 
 					if(errors->messages->size() != 0)
 						IsError = true;

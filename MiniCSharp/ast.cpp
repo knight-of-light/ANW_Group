@@ -217,6 +217,9 @@ Type::Type(int l, int c) : Node(l,c)
 {
 	this->type = 0;
 	this->arr_level = 0;
+	this->arr_capacity[0] = -1;
+	this->arr_capacity[1] = -1;
+	this->arr_capacity[2] = -1;
 	this->name = NULL;
 }
 
@@ -263,8 +266,8 @@ Ident::Ident(string n, int l, int c) : Node(l, c)
 
 Expr::Expr(int l, int c) : Node(l, c)
 {
-	//this->type = 0;
 	this->type = new Type(l,c);
+	this->num = -99999999999999999;
 }
 
 //*******       Incr		*********
@@ -328,24 +331,12 @@ IdentArr::IdentArr(Ident *id, ArrayIndex *ai, int l, int c) : Expr(l, c)
 }
 
 //*******      Assign		*********
-Assign::Assign(Ident *id, Expr *e, int l, int c) : Expr(l, c)
+Assign::Assign(Expr *m, Expr *r, int l, int c) : Expr(l, c)
 {
-	this->ident = id;
-	this->expr = e;
-	id->father = this;
-	e->father = this;
-}
-
-//*******     ArrAssign		*********
-ArrAssign::ArrAssign(Ident *id, ArrayIndex *ai, Expr *e, int l, int c) : Expr(l, c)
-{
-	this->ident = id;
-	this->arrayIndex = ai;
-	this->expr = e;
-
-	id->father = this;
-	ai->father = this;
-	e->father = this;
+	this->left = m;
+	this->right = r;
+	m->father = this;
+	r->father = this;
 }
 
 //*******       Invoke		*********
@@ -396,6 +387,13 @@ IdentArrCall::IdentArrCall(Ident *id, ArrayIndex *ai, Expr *e, int l, int c) : E
 
 	id->father = this;
 	ai->father = this;
+	e->father = this;
+}
+
+//*******     ThisCall  	*********
+ThisCall::ThisCall(Expr *e, int l, int c) : Expr(l,c)
+{
+	this->expr = e;
 	e->father = this;
 }
 
@@ -590,6 +588,9 @@ Null::Null(int l, int c) : Expr(l,c)
 ArrayIndex::ArrayIndex(int l, int c) : Node(l,c)
 {
 	this->arr_level = 0;
+	this->arr_capacity[0] = -1;
+	this->arr_capacity[1] = -1;
+	this->arr_capacity[2] = -1;
 }
 
 ArrayIndex_1::ArrayIndex_1(Expr *exp1, int l, int c) : ArrayIndex(l,c)
@@ -944,12 +945,6 @@ Assign::accept(Visitor *v)
 }
 
 void
-ArrAssign::accept(Visitor *v)
-{
-	v->Visit(this);
-}
-
-void
 Invoke::accept(Visitor *v)
 {
 	v->Visit(this);
@@ -975,6 +970,12 @@ IdentCall::accept(Visitor *v)
 
 void
 IdentArrCall::accept(Visitor *v)
+{
+	v->Visit(this);
+}
+
+void
+ThisCall::accept(Visitor *v)
 {
 	v->Visit(this);
 }

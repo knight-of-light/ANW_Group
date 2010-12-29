@@ -66,12 +66,12 @@ Grammar
    40          | BOOL
    41          | OBJECT
 
-   42 arraytype: IDENT '[' ']'
-   43          | IDENT '[' ',' ']'
-   44          | IDENT '[' ',' ',' ']'
-   45          | basictype '[' ']'
-   46          | basictype '[' ',' ']'
-   47          | basictype '[' ',' ',' ']'
+   42 arraytype: IDENT LSBracket RSBracket
+   43          | IDENT LSBracket ',' RSBracket
+   44          | IDENT LSBracket ',' ',' RSBracket
+   45          | basictype LSBracket RSBracket
+   46          | basictype LSBracket ',' RSBracket
+   47          | basictype LSBracket ',' ',' RSBracket
 
    48 expression: INCREMENT IDENT
    49           | DECREMENT IDENT
@@ -83,13 +83,13 @@ Grammar
    55           | '(' expression ')'
    56           | IDENT
    57           | IDENT arrayindex
-   58           | IDENT '=' expression
-   59           | IDENT arrayindex '=' expression
-   60           | IDENT '(' expr_list_e ')'
-   61           | NEW IDENT '(' expr_list_e ')'
-   62           | NEW noarraytype arrayindex
-   63           | IDENT '.' expression
-   64           | IDENT arrayindex '.' expression
+   58           | expression '=' expression
+   59           | IDENT '(' expr_list_e ')'
+   60           | NEW IDENT '(' expr_list_e ')'
+   61           | NEW noarraytype arrayindex
+   62           | IDENT '.' expression
+   63           | IDENT arrayindex '.' expression
+   64           | THIS '.' expression
    65           | expression EQ expression
    66           | expression NE expression
    67           | expression '<' expression
@@ -112,9 +112,9 @@ Grammar
    84           | THIS
    85           | NUL
 
-   86 arrayindex: '[' expression ']'
-   87           | '[' expression ',' expression ']'
-   88           | '[' expression ',' expression ',' expression ']'
+   86 arrayindex: LSBracket expression RSBracket
+   87           | LSBracket expression ',' expression RSBracket
+   88           | LSBracket expression ',' expression ',' expression RSBracket
 
    89 expr_list: expression
    90          | expr_list ',' expression
@@ -151,26 +151,24 @@ Terminals, with rules where they appear
 $end (0) 0
 '!' (33) 52
 '%' (37) 75
-'(' (40) 14 16 18 55 60 61 79 93 94 95 96
-')' (41) 14 16 18 55 60 61 79 93 94 95 96
+'(' (40) 14 16 18 55 59 60 79 93 94 95 96
+')' (41) 14 16 18 55 59 60 79 93 94 95 96
 '*' (42) 73
 '+' (43) 54 71
 ',' (44) 21 25 43 44 46 47 87 88 90
 '-' (45) 53 72
-'.' (46) 63 64
+'.' (46) 62 63 64
 '/' (47) 74
 ':' (58) 6
 ';' (59) 12 96 97 98 99 102
 '<' (60) 67
-'=' (61) 27 58 59
+'=' (61) 27 58
 '>' (62) 69
-'[' (91) 42 43 44 45 46 47 86 87 88
-']' (93) 42 43 44 45 46 47 86 87 88
 '{' (123) 4 6 14 16 18 101
 '}' (125) 4 6 14 16 18 101
 error (256)
-IDENT (258) 4 6 14 16 18 19 26 27 36 42 43 44 48 49 50 51 56 57 58
-    59 60 61 63 64
+IDENT (258) 4 6 14 16 18 19 26 27 36 42 43 44 48 49 50 51 56 57 59
+    60 62 63
 INTEGER (259) 80
 REAL (260) 81
 CLASS (261) 4 6
@@ -185,25 +183,27 @@ WHILE (269) 95
 FOR (270) 96
 FALSE (271) 83
 TRUE (272) 82
-NEW (273) 61 62
-THIS (274) 84
+NEW (273) 60 61
+THIS (274) 64 84
 NUL (275) 85
 PRIVATE (276) 30 33
 PUBLIC (277) 29 31
 STATIC (278) 31 32 33
 VOID (279) 18
 RETURN (280) 102
-IF_PREC (281)
-CAST (282)
-OR (283) 77
-AND (284) 76
-NE (285) 66
-EQ (286) 65
-SE (287) 68
-LE (288) 70
-UNARY_OP (289)
-DECREMENT (290) 49 51
-INCREMENT (291) 48 50
+LSBracket (281) 42 43 44 45 46 47 86 87 88
+RSBracket (282) 42 43 44 45 46 47 86 87 88
+IF_PREC (283)
+CAST (284)
+OR (285) 77
+AND (286) 76
+NE (287) 66
+EQ (288) 65
+SE (289) 68
+LE (290) 70
+UNARY_OP (291)
+DECREMENT (292) 49 51
+INCREMENT (293) 48 50
 
 
 Nonterminals, with rules where they appear
@@ -249,7 +249,7 @@ accessmodif (74)
 type (75)
     on left: 34 35, on right: 12 16 19 78 98 106
 noarraytype (76)
-    on left: 36 37, on right: 34 62
+    on left: 36 37, on right: 34 61
 basictype (77)
     on left: 38 39 40 41, on right: 37 45 46 47 79
 arraytype (78)
@@ -257,14 +257,14 @@ arraytype (78)
 expression (79)
     on left: 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65
     66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85,
-    on right: 27 52 53 54 55 58 59 63 64 65 66 67 68 69 70 71 72 73
+    on right: 27 52 53 54 55 58 62 63 64 65 66 67 68 69 70 71 72 73
     74 75 76 77 78 79 86 87 88 89 90 93 94 95 97 109
 arrayindex (80)
-    on left: 86 87 88, on right: 57 59 62 64
+    on left: 86 87 88, on right: 57 61 63
 expr_list (81)
     on left: 89 90, on right: 90 92
 expr_list_e (82)
-    on left: 91 92, on right: 60 61
+    on left: 91 92, on right: 59 60
 statement (83)
     on left: 93 94 95 96 97 98 99 101 102, on right: 93 94 95 96 104
 @6 (84)
@@ -497,12 +497,12 @@ state 24
 
    14 constructor: accessmodif IDENT . '(' @3 args_e ')' '{' statements '}'
    36 noarraytype: IDENT .
-   42 arraytype: IDENT . '[' ']'
-   43          | IDENT . '[' ',' ']'
-   44          | IDENT . '[' ',' ',' ']'
+   42 arraytype: IDENT . LSBracket RSBracket
+   43          | IDENT . LSBracket ',' RSBracket
+   44          | IDENT . LSBracket ',' ',' RSBracket
 
-    '('  shift, and go to state 35
-    '['  shift, and go to state 36
+    LSBracket  shift, and go to state 35
+    '('        shift, and go to state 36
 
     $default  reduce using rule 36 (noarraytype)
 
@@ -563,11 +563,11 @@ state 31
 state 32
 
    37 noarraytype: basictype .
-   45 arraytype: basictype . '[' ']'
-   46          | basictype . '[' ',' ']'
-   47          | basictype . '[' ',' ',' ']'
+   45 arraytype: basictype . LSBracket RSBracket
+   46          | basictype . LSBracket ',' RSBracket
+   47          | basictype . LSBracket ',' ',' RSBracket
 
-    '['  shift, and go to state 41
+    LSBracket  shift, and go to state 41
 
     $default  reduce using rule 37 (noarraytype)
 
@@ -600,21 +600,21 @@ state 34
 
 state 35
 
-   14 constructor: accessmodif IDENT '(' . @3 args_e ')' '{' statements '}'
+   42 arraytype: IDENT LSBracket . RSBracket
+   43          | IDENT LSBracket . ',' RSBracket
+   44          | IDENT LSBracket . ',' ',' RSBracket
 
-    $default  reduce using rule 13 (@3)
-
-    @3  go to state 43
+    RSBracket  shift, and go to state 43
+    ','        shift, and go to state 44
 
 
 state 36
 
-   42 arraytype: IDENT '[' . ']'
-   43          | IDENT '[' . ',' ']'
-   44          | IDENT '[' . ',' ',' ']'
+   14 constructor: accessmodif IDENT '(' . @3 args_e ')' '{' statements '}'
 
-    ','  shift, and go to state 44
-    ']'  shift, and go to state 45
+    $default  reduce using rule 13 (@3)
+
+    @3  go to state 45
 
 
 state 37
@@ -654,12 +654,12 @@ state 40
 
 state 41
 
-   45 arraytype: basictype '[' . ']'
-   46          | basictype '[' . ',' ']'
-   47          | basictype '[' . ',' ',' ']'
+   45 arraytype: basictype LSBracket . RSBracket
+   46          | basictype LSBracket . ',' RSBracket
+   47          | basictype LSBracket . ',' ',' RSBracket
 
-    ','  shift, and go to state 51
-    ']'  shift, and go to state 52
+    RSBracket  shift, and go to state 51
+    ','        shift, and go to state 52
 
 
 state 42
@@ -671,9 +671,25 @@ state 42
 
 state 43
 
+   42 arraytype: IDENT LSBracket RSBracket .
+
+    $default  reduce using rule 42 (arraytype)
+
+
+state 44
+
+   43 arraytype: IDENT LSBracket ',' . RSBracket
+   44          | IDENT LSBracket ',' . ',' RSBracket
+
+    RSBracket  shift, and go to state 53
+    ','        shift, and go to state 54
+
+
+state 45
+
    14 constructor: accessmodif IDENT '(' @3 . args_e ')' '{' statements '}'
 
-    IDENT   shift, and go to state 53
+    IDENT   shift, and go to state 55
     BOOL    shift, and go to state 25
     DOUBLE  shift, and go to state 26
     INT     shift, and go to state 27
@@ -681,29 +697,13 @@ state 43
 
     $default  reduce using rule 22 (args_e)
 
-    arg          go to state 54
-    args         go to state 55
-    args_e       go to state 56
-    type         go to state 57
+    arg          go to state 56
+    args         go to state 57
+    args_e       go to state 58
+    type         go to state 59
     noarraytype  go to state 31
     basictype    go to state 32
     arraytype    go to state 33
-
-
-state 44
-
-   43 arraytype: IDENT '[' ',' . ']'
-   44          | IDENT '[' ',' . ',' ']'
-
-    ','  shift, and go to state 58
-    ']'  shift, and go to state 59
-
-
-state 45
-
-   42 arraytype: IDENT '[' ']' .
-
-    $default  reduce using rule 42 (arraytype)
 
 
 state 46
@@ -764,82 +764,82 @@ state 50
 
 state 51
 
-   46 arraytype: basictype '[' ',' . ']'
-   47          | basictype '[' ',' . ',' ']'
-
-    ','  shift, and go to state 79
-    ']'  shift, and go to state 80
-
-
-state 52
-
-   45 arraytype: basictype '[' ']' .
+   45 arraytype: basictype LSBracket RSBracket .
 
     $default  reduce using rule 45 (arraytype)
 
 
+state 52
+
+   46 arraytype: basictype LSBracket ',' . RSBracket
+   47          | basictype LSBracket ',' . ',' RSBracket
+
+    RSBracket  shift, and go to state 79
+    ','        shift, and go to state 80
+
+
 state 53
 
-   36 noarraytype: IDENT .
-   42 arraytype: IDENT . '[' ']'
-   43          | IDENT . '[' ',' ']'
-   44          | IDENT . '[' ',' ',' ']'
+   43 arraytype: IDENT LSBracket ',' RSBracket .
 
-    '['  shift, and go to state 36
+    $default  reduce using rule 43 (arraytype)
+
+
+state 54
+
+   44 arraytype: IDENT LSBracket ',' ',' . RSBracket
+
+    RSBracket  shift, and go to state 81
+
+
+state 55
+
+   36 noarraytype: IDENT .
+   42 arraytype: IDENT . LSBracket RSBracket
+   43          | IDENT . LSBracket ',' RSBracket
+   44          | IDENT . LSBracket ',' ',' RSBracket
+
+    LSBracket  shift, and go to state 35
 
     $default  reduce using rule 36 (noarraytype)
 
 
-state 54
+state 56
 
    20 args: arg .
 
     $default  reduce using rule 20 (args)
 
 
-state 55
+state 57
 
    21 args: args . ',' arg
    23 args_e: args .
 
-    ','  shift, and go to state 81
+    ','  shift, and go to state 82
 
     $default  reduce using rule 23 (args_e)
 
 
-state 56
+state 58
 
    14 constructor: accessmodif IDENT '(' @3 args_e . ')' '{' statements '}'
 
-    ')'  shift, and go to state 82
-
-
-state 57
-
-   19 arg: type . IDENT
-
-    IDENT  shift, and go to state 83
-
-
-state 58
-
-   44 arraytype: IDENT '[' ',' ',' . ']'
-
-    ']'  shift, and go to state 84
+    ')'  shift, and go to state 83
 
 
 state 59
 
-   43 arraytype: IDENT '[' ',' ']' .
+   19 arg: type . IDENT
 
-    $default  reduce using rule 43 (arraytype)
+    IDENT  shift, and go to state 84
 
 
 state 60
 
    18 function: accessmodif VOID IDENT '(' @5 . args_e ')' '{' statements '}'
 
-    IDENT   shift, and go to state 53
+    IDENT   shift, and go to state 55
     BOOL    shift, and go to state 25
     DOUBLE  shift, and go to state 26
     INT     shift, and go to state 27
@@ -847,10 +847,10 @@ state 60
 
     $default  reduce using rule 22 (args_e)
 
-    arg          go to state 54
-    args         go to state 55
+    arg          go to state 56
+    args         go to state 57
     args_e       go to state 85
-    type         go to state 57
+    type         go to state 59
     noarraytype  go to state 31
     basictype    go to state 32
     arraytype    go to state 33
@@ -862,22 +862,19 @@ state 61
    51           | IDENT . DECREMENT
    56           | IDENT .
    57           | IDENT . arrayindex
-   58           | IDENT . '=' expression
-   59           | IDENT . arrayindex '=' expression
-   60           | IDENT . '(' expr_list_e ')'
-   63           | IDENT . '.' expression
-   64           | IDENT . arrayindex '.' expression
+   59           | IDENT . '(' expr_list_e ')'
+   62           | IDENT . '.' expression
+   63           | IDENT . arrayindex '.' expression
 
-    '='        shift, and go to state 86
+    LSBracket  shift, and go to state 86
     DECREMENT  shift, and go to state 87
     INCREMENT  shift, and go to state 88
     '.'        shift, and go to state 89
     '('        shift, and go to state 90
-    '['        shift, and go to state 91
 
     $default  reduce using rule 56 (expression)
 
-    arrayindex  go to state 92
+    arrayindex  go to state 91
 
 
 state 62
@@ -910,22 +907,25 @@ state 65
 
 state 66
 
-   61 expression: NEW . IDENT '(' expr_list_e ')'
-   62           | NEW . noarraytype arrayindex
+   60 expression: NEW . IDENT '(' expr_list_e ')'
+   61           | NEW . noarraytype arrayindex
 
-    IDENT   shift, and go to state 93
+    IDENT   shift, and go to state 92
     BOOL    shift, and go to state 25
     DOUBLE  shift, and go to state 26
     INT     shift, and go to state 27
     OBJECT  shift, and go to state 28
 
-    noarraytype  go to state 94
-    basictype    go to state 95
+    noarraytype  go to state 93
+    basictype    go to state 94
 
 
 state 67
 
-   84 expression: THIS .
+   64 expression: THIS . '.' expression
+   84           | THIS .
+
+    '.'  shift, and go to state 95
 
     $default  reduce using rule 84 (expression)
 
@@ -1048,7 +1048,8 @@ state 74
 state 75
 
    27 variable: IDENT '=' expression .
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -1064,19 +1065,20 @@ state 75
    78           | expression . IS type
 
     IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '='  shift, and go to state 104
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 27 (variable)
 
@@ -1085,7 +1087,7 @@ state 76
 
    16 function: accessmodif type IDENT '(' @4 . args_e ')' '{' statements '}'
 
-    IDENT   shift, and go to state 53
+    IDENT   shift, and go to state 55
     BOOL    shift, and go to state 25
     DOUBLE  shift, and go to state 26
     INT     shift, and go to state 27
@@ -1093,10 +1095,10 @@ state 76
 
     $default  reduce using rule 22 (args_e)
 
-    arg          go to state 54
-    args         go to state 55
-    args_e       go to state 117
-    type         go to state 57
+    arg          go to state 56
+    args         go to state 57
+    args_e       go to state 118
+    type         go to state 59
     noarraytype  go to state 31
     basictype    go to state 32
     arraytype    go to state 33
@@ -1121,102 +1123,68 @@ state 78
 
 state 79
 
-   47 arraytype: basictype '[' ',' ',' . ']'
-
-    ']'  shift, and go to state 118
-
-
-state 80
-
-   46 arraytype: basictype '[' ',' ']' .
+   46 arraytype: basictype LSBracket ',' RSBracket .
 
     $default  reduce using rule 46 (arraytype)
 
 
+state 80
+
+   47 arraytype: basictype LSBracket ',' ',' . RSBracket
+
+    RSBracket  shift, and go to state 119
+
+
 state 81
+
+   44 arraytype: IDENT LSBracket ',' ',' RSBracket .
+
+    $default  reduce using rule 44 (arraytype)
+
+
+state 82
 
    21 args: args ',' . arg
 
-    IDENT   shift, and go to state 53
+    IDENT   shift, and go to state 55
     BOOL    shift, and go to state 25
     DOUBLE  shift, and go to state 26
     INT     shift, and go to state 27
     OBJECT  shift, and go to state 28
 
-    arg          go to state 119
-    type         go to state 57
+    arg          go to state 120
+    type         go to state 59
     noarraytype  go to state 31
     basictype    go to state 32
     arraytype    go to state 33
 
 
-state 82
+state 83
 
    14 constructor: accessmodif IDENT '(' @3 args_e ')' . '{' statements '}'
 
-    '{'  shift, and go to state 120
+    '{'  shift, and go to state 121
 
 
-state 83
+state 84
 
    19 arg: type IDENT .
 
     $default  reduce using rule 19 (arg)
 
 
-state 84
-
-   44 arraytype: IDENT '[' ',' ',' ']' .
-
-    $default  reduce using rule 44 (arraytype)
-
-
 state 85
 
    18 function: accessmodif VOID IDENT '(' @5 args_e . ')' '{' statements '}'
 
-    ')'  shift, and go to state 121
+    ')'  shift, and go to state 122
 
 
 state 86
 
-   58 expression: IDENT '=' . expression
-
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-
-    expression  go to state 122
-
-
-state 87
-
-   51 expression: IDENT DECREMENT .
-
-    $default  reduce using rule 51 (expression)
-
-
-state 88
-
-   50 expression: IDENT INCREMENT .
-
-    $default  reduce using rule 50 (expression)
-
-
-state 89
-
-   63 expression: IDENT '.' . expression
+   86 arrayindex: LSBracket . expression RSBracket
+   87           | LSBracket . expression ',' expression RSBracket
+   88           | LSBracket . expression ',' expression ',' expression RSBracket
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1236,9 +1204,45 @@ state 89
     expression  go to state 123
 
 
+state 87
+
+   51 expression: IDENT DECREMENT .
+
+    $default  reduce using rule 51 (expression)
+
+
+state 88
+
+   50 expression: IDENT INCREMENT .
+
+    $default  reduce using rule 50 (expression)
+
+
+state 89
+
+   62 expression: IDENT '.' . expression
+
+    IDENT      shift, and go to state 61
+    INTEGER    shift, and go to state 62
+    REAL       shift, and go to state 63
+    FALSE      shift, and go to state 64
+    TRUE       shift, and go to state 65
+    NEW        shift, and go to state 66
+    THIS       shift, and go to state 67
+    NUL        shift, and go to state 68
+    '+'        shift, and go to state 69
+    '-'        shift, and go to state 70
+    '!'        shift, and go to state 71
+    DECREMENT  shift, and go to state 72
+    INCREMENT  shift, and go to state 73
+    '('        shift, and go to state 74
+
+    expression  go to state 124
+
+
 state 90
 
-   60 expression: IDENT '(' . expr_list_e ')'
+   59 expression: IDENT '(' . expr_list_e ')'
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1257,16 +1261,50 @@ state 90
 
     $default  reduce using rule 91 (expr_list_e)
 
-    expression   go to state 124
-    expr_list    go to state 125
-    expr_list_e  go to state 126
+    expression   go to state 125
+    expr_list    go to state 126
+    expr_list_e  go to state 127
 
 
 state 91
 
-   86 arrayindex: '[' . expression ']'
-   87           | '[' . expression ',' expression ']'
-   88           | '[' . expression ',' expression ',' expression ']'
+   57 expression: IDENT arrayindex .
+   63           | IDENT arrayindex . '.' expression
+
+    '.'  shift, and go to state 128
+
+    $default  reduce using rule 57 (expression)
+
+
+state 92
+
+   36 noarraytype: IDENT .
+   60 expression: NEW IDENT . '(' expr_list_e ')'
+
+    '('  shift, and go to state 129
+
+    $default  reduce using rule 36 (noarraytype)
+
+
+state 93
+
+   61 expression: NEW noarraytype . arrayindex
+
+    LSBracket  shift, and go to state 86
+
+    arrayindex  go to state 130
+
+
+state 94
+
+   37 noarraytype: basictype .
+
+    $default  reduce using rule 37 (noarraytype)
+
+
+state 95
+
+   64 expression: THIS '.' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1283,50 +1321,13 @@ state 91
     INCREMENT  shift, and go to state 73
     '('        shift, and go to state 74
 
-    expression  go to state 127
-
-
-state 92
-
-   57 expression: IDENT arrayindex .
-   59           | IDENT arrayindex . '=' expression
-   64           | IDENT arrayindex . '.' expression
-
-    '='  shift, and go to state 128
-    '.'  shift, and go to state 129
-
-    $default  reduce using rule 57 (expression)
-
-
-state 93
-
-   36 noarraytype: IDENT .
-   61 expression: NEW IDENT . '(' expr_list_e ')'
-
-    '('  shift, and go to state 130
-
-    $default  reduce using rule 36 (noarraytype)
-
-
-state 94
-
-   62 expression: NEW noarraytype . arrayindex
-
-    '['  shift, and go to state 91
-
-    arrayindex  go to state 131
-
-
-state 95
-
-   37 noarraytype: basictype .
-
-    $default  reduce using rule 37 (noarraytype)
+    expression  go to state 131
 
 
 state 96
 
    54 expression: '+' expression .
+   58           | expression . '=' expression
    65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
@@ -1348,6 +1349,7 @@ state 96
 state 97
 
    53 expression: '-' expression .
+   58           | expression . '=' expression
    65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
@@ -1369,6 +1371,7 @@ state 97
 state 98
 
    52 expression: '!' expression .
+   58           | expression . '=' expression
    65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
@@ -1411,6 +1414,7 @@ state 101
 state 102
 
    55 expression: '(' expression . ')'
+   58           | expression . '=' expression
    65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
@@ -1427,19 +1431,20 @@ state 102
    78           | expression . IS type
 
     IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '='  shift, and go to state 104
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
     ')'  shift, and go to state 133
 
 
@@ -1447,7 +1452,7 @@ state 103
 
    78 expression: expression IS . type
 
-    IDENT   shift, and go to state 53
+    IDENT   shift, and go to state 55
     BOOL    shift, and go to state 25
     DOUBLE  shift, and go to state 26
     INT     shift, and go to state 27
@@ -1461,7 +1466,7 @@ state 103
 
 state 104
 
-   77 expression: expression OR . expression
+   58 expression: expression '=' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1483,7 +1488,7 @@ state 104
 
 state 105
 
-   76 expression: expression AND . expression
+   77 expression: expression OR . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1505,7 +1510,7 @@ state 105
 
 state 106
 
-   66 expression: expression NE . expression
+   76 expression: expression AND . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1527,7 +1532,7 @@ state 106
 
 state 107
 
-   65 expression: expression EQ . expression
+   66 expression: expression NE . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1549,7 +1554,7 @@ state 107
 
 state 108
 
-   69 expression: expression '>' . expression
+   65 expression: expression EQ . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1571,7 +1576,7 @@ state 108
 
 state 109
 
-   67 expression: expression '<' . expression
+   69 expression: expression '>' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1593,7 +1598,7 @@ state 109
 
 state 110
 
-   68 expression: expression SE . expression
+   67 expression: expression '<' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1615,7 +1620,7 @@ state 110
 
 state 111
 
-   70 expression: expression LE . expression
+   68 expression: expression SE . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1637,7 +1642,7 @@ state 111
 
 state 112
 
-   71 expression: expression '+' . expression
+   70 expression: expression LE . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1659,7 +1664,7 @@ state 112
 
 state 113
 
-   72 expression: expression '-' . expression
+   71 expression: expression '+' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1681,7 +1686,7 @@ state 113
 
 state 114
 
-   73 expression: expression '*' . expression
+   72 expression: expression '-' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1703,7 +1708,7 @@ state 114
 
 state 115
 
-   74 expression: expression '/' . expression
+   73 expression: expression '*' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1725,7 +1730,7 @@ state 115
 
 state 116
 
-   75 expression: expression '%' . expression
+   74 expression: expression '/' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1747,192 +1752,7 @@ state 116
 
 state 117
 
-   16 function: accessmodif type IDENT '(' @4 args_e . ')' '{' statements '}'
-
-    ')'  shift, and go to state 148
-
-
-state 118
-
-   47 arraytype: basictype '[' ',' ',' ']' .
-
-    $default  reduce using rule 47 (arraytype)
-
-
-state 119
-
-   21 args: args ',' arg .
-
-    $default  reduce using rule 21 (args)
-
-
-state 120
-
-   14 constructor: accessmodif IDENT '(' @3 args_e ')' '{' . statements '}'
-
-    $default  reduce using rule 103 (statements)
-
-    statements  go to state 149
-
-
-state 121
-
-   18 function: accessmodif VOID IDENT '(' @5 args_e ')' . '{' statements '}'
-
-    '{'  shift, and go to state 150
-
-
-state 122
-
-   58 expression: IDENT '=' expression .
-   65           | expression . EQ expression
-   66           | expression . NE expression
-   67           | expression . '<' expression
-   68           | expression . SE expression
-   69           | expression . '>' expression
-   70           | expression . LE expression
-   71           | expression . '+' expression
-   72           | expression . '-' expression
-   73           | expression . '*' expression
-   74           | expression . '/' expression
-   75           | expression . '%' expression
-   76           | expression . AND expression
-   77           | expression . OR expression
-   78           | expression . IS type
-
-    IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
-
-    $default  reduce using rule 58 (expression)
-
-
-state 123
-
-   63 expression: IDENT '.' expression .
-   65           | expression . EQ expression
-   66           | expression . NE expression
-   67           | expression . '<' expression
-   68           | expression . SE expression
-   69           | expression . '>' expression
-   70           | expression . LE expression
-   71           | expression . '+' expression
-   72           | expression . '-' expression
-   73           | expression . '*' expression
-   74           | expression . '/' expression
-   75           | expression . '%' expression
-   76           | expression . AND expression
-   77           | expression . OR expression
-   78           | expression . IS type
-
-    $default  reduce using rule 63 (expression)
-
-
-state 124
-
-   65 expression: expression . EQ expression
-   66           | expression . NE expression
-   67           | expression . '<' expression
-   68           | expression . SE expression
-   69           | expression . '>' expression
-   70           | expression . LE expression
-   71           | expression . '+' expression
-   72           | expression . '-' expression
-   73           | expression . '*' expression
-   74           | expression . '/' expression
-   75           | expression . '%' expression
-   76           | expression . AND expression
-   77           | expression . OR expression
-   78           | expression . IS type
-   89 expr_list: expression .
-
-    IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
-
-    $default  reduce using rule 89 (expr_list)
-
-
-state 125
-
-   90 expr_list: expr_list . ',' expression
-   92 expr_list_e: expr_list .
-
-    ','  shift, and go to state 151
-
-    $default  reduce using rule 92 (expr_list_e)
-
-
-state 126
-
-   60 expression: IDENT '(' expr_list_e . ')'
-
-    ')'  shift, and go to state 152
-
-
-state 127
-
-   65 expression: expression . EQ expression
-   66           | expression . NE expression
-   67           | expression . '<' expression
-   68           | expression . SE expression
-   69           | expression . '>' expression
-   70           | expression . LE expression
-   71           | expression . '+' expression
-   72           | expression . '-' expression
-   73           | expression . '*' expression
-   74           | expression . '/' expression
-   75           | expression . '%' expression
-   76           | expression . AND expression
-   77           | expression . OR expression
-   78           | expression . IS type
-   86 arrayindex: '[' expression . ']'
-   87           | '[' expression . ',' expression ']'
-   88           | '[' expression . ',' expression ',' expression ']'
-
-    IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
-    ','  shift, and go to state 153
-    ']'  shift, and go to state 154
-
-
-state 128
-
-   59 expression: IDENT arrayindex '=' . expression
+   75 expression: expression '%' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1949,12 +1769,166 @@ state 128
     INCREMENT  shift, and go to state 73
     '('        shift, and go to state 74
 
-    expression  go to state 155
+    expression  go to state 148
 
 
-state 129
+state 118
 
-   64 expression: IDENT arrayindex '.' . expression
+   16 function: accessmodif type IDENT '(' @4 args_e . ')' '{' statements '}'
+
+    ')'  shift, and go to state 149
+
+
+state 119
+
+   47 arraytype: basictype LSBracket ',' ',' RSBracket .
+
+    $default  reduce using rule 47 (arraytype)
+
+
+state 120
+
+   21 args: args ',' arg .
+
+    $default  reduce using rule 21 (args)
+
+
+state 121
+
+   14 constructor: accessmodif IDENT '(' @3 args_e ')' '{' . statements '}'
+
+    $default  reduce using rule 103 (statements)
+
+    statements  go to state 150
+
+
+state 122
+
+   18 function: accessmodif VOID IDENT '(' @5 args_e ')' . '{' statements '}'
+
+    '{'  shift, and go to state 151
+
+
+state 123
+
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
+   66           | expression . NE expression
+   67           | expression . '<' expression
+   68           | expression . SE expression
+   69           | expression . '>' expression
+   70           | expression . LE expression
+   71           | expression . '+' expression
+   72           | expression . '-' expression
+   73           | expression . '*' expression
+   74           | expression . '/' expression
+   75           | expression . '%' expression
+   76           | expression . AND expression
+   77           | expression . OR expression
+   78           | expression . IS type
+   86 arrayindex: LSBracket expression . RSBracket
+   87           | LSBracket expression . ',' expression RSBracket
+   88           | LSBracket expression . ',' expression ',' expression RSBracket
+
+    IS         shift, and go to state 103
+    RSBracket  shift, and go to state 152
+    '='        shift, and go to state 104
+    OR         shift, and go to state 105
+    AND        shift, and go to state 106
+    NE         shift, and go to state 107
+    EQ         shift, and go to state 108
+    '>'        shift, and go to state 109
+    '<'        shift, and go to state 110
+    SE         shift, and go to state 111
+    LE         shift, and go to state 112
+    '+'        shift, and go to state 113
+    '-'        shift, and go to state 114
+    '*'        shift, and go to state 115
+    '/'        shift, and go to state 116
+    '%'        shift, and go to state 117
+    ','        shift, and go to state 153
+
+
+state 124
+
+   58 expression: expression . '=' expression
+   62           | IDENT '.' expression .
+   65           | expression . EQ expression
+   66           | expression . NE expression
+   67           | expression . '<' expression
+   68           | expression . SE expression
+   69           | expression . '>' expression
+   70           | expression . LE expression
+   71           | expression . '+' expression
+   72           | expression . '-' expression
+   73           | expression . '*' expression
+   74           | expression . '/' expression
+   75           | expression . '%' expression
+   76           | expression . AND expression
+   77           | expression . OR expression
+   78           | expression . IS type
+
+    $default  reduce using rule 62 (expression)
+
+
+state 125
+
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
+   66           | expression . NE expression
+   67           | expression . '<' expression
+   68           | expression . SE expression
+   69           | expression . '>' expression
+   70           | expression . LE expression
+   71           | expression . '+' expression
+   72           | expression . '-' expression
+   73           | expression . '*' expression
+   74           | expression . '/' expression
+   75           | expression . '%' expression
+   76           | expression . AND expression
+   77           | expression . OR expression
+   78           | expression . IS type
+   89 expr_list: expression .
+
+    IS   shift, and go to state 103
+    '='  shift, and go to state 104
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
+
+    $default  reduce using rule 89 (expr_list)
+
+
+state 126
+
+   90 expr_list: expr_list . ',' expression
+   92 expr_list_e: expr_list .
+
+    ','  shift, and go to state 154
+
+    $default  reduce using rule 92 (expr_list_e)
+
+
+state 127
+
+   59 expression: IDENT '(' expr_list_e . ')'
+
+    ')'  shift, and go to state 155
+
+
+state 128
+
+   63 expression: IDENT arrayindex '.' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1974,9 +1948,9 @@ state 129
     expression  go to state 156
 
 
-state 130
+state 129
 
-   61 expression: NEW IDENT '(' . expr_list_e ')'
+   60 expression: NEW IDENT '(' . expr_list_e ')'
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -1995,16 +1969,38 @@ state 130
 
     $default  reduce using rule 91 (expr_list_e)
 
-    expression   go to state 124
-    expr_list    go to state 125
+    expression   go to state 125
+    expr_list    go to state 126
     expr_list_e  go to state 157
+
+
+state 130
+
+   61 expression: NEW noarraytype arrayindex .
+
+    $default  reduce using rule 61 (expression)
 
 
 state 131
 
-   62 expression: NEW noarraytype arrayindex .
+   58 expression: expression . '=' expression
+   64           | THIS '.' expression .
+   65           | expression . EQ expression
+   66           | expression . NE expression
+   67           | expression . '<' expression
+   68           | expression . SE expression
+   69           | expression . '>' expression
+   70           | expression . LE expression
+   71           | expression . '+' expression
+   72           | expression . '-' expression
+   73           | expression . '*' expression
+   74           | expression . '/' expression
+   75           | expression . '%' expression
+   76           | expression . AND expression
+   77           | expression . OR expression
+   78           | expression . IS type
 
-    $default  reduce using rule 62 (expression)
+    $default  reduce using rule 64 (expression)
 
 
 state 132
@@ -2045,7 +2041,46 @@ state 134
 
 state 135
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   58           | expression '=' expression .
+   65           | expression . EQ expression
+   66           | expression . NE expression
+   67           | expression . '<' expression
+   68           | expression . SE expression
+   69           | expression . '>' expression
+   70           | expression . LE expression
+   71           | expression . '+' expression
+   72           | expression . '-' expression
+   73           | expression . '*' expression
+   74           | expression . '/' expression
+   75           | expression . '%' expression
+   76           | expression . AND expression
+   77           | expression . OR expression
+   78           | expression . IS type
+
+    IS   shift, and go to state 103
+    '='  shift, and go to state 104
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
+
+    $default  reduce using rule 58 (expression)
+
+
+state 136
+
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2062,25 +2097,26 @@ state 135
    78           | expression . IS type
 
     IS   shift, and go to state 103
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 77 (expression)
 
 
-state 136
+state 137
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2097,24 +2133,25 @@ state 136
    78           | expression . IS type
 
     IS   shift, and go to state 103
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 76 (expression)
 
 
-state 137
+state 138
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    66           | expression NE expression .
    67           | expression . '<' expression
@@ -2131,22 +2168,23 @@ state 137
    78           | expression . IS type
 
     IS   shift, and go to state 103
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 66 (expression)
 
 
-state 138
+state 139
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    65           | expression EQ expression .
    66           | expression . NE expression
    67           | expression . '<' expression
@@ -2163,22 +2201,23 @@ state 138
    78           | expression . IS type
 
     IS   shift, and go to state 103
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 65 (expression)
 
 
-state 139
+state 140
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2194,18 +2233,19 @@ state 139
    77           | expression . OR expression
    78           | expression . IS type
 
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 69 (expression)
 
 
-state 140
+state 141
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    67           | expression '<' expression .
@@ -2221,18 +2261,19 @@ state 140
    77           | expression . OR expression
    78           | expression . IS type
 
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 67 (expression)
 
 
-state 141
+state 142
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2248,18 +2289,19 @@ state 141
    77           | expression . OR expression
    78           | expression . IS type
 
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 68 (expression)
 
 
-state 142
+state 143
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2275,18 +2317,19 @@ state 142
    77           | expression . OR expression
    78           | expression . IS type
 
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 70 (expression)
 
 
-state 143
+state 144
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2302,16 +2345,17 @@ state 143
    77           | expression . OR expression
    78           | expression . IS type
 
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 71 (expression)
 
 
-state 144
+state 145
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2327,16 +2371,17 @@ state 144
    77           | expression . OR expression
    78           | expression . IS type
 
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 72 (expression)
 
 
-state 145
+state 146
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2355,9 +2400,10 @@ state 145
     $default  reduce using rule 73 (expression)
 
 
-state 146
+state 147
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2376,9 +2422,10 @@ state 146
     $default  reduce using rule 74 (expression)
 
 
-state 147
+state 148
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2397,14 +2444,14 @@ state 147
     $default  reduce using rule 75 (expression)
 
 
-state 148
+state 149
 
    16 function: accessmodif type IDENT '(' @4 args_e ')' . '{' statements '}'
 
     '{'  shift, and go to state 159
 
 
-state 149
+state 150
 
    14 constructor: accessmodif IDENT '(' @3 args_e ')' '{' statements . '}'
   104 statements: statements . statement
@@ -2443,7 +2490,7 @@ state 149
     statement    go to state 170
 
 
-state 150
+state 151
 
    18 function: accessmodif VOID IDENT '(' @5 args_e ')' '{' . statements '}'
 
@@ -2452,9 +2499,17 @@ state 150
     statements  go to state 171
 
 
-state 151
+state 152
 
-   90 expr_list: expr_list ',' . expression
+   86 arrayindex: LSBracket expression RSBracket .
+
+    $default  reduce using rule 86 (arrayindex)
+
+
+state 153
+
+   87 arrayindex: LSBracket expression ',' . expression RSBracket
+   88           | LSBracket expression ',' . expression ',' expression RSBracket
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -2474,17 +2529,9 @@ state 151
     expression  go to state 172
 
 
-state 152
+state 154
 
-   60 expression: IDENT '(' expr_list_e ')' .
-
-    $default  reduce using rule 60 (expression)
-
-
-state 153
-
-   87 arrayindex: '[' expression ',' . expression ']'
-   88           | '[' expression ',' . expression ',' expression ']'
+   90 expr_list: expr_list ',' . expression
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -2504,52 +2551,17 @@ state 153
     expression  go to state 173
 
 
-state 154
-
-   86 arrayindex: '[' expression ']' .
-
-    $default  reduce using rule 86 (arrayindex)
-
-
 state 155
 
-   59 expression: IDENT arrayindex '=' expression .
-   65           | expression . EQ expression
-   66           | expression . NE expression
-   67           | expression . '<' expression
-   68           | expression . SE expression
-   69           | expression . '>' expression
-   70           | expression . LE expression
-   71           | expression . '+' expression
-   72           | expression . '-' expression
-   73           | expression . '*' expression
-   74           | expression . '/' expression
-   75           | expression . '%' expression
-   76           | expression . AND expression
-   77           | expression . OR expression
-   78           | expression . IS type
-
-    IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+   59 expression: IDENT '(' expr_list_e ')' .
 
     $default  reduce using rule 59 (expression)
 
 
 state 156
 
-   64 expression: IDENT arrayindex '.' expression .
+   58 expression: expression . '=' expression
+   63           | IDENT arrayindex '.' expression .
    65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
@@ -2565,19 +2577,20 @@ state 156
    77           | expression . OR expression
    78           | expression . IS type
 
-    $default  reduce using rule 64 (expression)
+    $default  reduce using rule 63 (expression)
 
 
 state 157
 
-   61 expression: NEW IDENT '(' expr_list_e . ')'
+   60 expression: NEW IDENT '(' expr_list_e . ')'
 
     ')'  shift, and go to state 174
 
 
 state 158
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2594,19 +2607,19 @@ state 158
    79           | '(' basictype ')' expression .
 
     IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 79 (expression)
 
@@ -2623,30 +2636,27 @@ state 159
 state 160
 
    36 noarraytype: IDENT .
-   42 arraytype: IDENT . '[' ']'
-   43          | IDENT . '[' ',' ']'
-   44          | IDENT . '[' ',' ',' ']'
+   42 arraytype: IDENT . LSBracket RSBracket
+   43          | IDENT . LSBracket ',' RSBracket
+   44          | IDENT . LSBracket ',' ',' RSBracket
    50 expression: IDENT . INCREMENT
    51           | IDENT . DECREMENT
    56           | IDENT .
    57           | IDENT . arrayindex
-   58           | IDENT . '=' expression
-   59           | IDENT . arrayindex '=' expression
-   60           | IDENT . '(' expr_list_e ')'
-   63           | IDENT . '.' expression
-   64           | IDENT . arrayindex '.' expression
+   59           | IDENT . '(' expr_list_e ')'
+   62           | IDENT . '.' expression
+   63           | IDENT . arrayindex '.' expression
 
-    '='        shift, and go to state 86
+    LSBracket  shift, and go to state 176
     DECREMENT  shift, and go to state 87
     INCREMENT  shift, and go to state 88
     '.'        shift, and go to state 89
     '('        shift, and go to state 90
-    '['        shift, and go to state 176
 
     IDENT     reduce using rule 36 (noarraytype)
     $default  reduce using rule 56 (expression)
 
-    arrayindex  go to state 92
+    arrayindex  go to state 91
 
 
 state 161
@@ -2731,7 +2741,8 @@ state 168
 
 state 169
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2748,19 +2759,20 @@ state 169
    97 statement: expression . ';'
 
     IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '='  shift, and go to state 104
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
     ';'  shift, and go to state 184
 
 
@@ -2812,7 +2824,47 @@ state 171
 
 state 172
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
+   66           | expression . NE expression
+   67           | expression . '<' expression
+   68           | expression . SE expression
+   69           | expression . '>' expression
+   70           | expression . LE expression
+   71           | expression . '+' expression
+   72           | expression . '-' expression
+   73           | expression . '*' expression
+   74           | expression . '/' expression
+   75           | expression . '%' expression
+   76           | expression . AND expression
+   77           | expression . OR expression
+   78           | expression . IS type
+   87 arrayindex: LSBracket expression ',' expression . RSBracket
+   88           | LSBracket expression ',' expression . ',' expression RSBracket
+
+    IS         shift, and go to state 103
+    RSBracket  shift, and go to state 186
+    '='        shift, and go to state 104
+    OR         shift, and go to state 105
+    AND        shift, and go to state 106
+    NE         shift, and go to state 107
+    EQ         shift, and go to state 108
+    '>'        shift, and go to state 109
+    '<'        shift, and go to state 110
+    SE         shift, and go to state 111
+    LE         shift, and go to state 112
+    '+'        shift, and go to state 113
+    '-'        shift, and go to state 114
+    '*'        shift, and go to state 115
+    '/'        shift, and go to state 116
+    '%'        shift, and go to state 117
+    ','        shift, and go to state 187
+
+
+state 173
+
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -2829,65 +2881,29 @@ state 172
    90 expr_list: expr_list ',' expression .
 
     IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '='  shift, and go to state 104
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 90 (expr_list)
 
 
-state 173
-
-   65 expression: expression . EQ expression
-   66           | expression . NE expression
-   67           | expression . '<' expression
-   68           | expression . SE expression
-   69           | expression . '>' expression
-   70           | expression . LE expression
-   71           | expression . '+' expression
-   72           | expression . '-' expression
-   73           | expression . '*' expression
-   74           | expression . '/' expression
-   75           | expression . '%' expression
-   76           | expression . AND expression
-   77           | expression . OR expression
-   78           | expression . IS type
-   87 arrayindex: '[' expression ',' expression . ']'
-   88           | '[' expression ',' expression . ',' expression ']'
-
-    IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
-    ','  shift, and go to state 186
-    ']'  shift, and go to state 187
-
-
 state 174
 
-   61 expression: NEW IDENT '(' expr_list_e ')' .
+   60 expression: NEW IDENT '(' expr_list_e ')' .
 
-    $default  reduce using rule 61 (expression)
+    $default  reduce using rule 60 (expression)
 
 
 state 175
@@ -2931,12 +2947,12 @@ state 175
 
 state 176
 
-   42 arraytype: IDENT '[' . ']'
-   43          | IDENT '[' . ',' ']'
-   44          | IDENT '[' . ',' ',' ']'
-   86 arrayindex: '[' . expression ']'
-   87           | '[' . expression ',' expression ']'
-   88           | '[' . expression ',' expression ',' expression ']'
+   42 arraytype: IDENT LSBracket . RSBracket
+   43          | IDENT LSBracket . ',' RSBracket
+   44          | IDENT LSBracket . ',' ',' RSBracket
+   86 arrayindex: LSBracket . expression RSBracket
+   87           | LSBracket . expression ',' expression RSBracket
+   88           | LSBracket . expression ',' expression ',' expression RSBracket
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -2946,6 +2962,7 @@ state 176
     NEW        shift, and go to state 66
     THIS       shift, and go to state 67
     NUL        shift, and go to state 68
+    RSBracket  shift, and go to state 43
     '+'        shift, and go to state 69
     '-'        shift, and go to state 70
     '!'        shift, and go to state 71
@@ -2953,9 +2970,8 @@ state 176
     INCREMENT  shift, and go to state 73
     '('        shift, and go to state 74
     ','        shift, and go to state 44
-    ']'        shift, and go to state 45
 
-    expression  go to state 127
+    expression  go to state 123
 
 
 state 177
@@ -3026,7 +3042,8 @@ state 179
 
 state 180
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -3043,19 +3060,20 @@ state 180
   109 expr_e: expression .
 
     IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '='  shift, and go to state 104
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
 
     $default  reduce using rule 109 (expr_e)
 
@@ -3101,7 +3119,14 @@ state 185
 
 state 186
 
-   88 arrayindex: '[' expression ',' expression ',' . expression ']'
+   87 arrayindex: LSBracket expression ',' expression RSBracket .
+
+    $default  reduce using rule 87 (arrayindex)
+
+
+state 187
+
+   88 arrayindex: LSBracket expression ',' expression ',' . expression RSBracket
 
     IDENT      shift, and go to state 61
     INTEGER    shift, and go to state 62
@@ -3121,13 +3146,6 @@ state 186
     expression  go to state 198
 
 
-state 187
-
-   87 arrayindex: '[' expression ',' expression ']' .
-
-    $default  reduce using rule 87 (arrayindex)
-
-
 state 188
 
    16 function: accessmodif type IDENT '(' @4 args_e ')' '{' statements '}' .
@@ -3137,7 +3155,8 @@ state 188
 
 state 189
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -3155,25 +3174,27 @@ state 189
    94          | IF '(' expression . ')' statement ELSE statement
 
     IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '='  shift, and go to state 104
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
     ')'  shift, and go to state 199
 
 
 state 190
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -3190,19 +3211,20 @@ state 190
    95 statement: WHILE '(' expression . ')' statement
 
     IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
+    '='  shift, and go to state 104
+    OR   shift, and go to state 105
+    AND  shift, and go to state 106
+    NE   shift, and go to state 107
+    EQ   shift, and go to state 108
+    '>'  shift, and go to state 109
+    '<'  shift, and go to state 110
+    SE   shift, and go to state 111
+    LE   shift, and go to state 112
+    '+'  shift, and go to state 113
+    '-'  shift, and go to state 114
+    '*'  shift, and go to state 115
+    '/'  shift, and go to state 116
+    '%'  shift, and go to state 117
     ')'  shift, and go to state 200
 
 
@@ -3211,12 +3233,12 @@ state 191
    26 variable: IDENT .
    27         | IDENT . '=' expression
    36 noarraytype: IDENT .
-   42 arraytype: IDENT . '[' ']'
-   43          | IDENT . '[' ',' ']'
-   44          | IDENT . '[' ',' ',' ']'
+   42 arraytype: IDENT . LSBracket RSBracket
+   43          | IDENT . LSBracket ',' RSBracket
+   44          | IDENT . LSBracket ',' ',' RSBracket
 
-    '='  shift, and go to state 47
-    '['  shift, and go to state 36
+    LSBracket  shift, and go to state 35
+    '='        shift, and go to state 47
 
     IDENT     reduce using rule 36 (noarraytype)
     $default  reduce using rule 26 (variable)
@@ -3304,7 +3326,8 @@ state 197
 
 state 198
 
-   65 expression: expression . EQ expression
+   58 expression: expression . '=' expression
+   65           | expression . EQ expression
    66           | expression . NE expression
    67           | expression . '<' expression
    68           | expression . SE expression
@@ -3318,23 +3341,24 @@ state 198
    76           | expression . AND expression
    77           | expression . OR expression
    78           | expression . IS type
-   88 arrayindex: '[' expression ',' expression ',' expression . ']'
+   88 arrayindex: LSBracket expression ',' expression ',' expression . RSBracket
 
-    IS   shift, and go to state 103
-    OR   shift, and go to state 104
-    AND  shift, and go to state 105
-    NE   shift, and go to state 106
-    EQ   shift, and go to state 107
-    '>'  shift, and go to state 108
-    '<'  shift, and go to state 109
-    SE   shift, and go to state 110
-    LE   shift, and go to state 111
-    '+'  shift, and go to state 112
-    '-'  shift, and go to state 113
-    '*'  shift, and go to state 114
-    '/'  shift, and go to state 115
-    '%'  shift, and go to state 116
-    ']'  shift, and go to state 204
+    IS         shift, and go to state 103
+    RSBracket  shift, and go to state 204
+    '='        shift, and go to state 104
+    OR         shift, and go to state 105
+    AND        shift, and go to state 106
+    NE         shift, and go to state 107
+    EQ         shift, and go to state 108
+    '>'        shift, and go to state 109
+    '<'        shift, and go to state 110
+    SE         shift, and go to state 111
+    LE         shift, and go to state 112
+    '+'        shift, and go to state 113
+    '-'        shift, and go to state 114
+    '*'        shift, and go to state 115
+    '/'        shift, and go to state 116
+    '%'        shift, and go to state 117
 
 
 state 199
@@ -3456,7 +3480,7 @@ state 203
 
 state 204
 
-   88 arrayindex: '[' expression ',' expression ',' expression ']' .
+   88 arrayindex: LSBracket expression ',' expression ',' expression RSBracket .
 
     $default  reduce using rule 88 (arrayindex)
 

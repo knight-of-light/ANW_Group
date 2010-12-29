@@ -87,7 +87,7 @@ public:
 	bool AddSym(Ident *id, int kind, int acctype, Type *type, Args *args, Function *meth); // Add Symbol to Ident and add it to hashTable, used for Ident of Function.
 
 	bool IsDeclared(Ident *id, Deffered *def); // Check if the Ident is Declared, used for local and global Ident.
-	bool IsDeclared(Ident *id, int ScopeNum, bool CheckClassName, bool IsCall); // Check if Ident is declared in spacific scope or his fathers ( and in class if CheckClassName is true).
+	bool IsDeclared(Ident *id, int ScopeNum, bool CheckClasses, bool IsCall); // Check if Ident is declared in spacific scope or his fathers ( and in class if CheckClassName is true).
 	bool IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope, bool IsCall); // Check if the Ident is Declared, used for Invoke and NewObject Ident.
 	bool IsDeclared(Ident *id, int kind, Deffered *def); // Check if the Idnet is Declared, used for ClassInhert and IdentType.
 

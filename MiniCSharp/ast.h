@@ -49,12 +49,12 @@ class Paren;
 class IdentExpr;
 class IdentArr;
 class Assign;
-class ArrAssign;
 class Invoke;
 class NewObject;
 class NewArray;
 class IdentCall;
 class IdentArrCall;
+class ThisCall;
 class Equal;
 class NotEq;
 class Smaller;
@@ -272,6 +272,7 @@ public:
 	int type;
 	// 0: no arr, 1: [], 2: [,], 3: [,,]
 	int arr_level;
+	int arr_capacity[3]; // if type is array then I put array capacity.
 	Ident *name;
 
 	Type(int, int);
@@ -316,8 +317,9 @@ class Expr : public Node
 {
 public:
 	//-1: no type, 0 = Null, 1 = int , 2 = double , 3 = boolean, 4: void
-	// int type;
 	Type *type;
+	// num of expr if there are number.
+	int num;
 	Expr(int, int);
 	virtual void accept(Visitor *);
 };
@@ -409,22 +411,10 @@ public:
 class Assign : public Expr
 {
 public:
-	Ident	*ident;
-	Expr	*expr;
+	Expr	*left;
+	Expr	*right;
 
-	Assign(Ident *, Expr *, int, int);
-	virtual void accept(Visitor *);
-};
-
-//*******     ArrAssign		*********
-class ArrAssign : public Expr
-{
-public:
-	Ident		*ident;
-	ArrayIndex	*arrayIndex;
-	Expr		*expr;
-
-	ArrAssign(Ident *, ArrayIndex *, Expr *, int, int);
+	Assign(Expr *, Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -481,6 +471,16 @@ public:
 	Expr		*expr;
 
 	IdentArrCall(Ident *, ArrayIndex *, Expr *, int, int);
+	virtual void accept(Visitor *);
+};
+
+//*******     ThisCall  	*********
+class ThisCall : public Expr
+{
+public:
+	Expr	*expr;
+
+	ThisCall(Expr *, int, int);
 	virtual void accept(Visitor *);
 };
 
@@ -707,6 +707,7 @@ class ArrayIndex : public Node
 public:
 	// 1: [] , 2: [,] , 3: [,,]
 	int arr_level;
+	int arr_capacity[3];
 	ArrayIndex(int, int);
 	virtual void accept(Visitor *);
 };
@@ -790,7 +791,7 @@ public:
 class IfElse : public If
 {
 public:
-	Stat		*elseStat;
+	Stat	*elseStat;
 
 	IfElse(Expr *, Stat *, Stat *, int , int );
 	virtual void accept(Visitor *);

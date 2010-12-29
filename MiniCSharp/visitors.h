@@ -37,12 +37,12 @@ public:
 	virtual void Visit(IdentExpr *) = 0;
 	virtual void Visit(IdentArr *) = 0;
 	virtual void Visit(Assign *) = 0;
-	virtual void Visit(ArrAssign *) = 0;
 	virtual void Visit(Invoke *) = 0;
 	virtual void Visit(NewObject *) = 0;
 	virtual void Visit(NewArray *) = 0;
 	virtual void Visit(IdentCall *) = 0;
 	virtual void Visit(IdentArrCall *) = 0;
+	virtual void Visit(ThisCall *) = 0;
 	virtual void Visit(Equal *) = 0;
 	virtual void Visit(NotEq *) = 0;
 	virtual void Visit(Smaller *) = 0;
@@ -117,12 +117,12 @@ public:
 	virtual void Visit(IdentExpr *);
 	virtual void Visit(IdentArr *);
 	virtual void Visit(Assign *);
-	virtual void Visit(ArrAssign *);
 	virtual void Visit(Invoke *);
 	virtual void Visit(NewObject *);
 	virtual void Visit(NewArray *);
 	virtual void Visit(IdentCall *);
 	virtual void Visit(IdentArrCall *);
+	virtual void Visit(ThisCall *);
 	virtual void Visit(Equal *);
 	virtual void Visit(NotEq *);
 	virtual void Visit(Smaller *);
@@ -185,7 +185,7 @@ private:
 class TypeVisitor : public Visitor
 {
 public:
-	TypeVisitor(Root *file, SymTab *st, Deffered *def);
+	TypeVisitor(Root *file, SymTab *st);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);
@@ -213,12 +213,12 @@ public:
 	virtual void Visit(IdentExpr *);
 	virtual void Visit(IdentArr *);
 	virtual void Visit(Assign *);
-	virtual void Visit(ArrAssign *);
 	virtual void Visit(Invoke *);
 	virtual void Visit(NewObject *);
 	virtual void Visit(NewArray *);
 	virtual void Visit(IdentCall *);
 	virtual void Visit(IdentArrCall *);
+	virtual void Visit(ThisCall *);
 	virtual void Visit(Equal *);
 	virtual void Visit(NotEq *);
 	virtual void Visit(Smaller *);
@@ -258,14 +258,15 @@ public:
 	virtual void Visit(Return *);
 	virtual void Visit(Variables_e *);
 	SymTab *symtab;
-	Deffered *def;
 	string types [8];
+	string arrlvl [4];
 	Function *mainFunc;
 	int scopeNum;
 	int callNum;
 	bool IsStatic;
-	bool NeedReturn; // use this ident to know if we allowed to use return or not, (true: we need, false: we don't need).
-	int NumReturns;
+	bool IsReturn; // use this ident to know if we allowed to use return or not, (true: we need, false: we don't need).
+	int NumReturns; // how much returns we have.
+	Type *RetrurnType;
 };
 
 //***********************************************************************
@@ -302,12 +303,12 @@ public:
 	virtual void Visit(IdentExpr *);
 	virtual void Visit(IdentArr *);
 	virtual void Visit(Assign *);
-	virtual void Visit(ArrAssign *);
 	virtual void Visit(Invoke *);
 	virtual void Visit(NewObject *);
 	virtual void Visit(NewArray *);
 	virtual void Visit(IdentCall *);
 	virtual void Visit(IdentArrCall *);
+	virtual void Visit(ThisCall *);
 	virtual void Visit(Equal *);
 	virtual void Visit(NotEq *);
 	virtual void Visit(Smaller *);

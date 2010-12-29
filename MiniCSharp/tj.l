@@ -144,6 +144,14 @@ REAL3	(0|[1-9][0-9]*)([eE][-+]?(0|[1-9][0-9]*))
 						col += yyleng;
 						return OR;
 					}
+"["					{
+						col += yyleng;
+						return LSBracket;
+					}
+"]"					{
+						col += yyleng;
+						return RSBracket;
+					}
 0|[1-9][0-9]*		{
 						col += yyleng;
 						yylval.tInteger = new Integer(atoi(yytext), lin, col);

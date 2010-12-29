@@ -440,29 +440,10 @@ PrintVisitor::Visit(Assign *n)
 	count++;
 	
 	PrintBars(count);
-	n->ident->accept(this);
+	n->left->accept(this);
 	
 	PrintBars(count);
-	n->expr->accept(this);
-
-	count--;
-}
-
-void
-PrintVisitor::Visit(ArrAssign *n)
-{
-	cout << "ArrAssign" << endl;
-
-	count++;
-	
-	PrintBars(count);
-	n->ident->accept(this);
-	
-	PrintBars(count);
-	n->arrayIndex->accept(this);
-	
-	PrintBars(count);
-	n->expr->accept(this);
+	n->right->accept(this);
 
 	count--;
 }
@@ -543,6 +524,19 @@ PrintVisitor::Visit(IdentArrCall *n)
 
 	PrintBars(count);
 	n->arrayIndex->accept(this);
+
+	PrintBars(count);
+	n->expr->accept(this);
+
+	count--;
+}
+
+void
+PrintVisitor::Visit(ThisCall *n)
+{
+	cout << "ThisCall" << endl;
+
+	count++;
 
 	PrintBars(count);
 	n->expr->accept(this);

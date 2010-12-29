@@ -183,37 +183,37 @@ SymTab::AddSym(Ident *id, int kind, int acctype, Args *args, Constructor *constr
 {
 	// Add Constructor Symbol to hash table.
 
-	if(acctype != 3 && acctype != 4) // check if acctype didn't contain "static".
+	//if(acctype != 3 && acctype != 4) // check if acctype didn't contain "static". I checked from it in TypeVisitor
+	//{
+	string key = this->kinds[kind]+"@"+id->name;
+	for(int i=0; i < args->args->size(); i++)
 	{
-		string key = this->kinds[kind]+"@"+id->name;
-		for(int i=0; i < args->args->size(); i++)
-		{
-			int t = args->args->at(i)->type->type;
-			// if type of arg is Ident then write to key the name of Ident.
-			if(t == 6)
-				key += "@" + args->args->at(i)->type->name->name;
-			else
-				key += "@" + types[t];
-		}
-
-		if(this->Lookup(key, this->current) == NULL) // if there is no id have same key, then OK.
-		{
-			Sym *sym = new Sym(id->name, kind, acctype, this->current, args, constr);
-			this->current->hashTab->AddKey(key, sym);
-			id->symbol = sym;
-			return true;
-		}
+		int t = args->args->at(i)->type->type;
+		// if type of arg is Ident then write to key the name of Ident.
+		if(t == 6)
+			key += "@" + args->args->at(i)->type->name->name;
 		else
-		{
-			this->errors->AddError("Redefinition of Identifier '" + id->name + "'", id->line, id->column);
-			return false;
-		}
+			key += "@" + types[t];
 	}
+
+	if(this->Lookup(key, this->current) == NULL) // if there is no id have same key, then OK.
+	{
+		Sym *sym = new Sym(id->name, kind, acctype, this->current, args, constr);
+		this->current->hashTab->AddKey(key, sym);
+		id->symbol = sym;
+		return true;
+	}
+	else
+	{
+		this->errors->AddError("Redefinition of Identifier '" + id->name + "'", id->line, id->column);
+		return false;
+	}
+	/*}
 	else
 	{
 		this->errors->AddError("Access modifiers are not allowed on static constructors", id->line, id->column);
 		return false;
-	}
+	}*/
 }
 
 bool

@@ -85,6 +85,7 @@
 %token NEW
 %token THIS NUL PRIVATE PUBLIC STATIC
 %token VOID RETURN
+%token LSBracket RSBracket
 
 %nonassoc IF_PREC
 %nonassoc ELSE
@@ -106,13 +107,13 @@ root:			/* empty */
 					{
 						$$ = new Root(lin, col);
 						symtab->AddNewScope();
-						file=$$;
+						file = $$;
 					}
 				| root class
 					{
 						$1->AddClass($2);
 						$$ = $1;
-						file=$$;
+						file = $$;
 					}
 ;
 
@@ -309,30 +310,30 @@ basictype:		  INT
 					}
 ;
 
-arraytype:		  IDENT '[' ']'
+arraytype:		  IDENT LSBracket RSBracket
 					{
 						$$ = new ArrayType(1, $1, lin, col);
 						symtab->IsDeclared($1, 1, def);
 					}
-				| IDENT '[' ',' ']'
+				| IDENT LSBracket ',' RSBracket
 					{
 						$$ = new ArrayType(2, $1, lin, col);
 						symtab->IsDeclared($1, 1, def);
 					}
-				| IDENT '[' ',' ',' ']'
+				| IDENT LSBracket ',' ',' RSBracket
 					{
 						$$ = new ArrayType(3, $1, lin, col);
 						symtab->IsDeclared($1, 1, def);
 					}
-				| basictype '[' ']'
+				| basictype LSBracket RSBracket
 					{
 						$$ = new ArrayType($1->type, 1, lin, col);
 					}
-				| basictype '[' ',' ']'
+				| basictype LSBracket ',' RSBracket
 					{
 						$$ = new ArrayType($1->type, 2, lin, col);
 					}
-				| basictype '[' ',' ',' ']'
+				| basictype LSBracket ',' ',' RSBracket
 					{
 						$$ = new ArrayType($1->type, 3, lin, col);
 					}
@@ -384,15 +385,10 @@ expression:		  INCREMENT IDENT
 						$$ = new IdentArr($1, $2, lin, col);
 						symtab->IsDeclared($1, def);
 					}
-				| IDENT '=' expression
+				| expression '=' expression
 					{
 						$$ = new Assign($1, $3, lin, col);
-						symtab->IsDeclared($1, def);
-					}
-				| IDENT arrayindex '=' expression
-					{
-						$$ = new ArrAssign($1, $2, $4, lin, col);
-						symtab->IsDeclared($1, def);
+						//symtab->IsDeclared($1, def);
 					}
 				| IDENT '(' expr_list_e ')'
 					{
@@ -419,6 +415,10 @@ expression:		  INCREMENT IDENT
 					{
 						$$ = new IdentArrCall($1, $2, $4, lin, col);
 						symtab->IsDeclared($1, def);
+					}
+				| THIS '.' expression
+					{
+						$$ = new ThisCall($3, lin, col);
 					}
 				| expression EQ expression
 					{
@@ -502,15 +502,15 @@ expression:		  INCREMENT IDENT
 					}
 ;
 
-arrayindex:		  '[' expression ']'
+arrayindex:		  LSBracket expression RSBracket
 					{
 						$$ = new ArrayIndex_1($2, lin, col);
 					}
-				| '[' expression ',' expression ']'
+				| LSBracket expression ',' expression RSBracket
 					{
 						$$ = new ArrayIndex_2($2, $4, lin, col);
 					}
-				| '[' expression ',' expression ',' expression ']'
+				| LSBracket expression ',' expression ',' expression RSBracket
 					{
 						$$ = new ArrayIndex_3($2, $4, $6, lin, col);
 					}
@@ -545,7 +545,7 @@ statement:		  IF '(' expression ')' statement %prec IF_PREC
 					{
 						$$ = new IfElse($3, $5, $7, lin, col);
 					}
-				| WHILE '(' expression ')'  statement
+				| WHILE '(' expression ')' statement
 					{
 						$$ = new While($3, $5, lin, col);
 					}
