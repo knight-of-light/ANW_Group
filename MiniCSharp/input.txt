@@ -1,176 +1,27 @@
-class Program
+class A //: C
 {
-    public int test;
+    public A() { }
+    public static int x;
+    public int y;
+}
+class B : A
+{
+    public B() { }
+    public A a;
+    int z;
+}
+class C : B
+{
+    public C() { }
+    int zz;
+}
+class M
+{
+    public M() { }
+    public void test() {}
     public static void Main()
     {
-
-        int[] arr;
-
-        arr = new int[9];
-        int i = 0;
-        arr[i] = i+1;
-
-
-        test[] arr2 = new test[4];
-        //arr2[0] = 3;
-
-        Program p = new Program();
-        p.TestFunction();
-        //Console.WriteLine(p.CheckIntegerGroupingAndItsPrioritiesAndItsOperations());
-        //Console.WriteLine(p.CheckDoubleGroupingAndItsPrioritiesAndItsOperations());
-        //p.TestArrays();
-
-        test tt = new test();
-        p.test = 5;
-
-        //p = 9;
-
-        Program pp;
-        pp = this;
-        this.test = 9;
+        B b = new B();
+        b.a = new A();
     }
-    public Program TestFunction()
-    {
-        Program p = new Program();
-        test t = new test();
-        test[] arr = new test[4];
-        return t;
-    }
-    public Program()// the class must Has one Constructor At Least 
-    {
-
-    }
-    public int CheckIntegerGroupingAndItsPrioritiesAndItsOperations()
-    {
-        //int x = 5 - 1 * 6 - 7 / 9;
-        //int y = 7 * 5 + 3 / 7;
-        //int z = 8 + x / 8 + x;
-        int x = 0;
-        int y = 0;
-        int z = 0;
-        x = y + z - y;
-        x++;
-        y--;
-        x = ++y;
-        z = --y + 12;
-        //Console.WriteLine(x);  x=35
-        //Console.WriteLine(y);  x=34
-        //Console.WriteLine(z);  x=46
-        if (x > 2)
-            if (x % 2 == 0)
-                return 0;
-            else
-                return 1;  //this is the Right return ;
-        else
-            return 2;
-        //  Canot reach to this code 
-        //if (z > 2)
-        //    if (z % 2 == 0)
-        //        return 0;
-        //    else
-        //        return 1;
-        //else
-        //    return 2;
-
-    }
-    public double CheckDoubleGroupingAndItsPrioritiesAndItsOperations()
-    {
-        double x = 54.9;
-        double y = 5.6;
-        double z = 8 + x / 10;
-        int t = 5;
-        // t = x; Error Canot convert From Double To Integer
-        //t = true;  Error Canot convert From boolean To Integer
-
-        x = y - z + x;
-        x++;
-        x = y++;
-        z = y;
-        //Console.WriteLine(x);  x=5.6
-        //Console.WriteLine(y);  y=6.6
-        //Console.WriteLine(z);  z=6.6
-        if (x > 2)
-            if (true)//x % 2 == 0)
-                return 3;
-            else
-                return 1; // this is the right Return 
-        else
-            return 2;
-        //  Canot reach to this code 
-        //if (z > 2)
-        //    if (z % 2 == 0)
-        //        return 0;
-        //    else
-        //        return 1;
-        //else
-        //    return 2;
-
-    }
-    public void TestArrays()
-    {
-        //int[] Arr = new int[10];
-        for (int i = 0; i < 10; i++)
-        {
-            //Arr[i] = i + 1;
-            //Console.WriteLine(Arr[i]); print 10--------1
-        }
-        int Counter = 10;
-        while (Counter > 0)
-        {
-            Counter--;
-            //Arr[Counter] = Counter + 1; //check if Counter in Index of array not bigger not smaller
-            //Console.WriteLine(Arr[Counter]); print 10--------1
-        }
-        Counter = 10;
-        while (Counter > 0)
-        {
-            Counter--;
-            //if (Counter % 2 == 0 && Counter % 3 != 0)
-             //   Arr[Counter] = 2; //check if Counter in Index of array not bigger not smaller
-            //Console.WriteLine(Arr[Counter]); print
-            //10
-            //2
-            //8
-            //7
-            //6
-            //2
-            //4
-            //2
-            //2
-            //1
-        }
-
-    }
-    public void TestStatements()
-    {
-        int x = 5;
-        for (int i = 0; i < 10; i++)
-        {
-            x++;// Use of unassigned local variable 'x' if x has  no value  yet
-            //Console.WriteLine(x);
-        }
-        int Counter = 10;
-        while (Counter > 0 || Counter > 1)
-        {
-            Counter--;
-            x = Counter + 1; //check if Counter in Index of array not bigger not smaller
-            //Console.WriteLine(x);
-        }
-        Counter = 10;
-        if (Counter >= 0 && Counter <= 10)
-            Counter = 10;
-        while (Counter > 0 && Counter > 1)
-        {
-            Counter--;
-            if (Counter % 2 == 0 && Counter % 3 != 0)
-                x = 2; //check if Counter in Index of array not bigger not smaller
-
-        }
-
-    }
-}
-class test : Program
-{
-    private void TestStatements11() { }
-    public test() { }
 }

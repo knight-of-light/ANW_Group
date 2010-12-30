@@ -58,6 +58,7 @@ TypeVisitor::Visit(Class *n)
 			Constructor *C = dynamic_cast<Constructor*>(n->members->members->at(i));
 			if(n->name->name != C->name->name)
 				this->symtab->errors->AddError("Method must have a retrun type", C->name->line, C->name->column);
+			C->name->symbol->clas = n;
 			IsContCons = true;
 		}
 
@@ -98,6 +99,7 @@ TypeVisitor::Visit(ClassInher *n)
 			Constructor *C = dynamic_cast<Constructor*>(n->members->members->at(i));
 			if(n->name->name != C->name->name )
 				this->symtab->errors->AddError("Method must have a retrun type", C->name->line, C->name->column);
+			C->name->symbol->clas = n;
 			IsContCons = true;
 		}
 
@@ -120,6 +122,14 @@ TypeVisitor::Visit(ClassInher *n)
 	}
 	if(!IsContCons) // if there is no Constructor in this class.
 		this->symtab->errors->AddError("Class should contain at less one Constructor", n->line, n->column);
+	
+	// Add all Global ident in parents to this class Global.
+	for(int i=0; i<n->Parents->size(); i++)
+	{
+		Class *C = dynamic_cast<Class*>(n->Parents->at(i)->symbol->clas);
+		for(int j=0; j<C->Globals->size(); j++)
+			n->AddGlobal(C->Globals->at(j));
+	}
 }
 
 void
@@ -639,7 +649,7 @@ TypeVisitor::Visit(NewObject *n)
 
 	n->exprList->accept(this);
 
-	if(this->symtab->IsDeclared(n->ident, 3, n->exprList, this->scopeNum))
+	if(this->symtab->IsDeclared(n->ident, 3, n->exprList, this->scopeNum, false))
 	{
 		n->type->type = 6;
 		n->type->name = n->ident;

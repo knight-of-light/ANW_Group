@@ -27,6 +27,9 @@ public:
 	int acctype; // if Global, Constructor or Function.
 
 	int location; // Ident location where is stored in memory, used in CodeVisitor.
+	int global_location; // Ident location where is stored in object memory, used in CodeVisitor.
+	vector<Ident> *Globals;
+
 	Scope *scope; // scope where the Ident Declared (not where it used).
 
 	Type *type; // Type of Ident, contain type, array level and Ident if its type is class.

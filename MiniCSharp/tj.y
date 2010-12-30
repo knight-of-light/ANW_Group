@@ -126,6 +126,18 @@ class:			  CLASS IDENT '{'
 						$$ = new Class($2, $5, lin, col);
 						symtab->OutScope();
 						symtab->AddSym($2, 1, $$);
+
+						// Add all Globals Idnet to vector in AST.Class
+						for(int i=0; i < $5->members->size(); i++)
+						{
+							Global *G = dynamic_cast<Global*>($5->members->at(i));
+							if(G != NULL)
+								for(int j=0; j < G->variables->variables->size(); j++)
+								{
+									$$->AddGlobal(G->variables->variables->at(j)->name);
+									$$->Globals->at($$->Globals->size()-1)->symbol->global_location = $$->Globals->size()-1;
+								}
+						}
 					}
 				| CLASS IDENT ':' IDENT '{'
 					{
@@ -134,10 +146,21 @@ class:			  CLASS IDENT '{'
 					 members '}'
 					{
 						$$ = new ClassInher($2, $4, $7, lin, col);
-						//$$->AddParent($4);
 						symtab->OutScope();
 						symtab->AddSym($2, 1, $$);
 						symtab->IsDeclared($4, 1, def);
+
+						// Add all Globals Idnet to vector in AST.ClassInher
+						for(int i=0; i < $7->members->size(); i++)
+						{
+							Global *G = dynamic_cast<Global*>($7->members->at(i));
+							if(G != NULL)
+								for(int j=0; j < G->variables->variables->size(); j++)
+								{
+									$$->AddGlobal(G->variables->variables->at(j)->name);
+									$$->Globals->at($$->Globals->size()-1)->symbol->global_location = $$->Globals->size()-1;
+								}
+						}
 					}
 ;
 

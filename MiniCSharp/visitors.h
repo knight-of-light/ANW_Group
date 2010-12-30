@@ -358,7 +358,11 @@ public:
 	int ifno;
 	int forno;
 	int whileno;
+	int NullLoc; // Null location
 	vector<int> lps;
+	bool IsLocation;
+	bool IsCall;
+	int callNum;
 	bool isGlobal;
 };
 

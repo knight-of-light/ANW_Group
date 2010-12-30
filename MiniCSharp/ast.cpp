@@ -31,6 +31,8 @@ Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 	this->Parents = new vector<Ident *>;
 	this->Childrens = new vector<Ident *>;
 
+	this->Globals = new vector<Ident *>;
+
 	n->father = this;
 	ms->father = this;
 }
@@ -40,7 +42,7 @@ Class::AddParent(Ident *parent_ID)
 {
 	/* Add Parent Ident to this class Parents.
 	** if ident was been added to class then retrun false and don't add it again.
-	** if not add it and return true.
+	** if not, add it and return true.
 	*/
 	for(int i=0; i<this->Parents->size(); i++)
 		if(this->Parents->at(i)->name == parent_ID->name) // if this ident was been added to class.
@@ -54,12 +56,28 @@ Class::AddChild(Ident *child_ID)
 {
 	/* Add Child Ident to this class Childrens.
 	** if ident was been added to class then retrun false and don't add it again.
-	** if not add it and return true.
+	** if not, add it and return true.
 	*/
 	for(int i=0; i<this->Childrens->size(); i++)
 		if(this->Childrens->at(i)->name == child_ID->name) // if this ident was been added to class.
 			return false;
 	this->Childrens->push_back(child_ID);
+	return true;
+}
+
+bool
+Class::AddGlobal(Ident *Global)
+{
+	/* Add Global Ident to this class Globals.
+	** if ident was been added to class then retrun false and don't add it again.
+	** if not, add it and return true.
+	*/
+	for(int i=0; i<this->Globals->size(); i++)
+		if(this->Globals->at(i)->name == Global->name)
+			return false;
+	this->Globals->push_back(Global); // Add Ident of Global to vector.
+	// Add location of Ident in vector to Ident symbol global_location.
+	this->Globals->at(this->Globals->size()-1)->symbol->global_location = this->Globals->size()-1;
 	return true;
 }
 

@@ -149,7 +149,10 @@ int main(int argsc, char **argsv)
 					{
 						cout << "Semantic analysis was done successfully! " << endl;
 						if(!type_only)
+						{
 							CodeVisitor *cv = new CodeVisitor(file, symtab, tv->mainFunc);
+							cout << "Code Generation was done successfully! " << endl;
+						}
 					}
 				}
 				else

@@ -11,6 +11,8 @@ Sym::Sym(string name, int kind, int acctype, Scope *scope, Type *type)
 	this->acctype = acctype;
 	this->type = type;
 	this->location = 0;
+	this->global_location = 0;
+	this->Globals = new vector<Ident>;
 	this->scope = scope;
 	this->clas = NULL;
 	this->constructor = NULL;
@@ -25,6 +27,8 @@ Sym::Sym(string name, int kind, Scope *scope, Class *clas)
 	this->acctype = 0;
 	this->type = NULL;
 	this->location = 0;
+	this->global_location = 0;
+	this->Globals = new vector<Ident>;
 	this->scope = scope;
 	this->clas = clas;
 	this->constructor = NULL;
@@ -39,6 +43,8 @@ Sym::Sym(string n, int kind, int acctype, Scope *scope, Args *args, Constructor 
 	this->acctype = acctype;
 	this->type = NULL;
 	this->location = 0;
+	this->global_location = 0;
+	this->Globals = new vector<Ident>;
 	this->scope = scope;
 	this->clas = NULL;
 	this->constructor = constr;
@@ -53,6 +59,8 @@ Sym::Sym(string n, int kind, int acctype, Scope *scope, Type *type, Args *args, 
 	this->acctype = acctype;
 	this->type = type;
 	this->location = 0;
+	this->global_location = 0;
+	this->Globals = new vector<Ident>;
 	this->scope = scope;
 	this->clas = NULL;
 	this->constructor = NULL;
@@ -361,7 +369,7 @@ SymTab::IsDeclared(Ident *id, int CurrentScope, bool CheckClasses, bool IsCall)
 						return true;
 					}
 				}
-				this->errors->AddError("Undeclared Identifier '" + id->name , id->line, id->column);
+				this->errors->AddError("Undeclared Identifier '" + id->name +"\'", id->line, id->column);
 				return false;
 			}
 		}
@@ -427,12 +435,12 @@ SymTab::IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope, bool IsC
 					}
 					else
 					{
-						this->errors->AddError("Cannot Access Function '" + id->name + "' from this scope", id->line, id->column);
+						this->errors->AddError("Cannot Access Function \'" + id->name + "\' from this scope", id->line, id->column);
 						return false;
 					}
 				}
 			}
-			this->errors->AddError("Undeclared Identifier '" + id->name + "' from this scope", id->line, id->column);
+			this->errors->AddError("Undeclared Identifier \'" + id->name + "\' from this scope", id->line, id->column);
 			return false;
 		}
 	}
@@ -458,7 +466,7 @@ SymTab::IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope, bool IsC
 					}
 					else
 					{
-						this->errors->AddError("Cannot Access Constructor '" + id->name + "' from this scope", id->line, id->column);
+						this->errors->AddError("Cannot Access Constructor \'" + id->name + "\' from this scope", id->line, id->column);
 						return false;
 					}
 				}
@@ -466,7 +474,7 @@ SymTab::IsDeclared(Ident *id, int kind, ExprList *el, int CurrentScope, bool IsC
 		}
 		if(sym == NULL)
 		{
-			this->errors->AddError("Undeclared Identifier '" + id->name + "' from this scope", id->line, id->column);
+			this->errors->AddError("Undeclared Identifier \'" + id->name + "\' from this scope", id->line, id->column);
 			return false;
 		}
 	}
@@ -715,7 +723,7 @@ Deffered::CheckClass(SymTab *symtab)
 			if(sym != NULL)
 				this->ids->at(i)->symbol = sym;
 			else
-				symtab->errors->AddError("Undeclared Identifier '" + this->ids->at(i)->name + "'", this->ids->at(i)->line, this->ids->at(i)->column);
+				symtab->errors->AddError("Undeclared Identifier \'" + this->ids->at(i)->name + "\'", this->ids->at(i)->line, this->ids->at(i)->column);
 		}
 	}
 }
@@ -777,12 +785,12 @@ Deffered::CheckAll(SymTab *symtab)
 						if(sym->acctype == 1 || sym->acctype == 3)
 							this->ids->at(i)->symbol = sym;
 						else
-							symtab->errors->AddError("Cannot Access Identifier '" + this->ids->at(i)->name + "' from this scope", this->ids->at(i)->line, this->ids->at(i)->column);
+							symtab->errors->AddError("Cannot Access Identifier \'" + this->ids->at(i)->name + "\' from this scope", this->ids->at(i)->line, this->ids->at(i)->column);
 						break;
 					}
 				}
 				if(sym == NULL)
-					symtab->errors->AddError("Undeclared Identifier '" + this->ids->at(i)->name + "' from this scope", this->ids->at(i)->line, this->ids->at(i)->column);
+					symtab->errors->AddError("Undeclared Identifier \'" + this->ids->at(i)->name + "\' from this scope", this->ids->at(i)->line, this->ids->at(i)->column);
 			}
 		}
 	}

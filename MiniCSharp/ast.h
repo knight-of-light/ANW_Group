@@ -137,9 +137,12 @@ public:
 	vector<Ident *>	*Parents;
 	vector<Ident *>	*Childrens;
 
+	vector<Ident *> *Globals;
+
 	Class(Ident *, Members *, int, int);
 	bool AddParent(Ident *parent_ID);
 	bool AddChild(Ident *child_ID);
+	bool AddGlobal(Ident *Global);
 	virtual void accept(Visitor *);
 };
 
