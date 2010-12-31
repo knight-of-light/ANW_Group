@@ -138,11 +138,18 @@ public:
 	vector<Ident *>	*Childrens;
 
 	vector<Ident *> *Globals;
+	vector<Ident *> *Statics;
 
 	Class(Ident *, Members *, int, int);
+
 	bool AddParent(Ident *parent_ID);
 	bool AddChild(Ident *child_ID);
+
 	bool AddGlobal(Ident *Global);
+	void AddStatic(Ident *Static);
+	void Reverse(vector<Ident *> *Vector);
+	void GiveNum(vector<Ident *> *Vector);
+
 	virtual void accept(Visitor *);
 };
 

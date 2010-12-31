@@ -68,6 +68,7 @@ TypeVisitor::Visit(Class *n)
 			Function *F = dynamic_cast<Function*>(n->members->members->at(i));
 			if(n->name->name == F->name->name)
 				this->symtab->errors->AddError("Member names cannot be the same as their enclosing type", F->name->line, F->name->column);
+			F->name->symbol->clas = n;
 		}
 
 		// Check if name of Global ARE NOT the same as name of class.
@@ -109,6 +110,7 @@ TypeVisitor::Visit(ClassInher *n)
 			Function *F = dynamic_cast<Function*>(n->members->members->at(i));
 			if(n->name->name == F->name->name)
 				this->symtab->errors->AddError("Member names cannot be the same as their enclosing type", F->name->line, F->name->column);
+			F->name->symbol->clas = n;
 		}
 
 		// Check if name of Global ARE NOT the same as name of class.
@@ -675,6 +677,11 @@ void
 TypeVisitor::Visit(IdentCall *n)
 {
 	// Ident '.' expression.
+
+	if( (dynamic_cast<IdentExpr*>(n->expr) == NULL) &&
+		(dynamic_cast<IdentCall*>(n->expr) == NULL)	&&
+		(dynamic_cast<Invoke*>(n->expr) == NULL)	    )
+		this->symtab->errors->AddError("you Cannot use IdentCall like this", n->expr->line, n->expr->column);
 
 	int num = this->callNum;
 

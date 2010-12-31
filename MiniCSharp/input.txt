@@ -8,6 +8,10 @@ class B : A
 {
     public B() { }
     public A a;
+    public void print()
+    {
+        Write(a.y);
+    }
     int z;
 }
 class C : B
@@ -18,10 +22,27 @@ class C : B
 class M
 {
     public M() { }
-    public void test() {}
+    public void test() { }
     public static void Main()
     {
         B b = new B();
         b.a = new A();
+
+        int num;
+
+        b.a.y = 99;     // IdentCall.
+        num = b.a.y;    // IdentCall.
+
+        Write(num);
+        b.print();
+
+        test();
+
+        Write(false);
+
+        int x = 0;
+        x = ++x;
+        Write(x);
+        
     }
 }

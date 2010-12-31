@@ -276,6 +276,7 @@ class CodeVisitor : public Visitor
 {
 public:
 	CodeVisitor(Root *, SymTab *st, Function *mainFunc);
+	string Rename(Ident *name);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);
@@ -352,7 +353,7 @@ public:
 	Class *mainClass;
 	Root *root;
 	SymTab *symtab;
-	string types [5];
+	string types [8];
 	int gp;
 	int lp;
 	int ifno;
@@ -360,9 +361,11 @@ public:
 	int whileno;
 	int NullLoc; // Null location
 	vector<int> lps;
+	vector<Function *> *Functions;
 	bool IsLocation;
 	bool IsCall;
 	int callNum;
+	Class *ObjectClass;
 	bool isGlobal;
 };
 

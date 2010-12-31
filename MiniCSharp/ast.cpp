@@ -32,6 +32,7 @@ Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 	this->Childrens = new vector<Ident *>;
 
 	this->Globals = new vector<Ident *>;
+	this->Statics = new vector<Ident *>;
 
 	n->father = this;
 	ms->father = this;
@@ -76,9 +77,35 @@ Class::AddGlobal(Ident *Global)
 		if(this->Globals->at(i)->name == Global->name)
 			return false;
 	this->Globals->push_back(Global); // Add Ident of Global to vector.
-	// Add location of Ident in vector to Ident symbol global_location.
-	this->Globals->at(this->Globals->size()-1)->symbol->global_location = this->Globals->size()-1;
 	return true;
+}
+
+void
+Class::AddStatic(Ident *Static)
+{
+	this->Statics->push_back(Static); // Add Ident of Static Global to vector.
+}
+
+void
+Class::Reverse(vector<Ident *> *Vector)
+{
+	vector<Ident *> *Reverse = new vector<Ident *>;
+	for(int i = Vector->size()-1; i>=0; i--)
+	{
+		Reverse->push_back(Vector->at(i));
+		Vector->pop_back();
+	}
+	for(int i=0; i<Reverse->size(); i++)
+		Vector->push_back(Reverse->at(i));
+	Reverse->clear();
+}
+
+void
+Class::GiveNum(vector<Ident *> *Vector)
+{
+	// Add location of Ident in vector to Ident symbol global_location.
+	for(int i=0; i<Vector->size(); i++)
+		Vector->at(i)->symbol->global_location = i;
 }
 
 ClassInher::ClassInher(Ident *n, Ident *p, Members *ms, int l, int c) : Class(n,ms,l,c)

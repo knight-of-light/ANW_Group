@@ -33,7 +33,7 @@ int main(int argsc, char **argsv)
 
 	bool parse_only		= false;
 	bool type_only		= false;
-	bool  parse_debug	= false;
+	bool parse_debug	= false;
 	bool ast_debug		= false;
 	
 	bool RunProgram = true;

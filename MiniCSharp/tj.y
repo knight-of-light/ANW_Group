@@ -132,11 +132,15 @@ class:			  CLASS IDENT '{'
 						{
 							Global *G = dynamic_cast<Global*>($5->members->at(i));
 							if(G != NULL)
+							{
 								for(int j=0; j < G->variables->variables->size(); j++)
 								{
-									$$->AddGlobal(G->variables->variables->at(j)->name);
-									$$->Globals->at($$->Globals->size()-1)->symbol->global_location = $$->Globals->size()-1;
+									if(G->accessModif->acctype != 3 && G->accessModif->acctype !=4)
+										$$->AddGlobal(G->variables->variables->at(j)->name);
+									else
+										$$->AddStatic(G->variables->variables->at(j)->name);
 								}
+							}
 						}
 					}
 				| CLASS IDENT ':' IDENT '{'
@@ -155,11 +159,15 @@ class:			  CLASS IDENT '{'
 						{
 							Global *G = dynamic_cast<Global*>($7->members->at(i));
 							if(G != NULL)
+							{
 								for(int j=0; j < G->variables->variables->size(); j++)
 								{
-									$$->AddGlobal(G->variables->variables->at(j)->name);
-									$$->Globals->at($$->Globals->size()-1)->symbol->global_location = $$->Globals->size()-1;
+									if(G->accessModif->acctype != 3 && G->accessModif->acctype !=4)
+										$$->AddGlobal(G->variables->variables->at(j)->name);
+									else
+										$$->AddStatic(G->variables->variables->at(j)->name);
 								}
+							}
 						}
 					}
 ;
