@@ -14,6 +14,7 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	this->lp = -1; // 1
 	this->NullLoc = this->gp; // Null location
 	this->Functions = new vector<Function *>;
+	this->Constructors = new vector<Constructor *>;
 	this->IsLocation = false;
 	this->IsCall = false;
 	this->ObjectClass = NULL;
@@ -73,11 +74,17 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	vout << "return" << endl;
 	vout << endl;
 
+	/*for(int i=0; i<this->Constructors->size(); i++)
+	{
+		Constructors->at(i)->accept(this);
+		vout << endl;
+	}
+
 	for(int i=0; i<this->Functions->size(); i++)
 	{
 		Functions->at(i)->accept(this);
 		vout << endl;
-	}
+	}*/
 
 }
 
@@ -118,6 +125,56 @@ CodeVisitor::Visit(Global  *n)
 void
 CodeVisitor::Visit(Constructor *n)
 {
+	Class *clas = n->name->symbol->clas;
+	vout << "jump END_" << this->Rename(n->name) << endl;
+	vout << this->Rename(n->name) << ":" << endl;
+
+	vout << "alloc " << clas->Globals->size() << endl;
+	this->gp -= 1;
+	vout << "storeg " << this->gp << endl;
+
+	// passed the arguments.
+	for(int i = 0; i < n->args->args->size(); i++)
+	{
+		vout << "pushg " << this->gp << endl;
+		this->gp += 1;
+		this->lp += 1;
+		n->args->args->at(i)->name->symbol->location = this->lp;
+		
+		vout << "storel " << this->lp << endl;
+	}
+	for(int i = 0; i < n->stats->stats->size(); i++)
+	{
+		//n->stats->stats->at(i)->accept(this);
+	}
+
+	// Give primary values.
+	for(int i=0; i<clas->Globals->size(); i++)
+	{
+		vout << "pushg " << this->gp << endl;
+		vout << "pushi " << clas->Globals->at(i)->symbol->global_location << endl;
+		switch(clas->Globals->at(i)->symbol->type->type)
+		{
+		case 2:
+			vout << "pushi 0" << endl;
+			break;
+		case 3:
+			vout << "pushf 0" << endl;
+			break;
+		case 4:
+			vout << "pushi 0" << endl;
+			break;
+		case 6:
+			vout << "pushg " << this->NullLoc << endl;
+			break;
+		}
+		vout << "storen" << endl;
+	}
+	vout << "pushg " << this->gp << endl;
+	this->gp += 1;
+
+	vout << "return" << endl;
+	vout << "jump END_" << this->Rename(n->name) << ":" << endl;
 }
 
 void
@@ -131,6 +188,8 @@ CodeVisitor::Visit(Function *n)
 		
 		vout << "jump END_" << this->Rename(n->name) << endl;
 		vout << this->Rename(n->name) << ":" << endl;
+
+		// passed the arguments.
 		for(int i = 0; i < n->args->args->size(); i++)
 		{
 			vout << "pushg " << this->gp << endl;
@@ -139,7 +198,6 @@ CodeVisitor::Visit(Function *n)
 			n->args->args->at(i)->name->symbol->location = this->lp;
 			
 			vout << "storel " << this->lp << endl;
-			//vout << "pushl " << this->lp << endl;
 		}
 		for(int i = 0; i < n->stats->stats->size(); i++)
 		{
@@ -423,7 +481,9 @@ CodeVisitor::Visit(Assign *n)
 void
 CodeVisitor::Visit(Invoke *n)
 {
-	// check if function is Write
+	/* - * - * - * - * - * - * - * - * - * - *
+	 *	      Write & Read Functions		 *
+	 * - * - * - * - * - * - * - * - * - * - */
 	if(  (n->ident->name == "Write") && (n->exprList->exprList->size() == 1) && 
 		 ( // check if type of exprList at 0 is int, double or bool
 			(n->exprList->exprList->at(0)->type->type == 2) || 
@@ -448,7 +508,10 @@ CodeVisitor::Visit(Invoke *n)
 	{
 		vout << "Read" << endl;
 	}
-	// Else
+	
+	/* - * - * - * - * - * - * - * - * - * - *
+	 *	          Other Functions			 *
+	 * - * - * - * - * - * - * - * - * - * - */
 	else
 	{
 		Class *clas = this->ObjectClass; // save ObjectClass in clas, because maybe it change.
@@ -468,16 +531,14 @@ CodeVisitor::Visit(Invoke *n)
 			this->gp -= 1;
 			mainloc = this->gp; // save this gp.
 			vout << "storeg " << mainloc << endl;
-			if(clas != NULL) // check if not NULL, that can cuse Stop program.
-				for(int i = clas->Globals->size()-1; i>=0; i--) // for each Global in class and perants save it's values to use in function.
-				{
-					this->gp -= 1;
-					clas->Globals->at(i)->symbol->location = this->gp;
-					vout << "pushg " << mainloc << endl;
-					vout << "pushi " << clas->Globals->at(i)->symbol->global_location << endl;
-					vout << "loadn" << endl;
-					vout << "storeg " << clas->Globals->at(i)->symbol->location << endl;
-				}
+			for(int i = clas->Globals->size()-1; i>=0; i--) // for each Global in class and perants save it's values to use in function.
+			{
+				this->gp -= 1;
+				clas->Globals->at(i)->symbol->location = this->gp;
+				vout << "pushg " << mainloc << endl;
+				vout << "load " << clas->Globals->at(i)->symbol->global_location << endl;
+				vout << "storeg " << clas->Globals->at(i)->symbol->location << endl;
+			}
 		}
 
 		// passed the arguments.
@@ -492,24 +553,21 @@ CodeVisitor::Visit(Invoke *n)
 		vout << "pusha " << this->Rename(n->ident) << endl;
 		vout << "call" << endl;
 		
-		//n->ident->symbol->method->accept(this);
-		
-		this->Functions->push_back(n->ident->symbol->method);
+		n->ident->symbol->method->accept(this);
+		//this->Functions->push_back(n->ident->symbol->method);
 
 		// if this Invoke invoking by call from object then load all object elements from gp to stok memory.
 		// return the news values of Global variables to object memory location.
 		if(IsCalled)
 		{
-			if(clas != NULL)
-				for(int i=0; i<clas->Globals->size(); i++)
-				{
-					vout << "pushg " << mainloc << endl;
-					vout << "pushi " << clas->Globals->at(i)->symbol->global_location << endl;
-					vout << "pushg " << clas->Globals->at(i)->symbol->location << endl;
-					vout << "storen" << endl;
-					this->gp += 1;
-					//clas->Globals->at(i)->symbol->location = 0;
-				}
+			for(int i=0; i<clas->Globals->size(); i++)
+			{
+				vout << "pushg " << mainloc << endl;
+				vout << "pushg " << clas->Globals->at(i)->symbol->location << endl;
+				vout << "store " << clas->Globals->at(i)->symbol->global_location << endl;
+				this->gp += 1;
+				//clas->Globals->at(i)->symbol->location = 0; // error
+			}
 			this->gp += 1;
 			mainloc = 0;
 		}
@@ -527,33 +585,21 @@ void
 CodeVisitor::Visit(NewObject *n)
 {
 	// NEW IDENT '(' expr_list ')'.
-	Class *clas = n->ident->symbol->clas;
-	vout << "alloc " << clas->Globals->size() << endl;
+	/*vout << "pusha " << this->Rename(n->ident->symbol->constructor->name) << endl;
+	vout << "call" << endl;
+	this->Constructors->push_back(n->ident->symbol->constructor);*/
+	vout << "alloc " << n->ident->symbol->clas->Globals->size() << endl;
+	/*vout << "pusha " << this->Rename(n->ident->symbol->constructor->name) << endl;
+	vout << "call" << endl;
+
 	this->gp -= 1;
 	vout << "storeg " << this->gp << endl;
-	for(int i=0; i<clas->Globals->size(); i++)
-	{
-		vout << "pushg " << this->gp << endl;
-		vout << "pushi " << clas->Globals->at(i)->symbol->global_location << endl;
-		switch(clas->Globals->at(i)->symbol->type->type)
-		{
-		case 2:
-			vout << "pushi 0" << endl;
-			break;
-		case 3:
-			vout << "pushf 0" << endl;
-			break;
-		case 4:
-			vout << "pushi 0" << endl;
-			break;
-		case 6:
-			vout << "pushg " << this->NullLoc << endl;
-			break;
-		}
-		vout << "storen" << endl;
-	}
+
+	n->ident->symbol->constructor->accept(this);
+
 	vout << "pushg " << this->gp << endl;
-	this->gp += 1;
+	this->gp += 1;*/
+
 }
 
 void
@@ -1063,7 +1109,7 @@ CodeVisitor::Rename(Ident *name)
 	final_name += "_";
 	final_name += name->name;
 	Args *args = dynamic_cast<Args*>(name->symbol->args);
-	for(int i=0; args->args->size(); i++)
+	for(int i=0; i<args->args->size(); i++)
 	{
 		final_name += "_";
 

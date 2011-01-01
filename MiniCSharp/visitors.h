@@ -361,7 +361,11 @@ public:
 	int whileno;
 	int NullLoc; // Null location
 	vector<int> lps;
+
 	vector<Function *> *Functions;
+	vector<Constructor *> *Constructors;
+	vector<int> *ConstructorsGP;
+
 	bool IsLocation;
 	bool IsCall;
 	int callNum;

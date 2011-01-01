@@ -8,15 +8,16 @@ class B : A
 {
     public B() { }
     public A a;
-    public void print()
+    public void print(int x)
     {
-        Write(a.y);
+        Write(x);
     }
     int z;
 }
 class C : B
 {
     public C() { }
+    public B b;
     int zz;
 }
 class M
@@ -25,16 +26,20 @@ class M
     public void test() { }
     public static void Main()
     {
-        B b = new B();
-        b.a = new A();
-
+        C c = new C();
+        c.b = new B();
+        c.b.a = new A();
         int num;
 
-        b.a.y = 99;     // IdentCall.
-        num = b.a.y;    // IdentCall.
+        c.b.a.y = 99;     // IdentCall.
+        A a = c.b.a;
+        Write(a.y);
+        c.b.print(c.b.a.y);
 
+        a.y = 68;
+        num = c.b.a.y;    // IdentCall.
+        Write(a.y);
         Write(num);
-        b.print();
 
         test();
 
