@@ -1520,6 +1520,8 @@ TypeVisitor::Visit(Return *n)
 
 	while(function == NULL)
 	{
+		/*if(node->father == NULL)
+			break;*/
 		node = node->father;
 		function = dynamic_cast<Function*>(node);
 	}

@@ -367,6 +367,7 @@ public:
 	vector<Constructor *> *Constructors;
 	vector<int> *ConstructorsGP;
 
+	int CurrentFunc;
 	int ReturnValue;
 	string FuncName;
 	bool IsLocation;

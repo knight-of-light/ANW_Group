@@ -17,6 +17,7 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	this->WriteLoc = this->gp;
 	this->Functions = new vector<Function *>;
 	this->Constructors = new vector<Constructor *>;
+	this->CurrentFunc = 0;
 	this->FuncName = "";
 	this->IsLocation = false;
 	this->IsCall = false;
@@ -98,6 +99,7 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	{
 		if(!this->Functions->at(i)->IsCalled)
 		{
+			this->CurrentFunc = i;
 			Functions->at(i)->accept(this);
 			vout << endl;
 		}
@@ -561,8 +563,12 @@ CodeVisitor::Visit(Invoke *n)
 			this->callNum = 0;
 		}
 
-		if(IsCalled)
-			vout << "storeg " << n->ident->symbol->location << endl;
+		/*if(IsCalled)
+			vout << "storeg " << n->ident->symbol->location << endl;*/
+
+		if(!IsCalled)
+			vout << "pushg " << this->Functions->at(this->CurrentFunc)->name->symbol->location << endl;
+		vout << "storeg " << n->ident->symbol->location << endl;
 
 		// passed the arguments.
 		for(int i = n->exprList->exprList->size() - 1; i >= 0 ; i--)

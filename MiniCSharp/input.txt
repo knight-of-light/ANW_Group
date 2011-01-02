@@ -20,14 +20,29 @@ class B : A
     }
     public int Argumentwithreturn(int x, int y, int z1)
     {
+        x = returnInt();
         return z1+x+y;
     }
+    //public int re(int i)
+    //{
+    //    if (i == 1)
+    //    {
+    //        z = re(i + 1);
+    //        return 2;
+    //    }
+    //     return z;
+    //}
     public int z;
 }
 class C : B
 {
     public C() { }
     public B b;
+    public int returnZ()
+    {
+        returnInt();
+        return z;
+    }
     int zz;
 }
 class M
@@ -63,6 +78,19 @@ class M
         Write(b2.z);
         Write(b2.Argumentwithreturn(3, 2, 2));
         b2.print();
+
+        C c = new C();
+        c.b = new B();
+        Write(c.Argumentwithreturn(8, 8, 8));
+        Write(c.z);
+        c.z = 222;
+        Write(c.z);
+        Write(c.returnZ());
+
+        /*C c = new C();
+        c.b = new B();
+        Write(c.b.re(1));*/
+
         //----------------
         //int x = 0;
         //int y = x++;
