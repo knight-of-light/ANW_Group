@@ -18,6 +18,10 @@ class B : A
         z = 535;
         return 2;
     }
+    public int Argumentwithreturn(int x, int y, int z1)
+    {
+        return z1+x+y;
+    }
     public int z;
 }
 class C : B
@@ -54,10 +58,11 @@ class M
         //b2.z = 15;
         //b2.print();
 
-       // b2.z = 44;
+        b2.z = 44;
         Write(b2.returnInt());
         Write(b2.z);
-        //b2.print();
+        Write(b2.Argumentwithreturn(3, 2, 2));
+        b2.print();
         //----------------
         //int x = 0;
         //int y = x++;

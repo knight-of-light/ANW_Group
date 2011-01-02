@@ -58,7 +58,12 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 			this->gp -= 1;
 			C->Functions->at(j)->symbol->location = this->gp;
 			this->gp -= 1;
-			C->Functions->at(i)->symbol->ReturnValue = this->gp;
+			C->Functions->at(j)->symbol->ReturnValue = this->gp;
+			for(int k=0; k<C->Functions->at(j)->symbol->method->args->args->size(); k++)
+			{
+				this->gp -= 1;
+				C->Functions->at(j)->symbol->method->args->args->at(k)->name->symbol->location = this->gp;
+			}
 		}
 	}
 
@@ -216,17 +221,6 @@ CodeVisitor::Visit(Function *n)
 			vout << "storeg " << C->Globals->at(i)->symbol->location << endl;
 		}
 
-		// passed the arguments.
-		for(int i = 0; i < n->args->args->size(); i++)
-		{
-			vout << "pushg " << this->gp << endl;
-			this->gp += 1;
-			this->lp += 1;
-			n->args->args->at(i)->name->symbol->location = this->lp;
-			
-			vout << "storel " << this->lp << endl;
-		}
-
 		// JUMP to STATMENTS.
 		vout << "jump STATMENTS_" << this->Rename(n->name) << endl;
 
@@ -244,12 +238,22 @@ CodeVisitor::Visit(Function *n)
 
 		// STATMENTS.
 		vout << "STATMENTS_" << this->Rename(n->name) << ":" << endl;
+
+		// passed the arguments.
+		for(int i = 0; i < n->args->args->size(); i++)
+		{
+			vout << "pushg " << n->args->args->at(i)->name->symbol->location << endl;
+			this->lp += 1;
+			n->args->args->at(i)->name->symbol->location = this->lp;
+			
+			vout << "storel " << this->lp << endl;
+		}
+
 		for(int i = 0; i < n->stats->stats->size(); i++)
 			n->stats->stats->at(i)->accept(this);
 
-
 		if(n->type == NULL)
-			vout << "END_" << this->Rename(n->name) << endl;
+			vout << "jump END_" << this->Rename(n->name) << endl;
 
 		// return Globals location to -1.
 		for(int i = C->Globals->size()-1; i>=0; i--)
@@ -563,9 +567,8 @@ CodeVisitor::Visit(Invoke *n)
 		// passed the arguments.
 		for(int i = n->exprList->exprList->size() - 1; i >= 0 ; i--)
 		{
-			this->gp -= 1;
 			n->exprList->exprList->at(i)->accept(this); // retrun value of expr
-			vout << "storeg " << this->gp << endl; // store value in gp
+			vout << "storeg " << n->ident->symbol->method->args->args->at(i)->name->symbol->location << endl; // store value in gp
 		}
 
 		// Call Function.
