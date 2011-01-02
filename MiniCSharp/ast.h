@@ -876,8 +876,8 @@ public:
 class Return : public Stat
 {
 public:
-	Expr	*expr;
-
+	Expr	  *expr;
+	Function  *function;
 	Return(Expr *, int, int);
 	virtual void accept(Visitor *);
 };

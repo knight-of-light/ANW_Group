@@ -17,8 +17,6 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	this->WriteLoc = this->gp;
 	this->Functions = new vector<Function *>;
 	this->Constructors = new vector<Constructor *>;
-	
-	this->ReturnValue = -1;
 	this->FuncName = "";
 	this->IsLocation = false;
 	this->IsCall = false;
@@ -196,7 +194,6 @@ CodeVisitor::Visit(Function *n)
 {
 	// if Called
 	n->IsCalled = true;
-	this->ReturnValue = n->name->symbol->ReturnValue;
 	this->FuncName = this->Rename(n->name);
 
 	// if the Function is not main 
@@ -229,13 +226,11 @@ CodeVisitor::Visit(Function *n)
 			
 			vout << "storel " << this->lp << endl;
 		}
-		for(int i = 0; i < n->stats->stats->size(); i++)
-		{
-			int returnval = this->ReturnValue;
-			n->stats->stats->at(i)->accept(this);
-			this->ReturnValue = returnval;
-		}
 
+		// JUMP to STATMENTS.
+		vout << "jump STATMENTS_" << this->Rename(n->name) << endl;
+
+		// JUMP to END of FUNCIOTN.
 		vout << "END_" << this->Rename(n->name) << ":" << endl;
 		for(int i = C->Globals->size()-1; i>=0; i--)
 		{
@@ -243,10 +238,23 @@ CodeVisitor::Visit(Function *n)
 			vout << "pushg " << C->Globals->at(i)->symbol->location << endl;
 			this->gp += 1;
 			vout << "store " << C->Globals->at(i)->symbol->global_location << endl;
-			C->Globals->at(i)->symbol->location = 0;
+			//C->Globals->at(i)->symbol->location = 0;
 		}
-
 		vout << "return" << endl;
+
+		// STATMENTS.
+		vout << "STATMENTS_" << this->Rename(n->name) << ":" << endl;
+		for(int i = 0; i < n->stats->stats->size(); i++)
+			n->stats->stats->at(i)->accept(this);
+
+
+		if(n->type == NULL)
+			vout << "END_" << this->Rename(n->name) << endl;
+
+		// return Globals location to -1.
+		for(int i = C->Globals->size()-1; i>=0; i--)
+			C->Globals->at(i)->symbol->location = -1;
+
 		//vout << "END_" << this->Rename(n->name) << ":" <<endl;
 		this->lp = this->lps.at(lps.size() - 1);
 		lps.pop_back();
@@ -519,7 +527,12 @@ CodeVisitor::Visit(Assign *n)
 		if(ident->type->type == 6) // if ident type is class.
 			vout << "storeg " << ident->ident->symbol->location << endl;
 		else
-			vout << "storel " << ident->ident->symbol->location << endl;
+		{
+			if(ident->ident->symbol->global_location != -1)
+				vout << "storeg " << ident->ident->symbol->location << endl;
+			else
+				vout << "storel " << ident->ident->symbol->location << endl;
+		}
 	}
 	else
 		vout << "storen" << endl;
@@ -563,10 +576,7 @@ CodeVisitor::Visit(Invoke *n)
 		
 		// write the return value on stack.
 		if( n->ident->symbol->method->type != NULL )
-		{
 			vout << "pushg " << n->ident->symbol->ReturnValue << endl;
-			//this->gp += 1;
-		}
 	}
 	
 	/* - * - * - * - * - * - * - * - * - * - *
@@ -1129,7 +1139,7 @@ CodeVisitor::Visit(Return *n)
 {
 	// RETURN expr_e ';'
 	n->expr->accept(this);
-	vout << "storeg " << this->ReturnValue << endl;
+	vout << "storeg " << n->function->name->symbol->ReturnValue << endl;
 	vout << "jump END_" << this->FuncName << endl;
 }
 

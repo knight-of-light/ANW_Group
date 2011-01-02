@@ -10,11 +10,13 @@ class B : A
     public A a;
     public void print()
     {
+        z = 525;
         Write(z);
     }
     public int returnInt()
     {
-        return z+2;
+        z = 535;
+        return 2;
     }
     public int z;
 }
@@ -44,16 +46,18 @@ class M
         //Write(a1.y);
         //Write(c.b.a.y);
 
-        B b1 = new B();
-        b1.z = 10;
+        //B b1 = new B();
+        //b1.z = 10;
 
-        b1.print();
+        //b1.print();
         B b2 = new B();
-        b2.z = 15;
-        b2.print();
+        //b2.z = 15;
+        //b2.print();
 
-        b2.z = b2.returnInt();
-        b2.print();
+       // b2.z = 44;
+        Write(b2.returnInt());
+        Write(b2.z);
+        //b2.print();
         //----------------
         //int x = 0;
         //int y = x++;

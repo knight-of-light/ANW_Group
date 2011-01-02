@@ -1514,6 +1514,19 @@ TypeVisitor::Visit(Block *n)
 void
 TypeVisitor::Visit(Return *n)
 {
+	// find Father of this return and put it in this->function.
+	Node *node = n;
+	Function *function = NULL;
+
+	while(function == NULL)
+	{
+		node = node->father;
+		function = dynamic_cast<Function*>(node);
+	}
+	if(function != NULL)
+		n->function = function;
+
+
 	// RETURN expr_e ';'
 	if(this->IsReturn) // Check if allow to use return.
 	{

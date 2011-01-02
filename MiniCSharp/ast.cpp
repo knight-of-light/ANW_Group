@@ -112,7 +112,10 @@ Class::GiveNum(vector<Ident *> *Vector)
 {
 	// Add location of Ident in vector to Ident symbol global_location.
 	for(int i=0; i<Vector->size(); i++)
+	{
 		Vector->at(i)->symbol->global_location = i;
+		Vector->at(i)->symbol->location = -1;
+	}
 }
 
 ClassInher::ClassInher(Ident *n, Ident *p, Members *ms, int l, int c) : Class(n,ms,l,c)
@@ -800,6 +803,7 @@ Block::Block(Stats *ss, int l, int c) : Stat(l,c)
 Return::Return(Expr *e, int l, int c) : Stat(l,c)
 {
 	this->expr = e;
+	this->function = NULL;
 	e->father = this;
 }
 
