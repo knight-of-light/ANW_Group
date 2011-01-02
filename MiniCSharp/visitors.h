@@ -360,12 +360,15 @@ public:
 	int forno;
 	int whileno;
 	int NullLoc; // Null location
+	int WriteLoc;
 	vector<int> lps;
 
 	vector<Function *> *Functions;
 	vector<Constructor *> *Constructors;
 	vector<int> *ConstructorsGP;
 
+	int ReturnValue;
+	string FuncName;
 	bool IsLocation;
 	bool IsCall;
 	int callNum;

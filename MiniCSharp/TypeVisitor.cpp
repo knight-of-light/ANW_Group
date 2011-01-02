@@ -1137,14 +1137,7 @@ TypeVisitor::Visit(Div *n)
 	switch(left)
 	{
 	case 2:
-		if(right == 2)
-			n->type->type = 3;
-		else if(right == 3)
-		{
-			n->left->type->type = 3;
-			n->type->type = 3;			
-		}
-		else
+		if(right != 2)
 			mismatch = true;
 		break;
 	case 3:

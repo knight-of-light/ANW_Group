@@ -11,8 +11,9 @@ Sym::Sym(string name, int kind, int acctype, Scope *scope, Type *type)
 	this->acctype = acctype;
 	this->type = type;
 	this->location = 0;
-	this->global_location = 0;
+	this->global_location = -1;
 	this->Globals = new vector<Ident>;
+	this->ReturnValue = -1;
 	this->scope = scope;
 	this->clas = NULL;
 	this->constructor = NULL;
@@ -27,8 +28,9 @@ Sym::Sym(string name, int kind, Scope *scope, Class *clas)
 	this->acctype = 0;
 	this->type = NULL;
 	this->location = 0;
-	this->global_location = 0;
+	this->global_location = -1;
 	this->Globals = new vector<Ident>;
+	this->ReturnValue = -1;
 	this->scope = scope;
 	this->clas = clas;
 	this->constructor = NULL;
@@ -43,8 +45,9 @@ Sym::Sym(string n, int kind, int acctype, Scope *scope, Args *args, Constructor 
 	this->acctype = acctype;
 	this->type = NULL;
 	this->location = 0;
-	this->global_location = 0;
+	this->global_location = -1;
 	this->Globals = new vector<Ident>;
+	this->ReturnValue = -1;
 	this->scope = scope;
 	this->clas = NULL;
 	this->constructor = constr;
@@ -59,8 +62,9 @@ Sym::Sym(string n, int kind, int acctype, Scope *scope, Type *type, Args *args, 
 	this->acctype = acctype;
 	this->type = type;
 	this->location = 0;
-	this->global_location = 0;
+	this->global_location = -1;
 	this->Globals = new vector<Ident>;
+	this->ReturnValue = -1;
 	this->scope = scope;
 	this->clas = NULL;
 	this->constructor = NULL;

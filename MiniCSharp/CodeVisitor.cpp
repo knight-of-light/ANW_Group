@@ -7,17 +7,21 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	this->symtab = st;
 	this->mainFunc = mainF;
 	
-	ifno = -1;
-	forno = -1;
+	ifno = 0;
+	forno = 0;
 	whileno = 0;
 	this->gp = 999;
-	this->lp = -1; // 1
+	this->lp = 0; // 1
 	this->NullLoc = this->gp; // Null location
+	this->gp -= 1;
+	this->WriteLoc = this->gp;
 	this->Functions = new vector<Function *>;
 	this->Constructors = new vector<Constructor *>;
+	
+	this->ReturnValue = -1;
+	this->FuncName = "";
 	this->IsLocation = false;
 	this->IsCall = false;
-	this->ObjectClass = NULL;
 	this->callNum = 0;
 	
 	types[0] = "no type";
@@ -37,8 +41,8 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	}
 
 	// alloc memory for NULL.
-	vout << "alloc 1" << endl;
-	vout << "storeg " << this->NullLoc << endl;
+	/*vout << "alloc 1" << endl;
+	vout << "storeg " << this->NullLoc << endl;*/
 
 
 	// Add gp as location for each ident in Static vector.
@@ -49,6 +53,14 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 		{
 			this->gp -= 1;
 			C->Statics->at(j)->symbol->location = this->gp;
+
+		}
+		for(int j=0; j<C->Functions->size(); j++)
+		{
+			this->gp -= 1;
+			C->Functions->at(j)->symbol->location = this->gp;
+			this->gp -= 1;
+			C->Functions->at(i)->symbol->ReturnValue = this->gp;
 		}
 	}
 
@@ -61,8 +73,7 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 
 	vout << endl;
 	vout << "Write_bool:" << endl;
-	vout << "pushg " << this->gp << endl;
-	this->gp += 1;
+	vout << "pushg " << WriteLoc << endl;
 	vout << "jz If_False" << endl;
 	vout << "pushs \"true\"" << endl;
 	vout << "writes" << endl;
@@ -78,13 +89,16 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	{
 		Constructors->at(i)->accept(this);
 		vout << endl;
-	}
+	}*/
 
 	for(int i=0; i<this->Functions->size(); i++)
 	{
-		Functions->at(i)->accept(this);
-		vout << endl;
-	}*/
+		if(!this->Functions->at(i)->IsCalled)
+		{
+			Functions->at(i)->accept(this);
+			vout << endl;
+		}
+	}
 
 }
 
@@ -180,14 +194,30 @@ CodeVisitor::Visit(Constructor *n)
 void
 CodeVisitor::Visit(Function *n)
 {
+	// if Called
+	n->IsCalled = true;
+	this->ReturnValue = n->name->symbol->ReturnValue;
+	this->FuncName = this->Rename(n->name);
+
 	// if the Function is not main 
 	if( !((n->name->name == "Main") && (n->type == NULL) && (n->args->args->size() == 0)) )
 	{
 		this->lps.push_back(this->lp);
-		this->lp = -1;
+		this->lp = 0;
 		
-		vout << "jump END_" << this->Rename(n->name) << endl;
+		//vout << "jump END_" << this->Rename(n->name) << endl;
 		vout << this->Rename(n->name) << ":" << endl;
+
+		Class *C = n->name->symbol->clas;
+
+		for(int i=0; i<C->Globals->size(); i++)
+		{
+			vout << "pushg " << n->name->symbol->location << endl;
+			vout << "load " << C->Globals->at(i)->symbol->global_location << endl;
+			this->gp -= 1;
+			C->Globals->at(i)->symbol->location = this->gp;
+			vout << "storeg " << C->Globals->at(i)->symbol->location << endl;
+		}
 
 		// passed the arguments.
 		for(int i = 0; i < n->args->args->size(); i++)
@@ -201,11 +231,23 @@ CodeVisitor::Visit(Function *n)
 		}
 		for(int i = 0; i < n->stats->stats->size(); i++)
 		{
+			int returnval = this->ReturnValue;
 			n->stats->stats->at(i)->accept(this);
+			this->ReturnValue = returnval;
+		}
+
+		vout << "END_" << this->Rename(n->name) << ":" << endl;
+		for(int i = C->Globals->size()-1; i>=0; i--)
+		{
+			vout << "pushg " << n->name->symbol->location << endl;
+			vout << "pushg " << C->Globals->at(i)->symbol->location << endl;
+			this->gp += 1;
+			vout << "store " << C->Globals->at(i)->symbol->global_location << endl;
+			C->Globals->at(i)->symbol->location = 0;
 		}
 
 		vout << "return" << endl;
-		vout << "END_" << this->Rename(n->name) << ":" <<endl;
+		//vout << "END_" << this->Rename(n->name) << ":" <<endl;
 		this->lp = this->lps.at(lps.size() - 1);
 		lps.pop_back();
 	}
@@ -329,12 +371,18 @@ CodeVisitor::Visit(Ident *n)
 		vout << "pushi " << n->symbol->global_location << endl; // write global_location num.
 	else // if not called.
 		if(!this->IsLocation) // if need to value (not location).
-			vout << "pushl " << n->symbol->location << endl; // Read value from location on lp and write to stack.
+		{
+			if(n->symbol->global_location != -1)
+				vout << "pushg " << n->symbol->location << endl;
+			else
+				vout << "pushl " << n->symbol->location << endl; // Read value from location on lp and write to stack.
+		}
 }
 
 void
 CodeVisitor::Visit(Expr *n)
 {
+	// empty.
 }
 
 void
@@ -345,7 +393,7 @@ CodeVisitor::Visit(Incr *n)
 		// ++ IDENT
 		if(n->isPrev)
 		{
-			n->name->accept(this);
+			vout << "pushl " << n->name->symbol->location << endl;
 			vout << "pushi 1" << endl;
 			vout << "add" << endl; 
 			vout << "storel " << n->name->symbol->location << endl;
@@ -354,7 +402,7 @@ CodeVisitor::Visit(Incr *n)
 		// IDENT ++
 		else
 		{
-			n->name->accept(this);
+			vout << "pushl " << n->name->symbol->location << endl;
 			this->gp -= 1;
 			vout << "storeg " << this->gp << endl;
 			vout << "pushg " << this->gp << endl;
@@ -442,7 +490,6 @@ void
 CodeVisitor::Visit(IdentExpr *n)
 {
 	// IdentExpr type is the same of Ident type.
-	//vout << "pushl " << n->ident->symbol->location << endl;
 	n->ident->accept(this);
 }
 
@@ -482,41 +529,14 @@ void
 CodeVisitor::Visit(Invoke *n)
 {
 	/* - * - * - * - * - * - * - * - * - * - *
-	 *	      Write & Read Functions		 *
+	 *	          Other Functions			 *
 	 * - * - * - * - * - * - * - * - * - * - */
-	if(  (n->ident->name == "Write") && (n->exprList->exprList->size() == 1) && 
+	if(! (  (n->ident->name == "Write") && (n->exprList->exprList->size() == 1) && 
 		 ( // check if type of exprList at 0 is int, double or bool
 			(n->exprList->exprList->at(0)->type->type == 2) || 
 			(n->exprList->exprList->at(0)->type->type == 3) || 
-			(n->exprList->exprList->at(0)->type->type == 4)    )  )
+			(n->exprList->exprList->at(0)->type->type == 4)    )  ) )
 	{
-		n->exprList->exprList->at(0)->accept(this);
-		if(n->exprList->exprList->at(0)->type->type == 2)
-			vout << "writei" << endl;
-		else if(n->exprList->exprList->at(0)->type->type == 3)
-			vout << "writef" << endl;
-		else if(n->exprList->exprList->at(0)->type->type == 4)
-		{
-			this->gp -= 1;
-			vout << "storeg " << this->gp << endl;
-			vout << "pusha Write_bool" << endl;
-			vout << "call" << endl;
-		}
-	}
-	// check if function is Read
-	else if( (n->ident->name == "Read") && (n->exprList->exprList->size() == 0) )
-	{
-		vout << "Read" << endl;
-	}
-	
-	/* - * - * - * - * - * - * - * - * - * - *
-	 *	          Other Functions			 *
-	 * - * - * - * - * - * - * - * - * - * - */
-	else
-	{
-		Class *clas = this->ObjectClass; // save ObjectClass in clas, because maybe it change.
-		this->ObjectClass = NULL; // put NULL in ObjectClass.
-		int mainloc = 0;
 		bool IsCalled = false;
 		if(this->callNum != 0)
 		{
@@ -524,22 +544,8 @@ CodeVisitor::Visit(Invoke *n)
 			this->callNum = 0;
 		}
 
-		// if this Invoke invoking by call from object then save all object elements in gp to use it.
-		// passed the Global variable in object.
 		if(IsCalled)
-		{
-			this->gp -= 1;
-			mainloc = this->gp; // save this gp.
-			vout << "storeg " << mainloc << endl;
-			for(int i = clas->Globals->size()-1; i>=0; i--) // for each Global in class and perants save it's values to use in function.
-			{
-				this->gp -= 1;
-				clas->Globals->at(i)->symbol->location = this->gp;
-				vout << "pushg " << mainloc << endl;
-				vout << "load " << clas->Globals->at(i)->symbol->global_location << endl;
-				vout << "storeg " << clas->Globals->at(i)->symbol->location << endl;
-			}
-		}
+			vout << "storeg " << n->ident->symbol->location << endl;
 
 		// passed the arguments.
 		for(int i = n->exprList->exprList->size() - 1; i >= 0 ; i--)
@@ -553,30 +559,37 @@ CodeVisitor::Visit(Invoke *n)
 		vout << "pusha " << this->Rename(n->ident) << endl;
 		vout << "call" << endl;
 		
-		n->ident->symbol->method->accept(this);
-		//this->Functions->push_back(n->ident->symbol->method);
-
-		// if this Invoke invoking by call from object then load all object elements from gp to stok memory.
-		// return the news values of Global variables to object memory location.
-		if(IsCalled)
-		{
-			for(int i=0; i<clas->Globals->size(); i++)
-			{
-				vout << "pushg " << mainloc << endl;
-				vout << "pushg " << clas->Globals->at(i)->symbol->location << endl;
-				vout << "store " << clas->Globals->at(i)->symbol->global_location << endl;
-				this->gp += 1;
-				//clas->Globals->at(i)->symbol->location = 0; // error
-			}
-			this->gp += 1;
-			mainloc = 0;
-		}
+		this->Functions->push_back(n->ident->symbol->method);
 		
 		// write the return value on stack.
 		if( n->ident->symbol->method->type != NULL )
 		{
-			vout << "pushg " << this->gp << endl;
-			this->gp += 1;
+			vout << "pushg " << n->ident->symbol->ReturnValue << endl;
+			//this->gp += 1;
+		}
+	}
+	
+	/* - * - * - * - * - * - * - * - * - * - *
+	 *	      Write & Read Functions		 *
+	 * - * - * - * - * - * - * - * - * - * - */
+
+	// check if function is Read
+	else if( (n->ident->name == "Read") && (n->exprList->exprList->size() == 0) )
+	{
+		vout << "Read" << endl;
+	}
+	else
+	{
+		n->exprList->exprList->at(0)->accept(this);
+		if(n->exprList->exprList->at(0)->type->type == 2)
+			vout << "writei" << endl;
+		else if(n->exprList->exprList->at(0)->type->type == 3)
+			vout << "writef" << endl;
+		else if(n->exprList->exprList->at(0)->type->type == 4)
+		{
+			vout << "storeg " << WriteLoc << endl;
+			vout << "pusha Write_bool" << endl;
+			vout << "call" << endl;
 		}
 	}
 }
@@ -633,8 +646,8 @@ CodeVisitor::Visit(IdentCall *n)
 */
 	}
 	
-	if(invoke != NULL) // if expr is Innvoke put this type class in ObjectClass.
-		this->ObjectClass = n->ident->symbol->type->name->symbol->clas;
+	//if(invoke != NULL) // if expr is Innvoke put this type class in ObjectClass.
+	//	this->ObjectClass = n->ident->symbol->type->name->symbol->clas;
 
 	this->callNum += 1;
 	n->expr->accept(this);
@@ -856,8 +869,6 @@ void
 CodeVisitor::Visit(Div *n)
 {
 	//expression / expression
-	n->left->accept(this);
-	n->right->accept(this);
 	if(n->left->type->type == 2)
 	{
 		n->left->accept(this);
@@ -869,6 +880,8 @@ CodeVisitor::Visit(Div *n)
 	}
 	else if(n->left->type->type == 3)
 	{
+		n->left->accept(this);
+		n->right->accept(this);
 		if(n->right->type->type == 2)
 			vout << "itof" << endl;
 		vout << "fdiv" << endl;
@@ -912,11 +925,13 @@ void
 CodeVisitor::Visit(Cast *n)
 {
 	// ( basictype ) expression
-	/*n->expr->accept(this);
-	if((n->typ->type == 2) && (n->expr->type == 3))
+	n->expr->accept(this);
+	int basic = n->typ->type;
+	int expr = n->expr->type->type;
+	if((basic == 2) && (expr == 3))
 		vout << "ftoi" << endl;
-	else if(n->typ->type == 3 && (n->expr->type == 2))
-		vout << "itof" << endl;*/
+	else if((basic == 3) && (expr == 2))
+		vout << "itof" << endl;
 }
 
 void
@@ -998,10 +1013,11 @@ CodeVisitor::Visit(If *n)
 	// if Expression is false(0) go to End if (pc to EndIf)
 	// if Expression is true(1) go into if (pc ++)
 	this->ifno++;
+	int ifnum = this->ifno;
 	n->expr->accept(this);
-	vout << "jz " << "ENDIF_" << this->ifno << endl;
+	vout << "jz " << "ENDIF_" << ifnum << endl;
 	n->stat->accept(this);
-	vout << "ENDIF_" << this->ifno << ":" << endl;
+	vout << "ENDIF_" << ifnum << ":" << endl;
 }
 
 void
@@ -1010,13 +1026,14 @@ CodeVisitor::Visit(IfElse *n)
 	// if Expression is false(0) go to ELSE (pc to ELSE)
 	// if Expression is true(1) go into if (pc ++) at end of statments jump to ENDIF (pc to ENDIF)
 	this->ifno++;
+	int ifnum = this->ifno;
 	n->expr->accept(this);
-	vout << "jz " << "ELSE_" << this->ifno << endl;
+	vout << "jz " << "ELSE_" << ifnum << endl;
 	n->stat->accept(this);
-	vout << "jump " << "ENDIF_" << this->ifno << endl;
-	vout << "ELSE_" << this->ifno << ":" << endl;
+	vout << "jump " << "ENDIF_" << ifnum << endl;
+	vout << "ELSE_" << ifnum << ":" << endl;
 	n->elseStat->accept(this);
-	vout << "ENDIF_" << this->ifno << ":" << endl;
+	vout << "ENDIF_" << ifnum << ":" << endl;
 
 }
 
@@ -1024,33 +1041,59 @@ void
 CodeVisitor::Visit(While *n)
 {
 	this->whileno++;
-	vout << "WBegin_" << this->whileno << ":" << endl;
+	int whlienum = this->whileno;
+	vout << "WBegin_" << whlienum << ":" << endl;
 	n->expr->accept(this);
-	vout << "jz " << "WEnd_" << this->whileno << endl;
+	vout << "jz " << "WEnd_" << whlienum << endl;
 	n->stat->accept(this);
-	vout << "jump WBegin_" << this->whileno << endl;
-	vout << "WEnd_" << this->whileno << ":" <<endl;
+	vout << "jump WBegin_" << whlienum << endl;
+	vout << "WEnd_" << whlienum << ":" <<endl;
 }
 
 void
 CodeVisitor::Visit(For *n)
 {
 	this->forno++;
+	int fornum = this->forno;
 
 	if(n->variables_e != NULL)
 		n->variables_e->accept(this);
-	vout << "ForBegin_" << this->forno << ":" << endl;
+	vout << "ForBegin_" << fornum << ":" << endl;
 
 	if(n->exprCond->type->type == 0)
 		vout << "pushi 1" << endl; // Always true;
 	else
 		n->exprCond->accept(this);
 
-	vout << "jz " << "ForEnd_" << this->forno << endl;
+	vout << "jz " << "ForEnd_" << fornum << endl;
 	n->stat->accept(this);
 	n->exprCount->accept(this);
-	vout << "jump " << "ForBegin_" << this->forno << endl;
-	vout << "ForEnd_" << this->forno << ":" << endl;
+	vout << "jump " << "ForBegin_" << fornum << endl;
+	vout << "ForEnd_" << fornum << ":" << endl;
+
+
+	//this->forno++;
+	//int number =this->forno;
+	//// for(;;) is infinity
+	//if( (n->variables_e == NULL) && (n->exprCond->type->type == 1) && (n->exprCount->type->type == 1) )
+	//{
+	//	vout << "ForBegin" << number<< ":" << endl;
+	//	n->stat->accept(this);
+	//	vout << "jump ForBegin" << number << endl;
+	//}
+	//// for( variables_e ';' expr_e ';' expr_e )
+	//else
+	//{
+
+	//	n->variables_e->accept(this);
+	//	vout << "ForBegin" << number << ":" << endl;
+	//	n->exprCond->accept(this);
+	//	vout << "jz " << "ForEnd" << number << endl;
+	//	n->stat->accept(this);
+	//	n->exprCount->accept(this);
+	//	vout << "jump " << "ForBegin" << number << endl;
+	//	vout << "ForEnd" << number << ":" << endl;
+	//}
 }
 
 void
@@ -1086,14 +1129,15 @@ CodeVisitor::Visit(Return *n)
 {
 	// RETURN expr_e ';'
 	n->expr->accept(this);
-	this->gp -= 1;
-	vout << "storeg " << this->gp << endl;
-	vout << "return" << endl;
+	vout << "storeg " << this->ReturnValue << endl;
+	vout << "jump END_" << this->FuncName << endl;
 }
 
 void
 CodeVisitor::Visit(Variables_e *n)
 {
+	for(int i = 0; i < n->variables->variables->size(); i++)
+		n->variables->variables->at(i)->accept(this);
 }
 
 /* - * - * - * - * - * - * - * - * - * - * - *

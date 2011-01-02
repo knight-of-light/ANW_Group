@@ -139,6 +139,7 @@ public:
 
 	vector<Ident *> *Globals;
 	vector<Ident *> *Statics;
+	vector<Ident *> *Functions;
 
 	Class(Ident *, Members *, int, int);
 
@@ -147,6 +148,7 @@ public:
 
 	bool AddGlobal(Ident *Global);
 	void AddStatic(Ident *Static);
+	void AddFunc(Ident *Function);
 	void Reverse(vector<Ident *> *Vector);
 	void GiveNum(vector<Ident *> *Vector);
 
@@ -212,6 +214,8 @@ public:
 	Ident		*name;
 	Args		*args;
 	Stats		*stats;
+
+	bool		IsCalled;
 
 	Function(AccessModif *, Type *, Ident *, Args *, Stats *, int, int);
 	Function(AccessModif *, Ident *, Args *, Stats *, int, int);

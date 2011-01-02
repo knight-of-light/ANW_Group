@@ -8,11 +8,15 @@ class B : A
 {
     public B() { }
     public A a;
-    public void print(int x)
+    public void print()
     {
-        Write(x);
+        Write(z);
     }
-    int z;
+    public int returnInt()
+    {
+        return z+2;
+    }
+    public int z;
 }
 class C : B
 {
@@ -26,28 +30,43 @@ class M
     public void test() { }
     public static void Main()
     {
-        C c = new C();
-        c.b = new B();
-        c.b.a = new A();
-        int num;
+        //C c = new C();
+        //c.b = new B();
+        //c.b.a = new A();
+        //int num;
 
-        c.b.a.y = 99;     // IdentCall.
-        A a = c.b.a;
-        Write(a.y);
-        c.b.print(c.b.a.y);
+        //c.b.a.y = 99;     // IdentCall.
+        //A a1 = c.b.a;
+        //Write(a1.y);
+        //Write(c.b.a.y);
 
-        a.y = 68;
-        num = c.b.a.y;    // IdentCall.
-        Write(a.y);
-        Write(num);
+        //a1.y = 68;
+        //Write(a1.y);
+        //Write(c.b.a.y);
 
-        test();
+        B b1 = new B();
+        b1.z = 10;
 
-        Write(false);
+        b1.print();
+        B b2 = new B();
+        b2.z = 15;
+        b2.print();
 
-        int x = 0;
-        x = ++x;
-        Write(x);
-        
+        b2.z = b2.returnInt();
+        b2.print();
+        //----------------
+        //int x = 0;
+        //int y = x++;
+        //Write(y);
+        //Write(x);
+
+        //----------------
+        //double x1 = 1;
+        //Write(-x1);
+        //----------------
+        //double x1 = 2.;
+        //double r1 = 3.;
+        //double div = r1 / x1;
+        //Write(div);
     }
 }

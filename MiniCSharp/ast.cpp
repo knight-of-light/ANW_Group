@@ -33,6 +33,7 @@ Class::Class(Ident *n, Members *ms, int l, int c) : Node(l,c)
 
 	this->Globals = new vector<Ident *>;
 	this->Statics = new vector<Ident *>;
+	this->Functions = new vector<Ident *>;
 
 	n->father = this;
 	ms->father = this;
@@ -84,6 +85,12 @@ void
 Class::AddStatic(Ident *Static)
 {
 	this->Statics->push_back(Static); // Add Ident of Static Global to vector.
+}
+
+void
+Class::AddFunc(Ident *Function)
+{
+	this->Functions->push_back(Function);
 }
 
 void
@@ -168,6 +175,8 @@ Function::Function(AccessModif *am, Type *ty, Ident *n, Args *as, Stats *ss, int
 	this->args = as;
 	this->stats = ss;
 
+	this->IsCalled = false;
+
 	am->father = this;
 	ty->father = this;
 	n->father = this;
@@ -182,6 +191,8 @@ Function::Function(AccessModif *am, Ident *n, Args *as, Stats *ss, int l, int c)
 	this->name = n;
 	this->args = as;
 	this->stats = ss;
+
+	this->IsCalled = false;
 
 	am->father = this;
 	n->father = this;

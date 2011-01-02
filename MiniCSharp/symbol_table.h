@@ -28,6 +28,7 @@ public:
 
 	int location; // Ident location where is stored in memory, used in CodeVisitor.
 	int global_location; // Ident location where is stored in object memory, used in CodeVisitor.
+	int ReturnValue;
 	vector<Ident> *Globals;
 
 	Scope *scope; // scope where the Ident Declared (not where it used).

@@ -158,6 +158,7 @@ class:			  CLASS IDENT '{'
 						for(int i=0; i < $7->members->size(); i++)
 						{
 							Global *G = dynamic_cast<Global*>($7->members->at(i));
+							Function *F = dynamic_cast<Function*>($7->members->at(i));
 							if(G != NULL)
 							{
 								for(int j=0; j < G->variables->variables->size(); j++)
@@ -167,6 +168,10 @@ class:			  CLASS IDENT '{'
 									else
 										$$->AddStatic(G->variables->variables->at(j)->name);
 								}
+							}
+							if(F != NULL)
+							{
+								$$->AddFunc(F->name);
 							}
 						}
 					}
