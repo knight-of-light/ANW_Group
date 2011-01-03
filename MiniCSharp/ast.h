@@ -111,7 +111,14 @@ public:
 	int		column;
 	Node	*father;
 
+	int		Location;
+	int		Global_Location;
+	int		PushType; // -1: no push, 1: pushl, 2: pushg, 3:load.
+
 	Node(int, int);
+	//void AddLocation(Ident *ident, int PushType);
+	void AddLocation(Node *node);
+	void AddLocation(int Location, int Global_Location, int PushType);
 	virtual void accept(Visitor *);
 };
 

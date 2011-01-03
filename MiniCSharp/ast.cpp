@@ -7,6 +7,32 @@ Node::Node(int line, int column)
 	this->column = column;
 	this->father = NULL;
 	this->Location = -1;
+	this->Global_Location = -1;
+	this->PushType = -1; // -1: no push, 1: pushl, 2: pushg, 3:load.
+}
+
+//void
+//Node::AddLocation(Ident *ident, int PushType)
+//{
+//	this->Location = ident->symbol->location;
+//	this->Global_Location = ident->symbol->global_location;
+//	this->PushType = PushType;
+//}
+
+void
+Node::AddLocation(Node *node)
+{
+	this->Location = node->Location;
+	this->Global_Location = node->Global_Location;
+	this->PushType = node->PushType;
+}
+
+void
+Node::AddLocation(int Location, int Global_Location, int PushType)
+{
+	this->Location = Location;
+	this->Global_Location = Global_Location;
+	this->PushType = PushType;
 }
 
 //*******     Root		*************

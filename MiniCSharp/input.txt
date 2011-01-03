@@ -1,20 +1,46 @@
-
-// if statment
-// output = 2
+class A
+{
+    public A() { }
+    public int x;
+    public int y;
+    public A a;
+    public bool boo;
+    public void print()
+    {
+        Write(x);
+    }
+}
 class E
 {
     public E() { }
     public static void Main()
     {
-        int counter = 1;
-        int number = 1;
-        int x = 10;
-        while (counter < x)
-        {
-            counter++;
-            Write(counter);
-        }
+        A a = new A();
+        a.a = new A();
+        a.x = 10;
+        a.y = 30;
+        a.print();
+        Write(a.x);
+        Write(a.y);
+
+        a.a.x = 10;
+        a.a.y = 30;
+        int x;
+        x = a.a.x;
+        Write(x);
+        Write(a.a.y);
+
+        a.a.a = new A();
+
+        a.a.a.x = 99;
+        Write(a.a.a.x);
+
+        a.a.a.a = new A();
+        a.a.a.a.y = 384;
+        Write(a.a.a.a.y);
+
+        a.a.a.a.boo = true;
+
+        Write(a.a.a.a.boo);
     }
 }
-
-

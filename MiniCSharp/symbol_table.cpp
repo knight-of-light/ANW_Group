@@ -4,7 +4,7 @@
 //					Symbol
 //***********************************************************************
 
-Sym::Sym(string name, int kind, int acctype, Scope *scope, Type *type)
+Sym::Sym(string name, int kind, int acctype, Scope *scope, Type *type, int PushType)
 {
 	this->name = name;
 	this->kind = kind;
@@ -12,6 +12,7 @@ Sym::Sym(string name, int kind, int acctype, Scope *scope, Type *type)
 	this->type = type;
 	this->location = 0;
 	this->global_location = -1;
+	this->PushType = PushType;
 	this->Globals = new vector<Ident>;
 	this->ReturnValue = -1;
 	this->scope = scope;
@@ -29,6 +30,7 @@ Sym::Sym(string name, int kind, Scope *scope, Class *clas)
 	this->type = NULL;
 	this->location = 0;
 	this->global_location = -1;
+	this->PushType = -1;
 	this->Globals = new vector<Ident>;
 	this->ReturnValue = -1;
 	this->scope = scope;
@@ -46,6 +48,7 @@ Sym::Sym(string n, int kind, int acctype, Scope *scope, Args *args, Constructor 
 	this->type = NULL;
 	this->location = 0;
 	this->global_location = -1;
+	this->PushType = -1;
 	this->Globals = new vector<Ident>;
 	this->ReturnValue = -1;
 	this->scope = scope;
@@ -63,6 +66,7 @@ Sym::Sym(string n, int kind, int acctype, Scope *scope, Type *type, Args *args, 
 	this->type = type;
 	this->location = 0;
 	this->global_location = -1;
+	this->PushType = -1;
 	this->Globals = new vector<Ident>;
 	this->ReturnValue = -1;
 	this->scope = scope;
@@ -150,14 +154,14 @@ SymTab::Lookup(std::string key, Scope *Current)
   **********  AddSym Functions  *************
   ******************************************* */
 bool
-SymTab::AddSym(Ident *id, int kind, int acctype, Type *type)
+SymTab::AddSym(Ident *id, int kind, int acctype, Type *type, int PushType)
 {
 	// Add Global and Lockal(stat var, for var, Arg) Ident.
 
 	string key = this->kinds[kind]+"@"+id->name;
 	if(this->Lookup(key, this->current) == NULL) // if there is no id have same key, then OK.
 	{
-		Sym *sym = new Sym(id->name, kind, acctype, this->current, type);
+		Sym *sym = new Sym(id->name, kind, acctype, this->current, type, PushType);
 		this->current->hashTab->AddKey(key, sym);
 		id->symbol = sym;
 		return true;

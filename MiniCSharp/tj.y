@@ -98,10 +98,9 @@
 %left '>' '<' LE SE IS
 %left '+' '-'
 %left '*'  '/'  '%'
-%right '!' INCREMENT DECREMENT UNARY_OP
+%right Exclamation INCREMENT DECREMENT UNARY_OP
 %left '.'
 %left '('
-
 %%
 root:			/* empty */
 					{
@@ -131,6 +130,7 @@ class:			  CLASS IDENT '{'
 						for(int i=0; i < $5->members->size(); i++)
 						{
 							Global *G = dynamic_cast<Global*>($5->members->at(i));
+							Function *F = dynamic_cast<Function*>($5->members->at(i));
 							if(G != NULL)
 							{
 								for(int j=0; j < G->variables->variables->size(); j++)
@@ -140,6 +140,10 @@ class:			  CLASS IDENT '{'
 									else
 										$$->AddStatic(G->variables->variables->at(j)->name);
 								}
+							}
+							if(F != NULL)
+							{
+								$$->AddFunc(F->name);
 							}
 						}
 					}
@@ -200,7 +204,7 @@ global:			  accessmodif type variables ';'
 					{
 						$$ = new Global($1, $2, $3, lin, col);
 						for(int i=0; i < $3->variables->size(); i++)
-							symtab->AddSym($3->variables->at(i)->name, 4, $1->acctype, $2);
+							symtab->AddSym($3->variables->at(i)->name, 4, $1->acctype, $2, 2);
 					}
 ;
 
@@ -241,7 +245,7 @@ function:		  accessmodif type IDENT '('
 arg :			  type IDENT
 					{
 						$$ = new Arg($1, $2, lin, col);
-						symtab->AddSym($2, 6, 0, $1);
+						symtab->AddSym($2, 6, 0, $1, 2);
 					}
 ;
 
@@ -395,7 +399,7 @@ expression:		  INCREMENT IDENT
 						$$ = new Decr($1, false, lin, col);
 						symtab->IsDeclared($1, def);
 					}
-				| '!' expression
+				| Exclamation expression
 					{
 						$$ = new Not($2, lin, col);
 					}
@@ -597,7 +601,7 @@ statement:		  IF '(' expression ')' statement %prec IF_PREC
 					{
 						$$ = new VariablesStat($1, $2, lin, col);
 						for(int i = 0; i < $2->variables->size(); i++)
-							symtab->AddSym($2->variables->at(i)->name, 5, 0, $1);
+							symtab->AddSym($2->variables->at(i)->name, 5, 0, $1, 1);
 					}
 				| ';'
 					{
@@ -637,7 +641,7 @@ variables_e:		  /* Empty */
 					{
 						$$ = new Variables_e($1, $2, lin, col);
 						for(int i = 0; i < $2->variables->size(); i++)
-							symtab->AddSym($2->variables->at(i)->name, 6, 0, $1);
+							symtab->AddSym($2->variables->at(i)->name, 6, 0, $1, 1);
 					}
 				| variables
 					{

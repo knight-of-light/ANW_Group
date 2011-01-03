@@ -77,7 +77,7 @@ Grammar
    49           | DECREMENT IDENT
    50           | IDENT INCREMENT
    51           | IDENT DECREMENT
-   52           | '!' expression
+   52           | Exclamation expression
    53           | '-' expression
    54           | '+' expression
    55           | '(' expression ')'
@@ -149,7 +149,6 @@ Grammar
 Terminals, with rules where they appear
 
 $end (0) 0
-'!' (33) 52
 '%' (37) 75
 '(' (40) 14 16 18 55 59 60 79 93 94 95 96
 ')' (41) 14 16 18 55 59 60 79 93 94 95 96
@@ -204,6 +203,7 @@ LE (290) 70
 UNARY_OP (291)
 DECREMENT (292) 49 51
 INCREMENT (293) 48 50
+Exclamation (294) 52
 
 
 Nonterminals, with rules where they appear
@@ -719,20 +719,20 @@ state 47
 
    27 variable: IDENT '=' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 75
 
@@ -941,20 +941,20 @@ state 69
 
    54 expression: '+' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 96
 
@@ -963,58 +963,58 @@ state 70
 
    53 expression: '-' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 97
 
 
 state 71
 
-   52 expression: '!' . expression
+   49 expression: DECREMENT . IDENT
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-
-    expression  go to state 98
+    IDENT  shift, and go to state 98
 
 
 state 72
 
-   49 expression: DECREMENT . IDENT
+   48 expression: INCREMENT . IDENT
 
     IDENT  shift, and go to state 99
 
 
 state 73
 
-   48 expression: INCREMENT . IDENT
+   52 expression: Exclamation . expression
 
-    IDENT  shift, and go to state 100
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+
+    expression  go to state 100
 
 
 state 74
@@ -1022,24 +1022,24 @@ state 74
    55 expression: '(' . expression ')'
    79           | '(' . basictype ')' expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    BOOL       shift, and go to state 25
-    DOUBLE     shift, and go to state 26
-    INT        shift, and go to state 27
-    OBJECT     shift, and go to state 28
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    BOOL         shift, and go to state 25
+    DOUBLE       shift, and go to state 26
+    INT          shift, and go to state 27
+    OBJECT       shift, and go to state 28
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     basictype   go to state 101
     expression  go to state 102
@@ -1186,20 +1186,20 @@ state 86
    87           | LSBracket . expression ',' expression RSBracket
    88           | LSBracket . expression ',' expression ',' expression RSBracket
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 123
 
@@ -1222,20 +1222,20 @@ state 89
 
    62 expression: IDENT '.' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 124
 
@@ -1244,20 +1244,20 @@ state 90
 
    59 expression: IDENT '(' . expr_list_e ')'
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     $default  reduce using rule 91 (expr_list_e)
 
@@ -1306,20 +1306,20 @@ state 95
 
    64 expression: THIS '.' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 131
 
@@ -1370,7 +1370,21 @@ state 97
 
 state 98
 
-   52 expression: '!' expression .
+   49 expression: DECREMENT IDENT .
+
+    $default  reduce using rule 49 (expression)
+
+
+state 99
+
+   48 expression: INCREMENT IDENT .
+
+    $default  reduce using rule 48 (expression)
+
+
+state 100
+
+   52 expression: Exclamation expression .
    58           | expression . '=' expression
    65           | expression . EQ expression
    66           | expression . NE expression
@@ -1388,20 +1402,6 @@ state 98
    78           | expression . IS type
 
     $default  reduce using rule 52 (expression)
-
-
-state 99
-
-   49 expression: DECREMENT IDENT .
-
-    $default  reduce using rule 49 (expression)
-
-
-state 100
-
-   48 expression: INCREMENT IDENT .
-
-    $default  reduce using rule 48 (expression)
 
 
 state 101
@@ -1468,20 +1468,20 @@ state 104
 
    58 expression: expression '=' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 135
 
@@ -1490,20 +1490,20 @@ state 105
 
    77 expression: expression OR . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 136
 
@@ -1512,20 +1512,20 @@ state 106
 
    76 expression: expression AND . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 137
 
@@ -1534,20 +1534,20 @@ state 107
 
    66 expression: expression NE . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 138
 
@@ -1556,20 +1556,20 @@ state 108
 
    65 expression: expression EQ . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 139
 
@@ -1578,20 +1578,20 @@ state 109
 
    69 expression: expression '>' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 140
 
@@ -1600,20 +1600,20 @@ state 110
 
    67 expression: expression '<' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 141
 
@@ -1622,20 +1622,20 @@ state 111
 
    68 expression: expression SE . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 142
 
@@ -1644,20 +1644,20 @@ state 112
 
    70 expression: expression LE . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 143
 
@@ -1666,20 +1666,20 @@ state 113
 
    71 expression: expression '+' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 144
 
@@ -1688,20 +1688,20 @@ state 114
 
    72 expression: expression '-' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 145
 
@@ -1710,20 +1710,20 @@ state 115
 
    73 expression: expression '*' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 146
 
@@ -1732,20 +1732,20 @@ state 116
 
    74 expression: expression '/' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 147
 
@@ -1754,20 +1754,20 @@ state 117
 
    75 expression: expression '%' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 148
 
@@ -1930,20 +1930,20 @@ state 128
 
    63 expression: IDENT arrayindex '.' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 156
 
@@ -1952,20 +1952,20 @@ state 129
 
    60 expression: NEW IDENT '(' . expr_list_e ')'
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     $default  reduce using rule 91 (expr_list_e)
 
@@ -2007,20 +2007,20 @@ state 132
 
    79 expression: '(' basictype ')' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 158
 
@@ -2456,31 +2456,31 @@ state 150
    14 constructor: accessmodif IDENT '(' @3 args_e ')' '{' statements . '}'
   104 statements: statements . statement
 
-    IDENT      shift, and go to state 160
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    BOOL       shift, and go to state 25
-    DOUBLE     shift, and go to state 26
-    INT        shift, and go to state 27
-    OBJECT     shift, and go to state 28
-    IF         shift, and go to state 161
-    WHILE      shift, and go to state 162
-    FOR        shift, and go to state 163
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    RETURN     shift, and go to state 164
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-    '{'        shift, and go to state 165
-    '}'        shift, and go to state 166
-    ';'        shift, and go to state 167
+    IDENT        shift, and go to state 160
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    BOOL         shift, and go to state 25
+    DOUBLE       shift, and go to state 26
+    INT          shift, and go to state 27
+    OBJECT       shift, and go to state 28
+    IF           shift, and go to state 161
+    WHILE        shift, and go to state 162
+    FOR          shift, and go to state 163
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    RETURN       shift, and go to state 164
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+    '{'          shift, and go to state 165
+    '}'          shift, and go to state 166
+    ';'          shift, and go to state 167
 
     type         go to state 168
     noarraytype  go to state 31
@@ -2511,20 +2511,20 @@ state 153
    87 arrayindex: LSBracket expression ',' . expression RSBracket
    88           | LSBracket expression ',' . expression ',' expression RSBracket
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 172
 
@@ -2533,20 +2533,20 @@ state 154
 
    90 expr_list: expr_list ',' . expression
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 173
 
@@ -2685,20 +2685,20 @@ state 164
 
   102 statement: RETURN . expr_e ';'
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     $default  reduce using rule 108 (expr_e)
 
@@ -2788,31 +2788,31 @@ state 171
    18 function: accessmodif VOID IDENT '(' @5 args_e ')' '{' statements . '}'
   104 statements: statements . statement
 
-    IDENT      shift, and go to state 160
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    BOOL       shift, and go to state 25
-    DOUBLE     shift, and go to state 26
-    INT        shift, and go to state 27
-    OBJECT     shift, and go to state 28
-    IF         shift, and go to state 161
-    WHILE      shift, and go to state 162
-    FOR        shift, and go to state 163
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    RETURN     shift, and go to state 164
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-    '{'        shift, and go to state 165
-    '}'        shift, and go to state 185
-    ';'        shift, and go to state 167
+    IDENT        shift, and go to state 160
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    BOOL         shift, and go to state 25
+    DOUBLE       shift, and go to state 26
+    INT          shift, and go to state 27
+    OBJECT       shift, and go to state 28
+    IF           shift, and go to state 161
+    WHILE        shift, and go to state 162
+    FOR          shift, and go to state 163
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    RETURN       shift, and go to state 164
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+    '{'          shift, and go to state 165
+    '}'          shift, and go to state 185
+    ';'          shift, and go to state 167
 
     type         go to state 168
     noarraytype  go to state 31
@@ -2911,31 +2911,31 @@ state 175
    16 function: accessmodif type IDENT '(' @4 args_e ')' '{' statements . '}'
   104 statements: statements . statement
 
-    IDENT      shift, and go to state 160
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    BOOL       shift, and go to state 25
-    DOUBLE     shift, and go to state 26
-    INT        shift, and go to state 27
-    OBJECT     shift, and go to state 28
-    IF         shift, and go to state 161
-    WHILE      shift, and go to state 162
-    FOR        shift, and go to state 163
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    RETURN     shift, and go to state 164
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-    '{'        shift, and go to state 165
-    '}'        shift, and go to state 188
-    ';'        shift, and go to state 167
+    IDENT        shift, and go to state 160
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    BOOL         shift, and go to state 25
+    DOUBLE       shift, and go to state 26
+    INT          shift, and go to state 27
+    OBJECT       shift, and go to state 28
+    IF           shift, and go to state 161
+    WHILE        shift, and go to state 162
+    FOR          shift, and go to state 163
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    RETURN       shift, and go to state 164
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+    '{'          shift, and go to state 165
+    '}'          shift, and go to state 188
+    ';'          shift, and go to state 167
 
     type         go to state 168
     noarraytype  go to state 31
@@ -2954,22 +2954,22 @@ state 176
    87           | LSBracket . expression ',' expression RSBracket
    88           | LSBracket . expression ',' expression ',' expression RSBracket
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    RSBracket  shift, and go to state 43
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-    ','        shift, and go to state 44
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    RSBracket    shift, and go to state 43
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+    ','          shift, and go to state 44
 
     expression  go to state 123
 
@@ -2979,20 +2979,20 @@ state 177
    93 statement: IF '(' . expression ')' statement
    94          | IF '(' . expression ')' statement ELSE statement
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 189
 
@@ -3001,20 +3001,20 @@ state 178
 
    95 statement: WHILE '(' . expression ')' statement
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 190
 
@@ -3128,20 +3128,20 @@ state 187
 
    88 arrayindex: LSBracket expression ',' expression ',' . expression RSBracket
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     expression  go to state 198
 
@@ -3283,31 +3283,31 @@ state 196
   101 statement: '{' @6 statements . '}'
   104 statements: statements . statement
 
-    IDENT      shift, and go to state 160
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    BOOL       shift, and go to state 25
-    DOUBLE     shift, and go to state 26
-    INT        shift, and go to state 27
-    OBJECT     shift, and go to state 28
-    IF         shift, and go to state 161
-    WHILE      shift, and go to state 162
-    FOR        shift, and go to state 163
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    RETURN     shift, and go to state 164
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-    '{'        shift, and go to state 165
-    '}'        shift, and go to state 203
-    ';'        shift, and go to state 167
+    IDENT        shift, and go to state 160
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    BOOL         shift, and go to state 25
+    DOUBLE       shift, and go to state 26
+    INT          shift, and go to state 27
+    OBJECT       shift, and go to state 28
+    IF           shift, and go to state 161
+    WHILE        shift, and go to state 162
+    FOR          shift, and go to state 163
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    RETURN       shift, and go to state 164
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+    '{'          shift, and go to state 165
+    '}'          shift, and go to state 203
+    ';'          shift, and go to state 167
 
     type         go to state 168
     noarraytype  go to state 31
@@ -3366,30 +3366,30 @@ state 199
    93 statement: IF '(' expression ')' . statement
    94          | IF '(' expression ')' . statement ELSE statement
 
-    IDENT      shift, and go to state 160
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    BOOL       shift, and go to state 25
-    DOUBLE     shift, and go to state 26
-    INT        shift, and go to state 27
-    OBJECT     shift, and go to state 28
-    IF         shift, and go to state 161
-    WHILE      shift, and go to state 162
-    FOR        shift, and go to state 163
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    RETURN     shift, and go to state 164
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-    '{'        shift, and go to state 165
-    ';'        shift, and go to state 167
+    IDENT        shift, and go to state 160
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    BOOL         shift, and go to state 25
+    DOUBLE       shift, and go to state 26
+    INT          shift, and go to state 27
+    OBJECT       shift, and go to state 28
+    IF           shift, and go to state 161
+    WHILE        shift, and go to state 162
+    FOR          shift, and go to state 163
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    RETURN       shift, and go to state 164
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+    '{'          shift, and go to state 165
+    ';'          shift, and go to state 167
 
     type         go to state 168
     noarraytype  go to state 31
@@ -3403,30 +3403,30 @@ state 200
 
    95 statement: WHILE '(' expression ')' . statement
 
-    IDENT      shift, and go to state 160
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    BOOL       shift, and go to state 25
-    DOUBLE     shift, and go to state 26
-    INT        shift, and go to state 27
-    OBJECT     shift, and go to state 28
-    IF         shift, and go to state 161
-    WHILE      shift, and go to state 162
-    FOR        shift, and go to state 163
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    RETURN     shift, and go to state 164
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-    '{'        shift, and go to state 165
-    ';'        shift, and go to state 167
+    IDENT        shift, and go to state 160
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    BOOL         shift, and go to state 25
+    DOUBLE       shift, and go to state 26
+    INT          shift, and go to state 27
+    OBJECT       shift, and go to state 28
+    IF           shift, and go to state 161
+    WHILE        shift, and go to state 162
+    FOR          shift, and go to state 163
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    RETURN       shift, and go to state 164
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+    '{'          shift, and go to state 165
+    ';'          shift, and go to state 167
 
     type         go to state 168
     noarraytype  go to state 31
@@ -3450,20 +3450,20 @@ state 202
 
    96 statement: FOR '(' variables_e ';' . expr_e ';' expr_e ')' statement
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     $default  reduce using rule 108 (expr_e)
 
@@ -3513,30 +3513,30 @@ state 208
 
    94 statement: IF '(' expression ')' statement ELSE . statement
 
-    IDENT      shift, and go to state 160
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    BOOL       shift, and go to state 25
-    DOUBLE     shift, and go to state 26
-    INT        shift, and go to state 27
-    OBJECT     shift, and go to state 28
-    IF         shift, and go to state 161
-    WHILE      shift, and go to state 162
-    FOR        shift, and go to state 163
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    RETURN     shift, and go to state 164
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-    '{'        shift, and go to state 165
-    ';'        shift, and go to state 167
+    IDENT        shift, and go to state 160
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    BOOL         shift, and go to state 25
+    DOUBLE       shift, and go to state 26
+    INT          shift, and go to state 27
+    OBJECT       shift, and go to state 28
+    IF           shift, and go to state 161
+    WHILE        shift, and go to state 162
+    FOR          shift, and go to state 163
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    RETURN       shift, and go to state 164
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+    '{'          shift, and go to state 165
+    ';'          shift, and go to state 167
 
     type         go to state 168
     noarraytype  go to state 31
@@ -3550,20 +3550,20 @@ state 209
 
    96 statement: FOR '(' variables_e ';' expr_e ';' . expr_e ')' statement
 
-    IDENT      shift, and go to state 61
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
+    IDENT        shift, and go to state 61
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
 
     $default  reduce using rule 108 (expr_e)
 
@@ -3589,30 +3589,30 @@ state 212
 
    96 statement: FOR '(' variables_e ';' expr_e ';' expr_e ')' . statement
 
-    IDENT      shift, and go to state 160
-    INTEGER    shift, and go to state 62
-    REAL       shift, and go to state 63
-    BOOL       shift, and go to state 25
-    DOUBLE     shift, and go to state 26
-    INT        shift, and go to state 27
-    OBJECT     shift, and go to state 28
-    IF         shift, and go to state 161
-    WHILE      shift, and go to state 162
-    FOR        shift, and go to state 163
-    FALSE      shift, and go to state 64
-    TRUE       shift, and go to state 65
-    NEW        shift, and go to state 66
-    THIS       shift, and go to state 67
-    NUL        shift, and go to state 68
-    RETURN     shift, and go to state 164
-    '+'        shift, and go to state 69
-    '-'        shift, and go to state 70
-    '!'        shift, and go to state 71
-    DECREMENT  shift, and go to state 72
-    INCREMENT  shift, and go to state 73
-    '('        shift, and go to state 74
-    '{'        shift, and go to state 165
-    ';'        shift, and go to state 167
+    IDENT        shift, and go to state 160
+    INTEGER      shift, and go to state 62
+    REAL         shift, and go to state 63
+    BOOL         shift, and go to state 25
+    DOUBLE       shift, and go to state 26
+    INT          shift, and go to state 27
+    OBJECT       shift, and go to state 28
+    IF           shift, and go to state 161
+    WHILE        shift, and go to state 162
+    FOR          shift, and go to state 163
+    FALSE        shift, and go to state 64
+    TRUE         shift, and go to state 65
+    NEW          shift, and go to state 66
+    THIS         shift, and go to state 67
+    NUL          shift, and go to state 68
+    RETURN       shift, and go to state 164
+    '+'          shift, and go to state 69
+    '-'          shift, and go to state 70
+    DECREMENT    shift, and go to state 71
+    INCREMENT    shift, and go to state 72
+    Exclamation  shift, and go to state 73
+    '('          shift, and go to state 74
+    '{'          shift, and go to state 165
+    ';'          shift, and go to state 167
 
     type         go to state 168
     noarraytype  go to state 31

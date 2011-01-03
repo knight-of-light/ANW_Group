@@ -35,6 +35,10 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	// Revers all Globals vector for all classes.
 	for(int i=0; i<ro->classes->size(); i++)
 	{
+		/*for(int j=0; j<ro->classes->at(i)->Globals->size(); j++)
+		{
+			ro->classes->at(i)->Globals->at(j)->symbol->PushType = 2;
+		}*/
 		ro->classes->at(i)->Reverse(ro->classes->at(i)->Globals);// Reverse Class->Globals Idents.
 		ro->classes->at(i)->GiveNum(ro->classes->at(i)->Globals);// Add num to global_location for each Ident in vector.
 	}
@@ -79,11 +83,11 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	vout << "Write_bool:" << endl;
 	vout << "pushg " << WriteLoc << endl;
 	vout << "jz If_False" << endl;
-	vout << "pushs \"true\"" << endl;
+	vout << "pushs \"True\"" << endl;
 	vout << "writes" << endl;
 	vout << "jump END_Write_bool" << endl;
 	vout << "If_False:" << endl;
-	vout << "pushs \"false\"" << endl;
+	vout << "pushs \"False\"" << endl;
 	vout << "writes" << endl;
 	vout << "END_Write_bool:" << endl;
 	vout << "return" << endl;
@@ -104,7 +108,6 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 			vout << endl;
 		}
 	}
-
 }
 
 void
@@ -209,7 +212,6 @@ CodeVisitor::Visit(Function *n)
 		this->lps.push_back(this->lp);
 		this->lp = 0; // Should be 0.
 		
-		//vout << "jump END_" << this->Rename(n->name) << endl;
 		vout << this->Rename(n->name) << ":" << endl;
 
 		Class *C = n->name->symbol->clas;
@@ -261,7 +263,6 @@ CodeVisitor::Visit(Function *n)
 		for(int i = C->Globals->size()-1; i>=0; i--)
 			C->Globals->at(i)->symbol->location = -1;
 
-		//vout << "END_" << this->Rename(n->name) << ":" <<endl;
 		this->lp = this->lps.at(lps.size() - 1);
 		lps.pop_back();
 	}
@@ -311,6 +312,10 @@ CodeVisitor::Visit(Variable  *n)
 		else
 		{
 			n->expr->accept(this);
+
+			if(n->expr->Location != -1)
+				vout << "pushl " << n->expr->Location << endl;
+
 			vout << "storel " << this->lp << endl;
 		}
 		break;
@@ -323,8 +328,13 @@ CodeVisitor::Visit(Variable  *n)
 		else
 		{
 			n->expr->accept(this);
+
+			if(n->expr->Location != -1)
+				vout << "pushl " << n->expr->Location << endl;
+
 			if(n->expr->type->type == 2)
 				vout << "itof" << endl;
+
 			vout << "storel " << this->lp << endl;
 		}
 		break;
@@ -337,6 +347,10 @@ CodeVisitor::Visit(Variable  *n)
 		else
 		{
 			n->expr->accept(this);
+
+			if(n->expr->Location != -1)
+				vout << "pushl " << n->expr->Location << endl;
+
 			vout << "storel " << this->lp << endl;
 		}
 		break;
@@ -381,16 +395,17 @@ CodeVisitor::Visit(ArrayType *n)
 void
 CodeVisitor::Visit(Ident *n)
 {
-	if(this->callNum != 0) // if Call.
-		vout << "pushi " << n->symbol->global_location << endl; // write global_location num.
-	else // if not called.
-		if(!this->IsLocation) // if need to value (not location).
-		{
-			if(n->symbol->global_location != -1)
-				vout << "pushg " << n->symbol->location << endl;
-			else
-				vout << "pushl " << n->symbol->location << endl; // Read value from location on lp and write to stack.
-		}
+	//if(this->callNum != 0) // if Call.
+	//	vout << "pushi " << n->symbol->global_location << endl; // write global_location num.
+	//else // if not called.
+	//	if(!this->IsLocation) // if need to value (not location).
+	//	{
+	//		if(n->symbol->global_location != -1)
+	//			vout << "pushg " << n->symbol->location << endl;
+	//		else
+	//			vout << "pushl " << n->symbol->location << endl; // Read value from location on lp and write to stack.
+	//	}
+	n->AddLocation(n->symbol->location, n->symbol->global_location, n->symbol->PushType);
 }
 
 void
@@ -411,20 +426,19 @@ CodeVisitor::Visit(Incr *n)
 			vout << "pushi 1" << endl;
 			vout << "add" << endl; 
 			vout << "storel " << n->name->symbol->location << endl;
-			vout << "pushl " << n->name->symbol->location << endl;
+			n->AddLocation(n->name);
 		}
 		// IDENT ++
 		else
 		{
 			vout << "pushl " << n->name->symbol->location << endl;
-			this->gp -= 1;
-			vout << "storeg " << this->gp << endl;
-			vout << "pushg " << this->gp << endl;
+			this->lp += 1;
+			vout << "storel " << this->lp << endl;
+			vout << "pushl " << this->lp << endl;
 			vout << "pushi 1" << endl;
 			vout << "add" << endl;
 			vout << "storel " << n->name->symbol->location << endl;
-			vout << "pushg " << this->gp << endl;
-			this->gp += 1;
+			n->AddLocation(this->lp, -1, 1);
 		}
 	}
 	else if(n->name->symbol->type->type == 3)
@@ -436,20 +450,19 @@ CodeVisitor::Visit(Incr *n)
 			vout << "pushf 1.0" << endl;
 			vout << "fadd" << endl;
 			vout << "storel " << n->name->symbol->location << endl;
-			vout << "pushl " << n->name->symbol->location << endl;
+			n->AddLocation(n->name);
 		}
 		// IDENT ++
 		else
 		{
 			vout << "pushl " << n->name->symbol->location << endl;
-			this->gp -= 1;
-			vout << "storeg " << this->gp << endl;
-			vout << "pushg " << this->gp << endl;
+			this->lp += 1;
+			vout << "storel " << this->lp << endl;
+			vout << "pushl " << this->lp << endl;
 			vout << "pushf 1.0" << endl;
 			vout << "fadd" << endl;
 			vout << "storel " << n->name->symbol->location << endl;
-			vout << "pushg " << this->gp << endl;
-			this->gp += 1;
+			n->AddLocation(this->lp, -1, 1);
 		}
 	}
 }
@@ -466,20 +479,19 @@ CodeVisitor::Visit(Decr *n)
 			vout << "pushi 1" << endl;
 			vout << "sub" << endl; 
 			vout << "storel " << n->name->symbol->location << endl;
-			vout << "pushl " << n->name->symbol->location << endl;
+			n->AddLocation(n->name);
 		}
 		// IDENT --
 		else
 		{
 			vout << "pushl " << n->name->symbol->location << endl;
-			this->gp -= 1;
-			vout << "storeg " << this->gp << endl;
-			vout << "pushg " << this->gp << endl;
+			this->lp += 1;
+			vout << "storel " << this->lp << endl;
+			vout << "pushl " << this->lp << endl;
 			vout << "pushi 1" << endl;
 			vout << "sub" << endl;
 			vout << "storel " << n->name->symbol->location << endl;
-			vout << "pushg " << this->gp << endl;
-			this->gp += 1;
+			n->AddLocation(this->lp, -1, 1);
 		}
 	}
 	else if(n->name->symbol->type->type == 3)
@@ -491,20 +503,19 @@ CodeVisitor::Visit(Decr *n)
 			vout << "pushf 1.0" << endl;
 			vout << "fsub" << endl;
 			vout << "storel " << n->name->symbol->location << endl;
-			vout << "pushl " << n->name->symbol->location << endl;
+			n->AddLocation(n->name);
 		}
 		// IDENT --
 		else
 		{
 			vout << "pushl " << n->name->symbol->location << endl;
-			this->gp -= 1;
-			vout << "storeg " << this->gp << endl;
-			vout << "pushg " << this->gp << endl;
+			this->lp += 1;
+			vout << "storel " << this->lp << endl;
+			vout << "pushl " << this->lp << endl;
 			vout << "pushf 1.0" << endl;
 			vout << "fsub" << endl;
 			vout << "storel " << n->name->symbol->location << endl;
-			vout << "pushg " << this->gp << endl;
-			this->gp += 1;
+			n->AddLocation(this->lp, -1, 1);
 		}
 	}
 }
@@ -514,7 +525,9 @@ CodeVisitor::Visit(Not *n)
 {
 	// ! expression, expression type is bool.
 	n->expr->accept(this);
-	vout << "not" << endl; 
+	if(n->expr->Location != -1)
+		vout << "pushl " << n->expr->Location << endl;
+	vout << "not" << endl;
 }
 
 void
@@ -522,6 +535,8 @@ CodeVisitor::Visit(Minus *n)
 {
 	// - expression, expression type is integer or double.
 	n->expr->accept(this);
+	if(n->expr->Location != -1)
+		vout << "pushl " << n->expr->Location << endl;
 
 	// if expression is Integer
 	if(n->expr->type->type == 2)
@@ -543,6 +558,8 @@ CodeVisitor::Visit(Plus *n)
 {
 	// + expression, expression type is integer or double.
 	n->expr->accept(this);
+	if(n->expr->Location != -1)
+		vout << "pushl " << n->expr->Location << endl;
 }
 
 void
@@ -550,6 +567,8 @@ CodeVisitor::Visit(Paren  *n)
 {
 	// '(' expression ')' type is the same of expression type.
 	n->expr->accept(this);
+	if(n->expr->Location != -1)
+		vout << "pushl " << n->expr->Location << endl;
 }
 
 void
@@ -557,6 +576,8 @@ CodeVisitor::Visit(IdentExpr *n)
 {
 	// IdentExpr type is the same of Ident type.
 	n->ident->accept(this);
+
+	n->AddLocation(n->ident);
 }
 
 void
@@ -570,32 +591,48 @@ CodeVisitor::Visit(Assign *n)
 {
 	// expression = expression.
 
-	IdentExpr *ident = dynamic_cast<IdentExpr*>(n->left);
-	if(ident == NULL)
-	{
-		this->IsLocation = true;
-		n->left->accept(this);
-		this->IsLocation = false;
-	}
+	//IdentExpr *ident = dynamic_cast<IdentExpr*>(n->left);
+	//if(ident == NULL)
+	//{
+	//	this->IsLocation = true;
+	//	n->left->accept(this);
+	//	this->IsLocation = false;
+	//}
+
+	//n->right->accept(this);
+	//if(n->left->type->type == 3 && n->right->type->type == 2)
+	//	vout << "itof" << endl;
+
+	//if(ident != NULL)
+	//{
+	//	if(ident->type->type == 6) // if ident type is class.
+	//		vout << "storeg " << ident->ident->symbol->location << endl;
+	//	else
+	//	{
+	//		if(ident->ident->symbol->global_location != -1)
+	//			vout << "storeg " << ident->ident->symbol->location << endl;
+	//		else
+	//			vout << "storel " << ident->ident->symbol->location << endl;
+	//	}
+	//}
+	//else
+	//	vout << "storen" << endl;
+
+	n->left->accept(this);
 
 	n->right->accept(this);
-	if(n->left->type->type == 3 && n->right->type->type == 2)
-		vout << "itof" << endl;
 
-	if(ident != NULL)
-	{
-		if(ident->type->type == 6) // if ident type is class.
-			vout << "storeg " << ident->ident->symbol->location << endl;
-		else
-		{
-			if(ident->ident->symbol->global_location != -1)
-				vout << "storeg " << ident->ident->symbol->location << endl;
-			else
-				vout << "storel " << ident->ident->symbol->location << endl;
-		}
-	}
-	else
-		vout << "storen" << endl;
+	if(n->right->Global_Location != -1)
+		vout << "load " << n->right->Global_Location << endl;
+
+	else if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
+	if(dynamic_cast<IdentCall*>(n->left) != NULL)
+		vout << "store " << /*n->left->Global_Location*/ dynamic_cast<IdentCall*>(n->left)->expr->Global_Location << endl;
+	else if(dynamic_cast<IdentExpr*>(n->left) != NULL)
+		vout << "storel " << n->left->Location << endl;
+
 }
 
 void
@@ -620,7 +657,7 @@ CodeVisitor::Visit(Invoke *n)
 		/*if(IsCalled)
 			vout << "storeg " << n->ident->symbol->location << endl;*/
 
-		if(!IsCalled)
+		if(!IsCalled)// passed Object if the func not called (in other func).
 			vout << "pushg " << this->Functions->at(this->CurrentFunc)->name->symbol->location << endl;
 		vout << "storeg " << n->ident->symbol->location << endl;
 
@@ -654,6 +691,16 @@ CodeVisitor::Visit(Invoke *n)
 	else
 	{
 		n->exprList->exprList->at(0)->accept(this);
+		Expr *expr = dynamic_cast<Expr*>(n->exprList->exprList->at(0));
+
+		/*if(expr->Global_Location != -1 && expr->Location == -1)
+			vout << "load " << expr->Global_Location << endl;
+		else if(expr->Global_Location != -1 && expr->Location != -1)
+			vout << "pushg " << expr->Location << endl;
+		else
+			vout << "pushl " << expr->Location << endl;*/
+		this->PrintPush(n->exprList->exprList->at(0));
+
 		if(n->exprList->exprList->at(0)->type->type == 2)
 			vout << "writei" << endl;
 		else if(n->exprList->exprList->at(0)->type->type == 3)
@@ -685,7 +732,6 @@ CodeVisitor::Visit(NewObject *n)
 
 	vout << "pushg " << this->gp << endl;
 	this->gp += 1;*/
-
 }
 
 void
@@ -698,39 +744,41 @@ void
 CodeVisitor::Visit(IdentCall *n)
 {
 	// Ident '.' expression.
-	
-	int num = this->callNum;
-	IdentCall *call = dynamic_cast<IdentCall*>(n->expr);
-	IdentExpr *ident = dynamic_cast<IdentExpr*>(n->expr);
-	Invoke *invoke = dynamic_cast<Invoke*>(n->expr);
-	
-	if(this->callNum == 0) // if this call is First call											// [_this_]<--gp
+	int num = this->callNum; // save this->callNum.
+	IdentCall *call = dynamic_cast<IdentCall*>(n->expr); // if n->expr is not IdentCall then NULL.
+	IdentExpr *ident = dynamic_cast<IdentExpr*>(n->expr); // if n->expr is not IdentExpr then NULL.
+	Invoke *invoke = dynamic_cast<Invoke*>(n->expr); // if n->expr is not Invoke then NULL.
+
+	n->ident->accept(this);
+
+	if(num == 0) // if this call is First call														// [_this_]<--gp
 		vout << "pushg " << n->ident->symbol->location << endl; // return memory location of object	// [______]
 																									// [______]
-	if(call != NULL) // if expression is a IdentCall.												//  STACK
-	{
-		vout << "pushi " << call->ident->symbol->global_location << endl; // return sub memory location of object
-		vout << "loadn" << endl; // return value of memory location at(sub memory location)
+																									//  STACK
+	if(call != NULL) // if expression is a IdentCall.
+		vout << "load " << call->ident->symbol->global_location << endl; // return value of memory location at(sub memory location)
 /*									  ______						  ______
         [__gp__]---location--\		2[object]---sub-memory---\		2[object]
 		[______]			 |		1[_value]				 |		1[_value]
 		[______]			 \----->0[______]				 \----->0[______]
-		 STACK						  ALLOC
+		 STACK						  ALLOC							  ALLOC
 */
-	}
-	
+
 	//if(invoke != NULL) // if expr is Innvoke put this type class in ObjectClass.
 	//	this->ObjectClass = n->ident->symbol->type->name->symbol->clas;
 
 	this->callNum += 1;
 	n->expr->accept(this);
 
-	if(ident != NULL) // if expr is Ident.
-		if(!IsLocation) // if need to value (not location).
-			vout << "loadn" << endl;
+	//if(ident != NULL) // if expr is Ident.
+	/*if(num != 0)
+		n->AddLocation(-1, n->expr->Global_Location);*/
+	/*else
+		n->AddLocation(n->Location, n->Global_Location);*/
 
 	if(num == 0)
 		this->callNum = 0;
+	n->AddLocation(n->ident->Location, n->expr->Global_Location, 3);
 }
 
 void
@@ -750,11 +798,21 @@ CodeVisitor::Visit(Equal *n)
 {
 	//expression == expression
 	n->left->accept(this);
+	
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	if(n->left->type->type == 2)
 		vout << "itof" << endl;
+
 	n->right->accept(this);
+	
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	if(n->right->type->type == 2)
 		vout << "itof" << endl;
+
 	vout << "equal" << endl;
 }
 
@@ -763,11 +821,21 @@ CodeVisitor::Visit(NotEq *n)
 {
 	//expression != expression
 	n->left->accept(this);
+	
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	if(n->left->type->type == 2)
 		vout << "itof" << endl;
+
 	n->right->accept(this);
+	
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	if(n->right->type->type == 2)
 		vout << "itof" << endl;
+
 	vout << "equal" << endl;
 	vout << "not" << endl;
 }
@@ -777,11 +845,21 @@ CodeVisitor::Visit(Smaller *n)
 {
 	//expression < expression
 	n->left->accept(this);
+
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	if(n->left->type->type == 2)
 		vout << "itof" << endl;
+
 	n->right->accept(this);
+
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	if(n->right->type->type == 2)
 		vout << "itof" << endl;
+
 	vout << "finf" << endl;
 }
 
@@ -790,11 +868,21 @@ CodeVisitor::Visit(SmallerEq *n)
 {
 	//expression <= expression
 	n->left->accept(this);
+
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	if(n->left->type->type == 2)
 		vout << "itof" << endl;
+
 	n->right->accept(this);
+
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	if(n->right->type->type == 2)
 		vout << "itof" << endl;
+
 	vout << "finfeq" << endl;
 }
 
@@ -803,11 +891,21 @@ CodeVisitor::Visit(Larger *n)
 {
 	//expression > expression
 	n->left->accept(this);
+
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	if(n->left->type->type == 2)
 		vout << "itof" << endl;
+
 	n->right->accept(this);
+
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	if(n->right->type->type == 2)
 		vout << "itof" << endl;
+
 	vout << "fsup" << endl;
 }
 
@@ -816,11 +914,21 @@ CodeVisitor::Visit(LargerEq *n)
 {
 	//expression >= expression
 	n->left->accept(this);
+
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	if(n->left->type->type == 2)
 		vout << "itof" << endl;
+
 	n->right->accept(this);
+
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	if(n->right->type->type == 2)
 		vout << "itof" << endl;
+
 	vout << "fsupeq" << endl;
 }
 
@@ -835,7 +943,15 @@ CodeVisitor::Visit(Add *n)
 	if((left == 2) && (right == 2) )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "add" << endl;
 	}
 
@@ -843,8 +959,16 @@ CodeVisitor::Visit(Add *n)
 	if((left == 2) && (right == 3) )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
 		vout << "itof" << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "fadd" << endl;
 	}
 
@@ -852,7 +976,15 @@ CodeVisitor::Visit(Add *n)
 	if((left == 3) && (right == 2) )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "itof" << endl;
 		vout << "fadd" << endl;
 	}
@@ -861,7 +993,15 @@ CodeVisitor::Visit(Add *n)
 	else if(left == 3 && right == 3 )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "fadd" << endl;
 	}
 }
@@ -877,7 +1017,15 @@ CodeVisitor::Visit(Sub *n)
 	if((left == 2) && (right == 2) )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "sub" << endl;
 	}
 
@@ -885,8 +1033,16 @@ CodeVisitor::Visit(Sub *n)
 	if((left == 2) && (right == 3) )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
 		vout << "itof" << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "fsub" << endl;
 	}
 
@@ -894,7 +1050,14 @@ CodeVisitor::Visit(Sub *n)
 	if((left == 3) && (right == 2) )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
 		vout << "itof" << endl;
 		vout << "fsub" << endl;
 	}
@@ -903,7 +1066,15 @@ CodeVisitor::Visit(Sub *n)
 	else if(left == 3 && right == 3 )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "fsub" << endl;
 	}
 }
@@ -919,7 +1090,15 @@ CodeVisitor::Visit(Mult *n)
 	if((left == 2) && (right == 2) )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "mul" << endl;
 	}
 
@@ -927,8 +1106,16 @@ CodeVisitor::Visit(Mult *n)
 	if((left == 2) && (right == 3) )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
 		vout << "itof" << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "fmul" << endl;
 	}
 
@@ -936,8 +1123,16 @@ CodeVisitor::Visit(Mult *n)
 	if((left == 3) && (right == 2) )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
 		vout << "itof" << endl;
+
 		vout << "fmul" << endl;
 	}
 
@@ -945,7 +1140,15 @@ CodeVisitor::Visit(Mult *n)
 	else if(left == 3 && right == 3 )
 	{
 		n->left->accept(this);
+	
+		if(n->left->Location != -1)
+			vout << "pushl " << n->left->Location << endl;
+
 		n->right->accept(this);
+	
+		if(n->right->Location != -1)
+			vout << "pushl " << n->right->Location << endl;
+
 		vout << "fmul" << endl;
 	}
 }
@@ -955,11 +1158,21 @@ CodeVisitor::Visit(Div *n)
 {
 	//expression / expression
 	n->left->accept(this);
+	
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	if(n->left->type->type == 2)
 		vout << "itof" << endl;
+
 	n->right->accept(this);
+	
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	if(n->right->type->type == 2)
 		vout << "itof" << endl;
+
 	vout << "fdiv" << endl;
 }
 
@@ -968,7 +1181,15 @@ CodeVisitor::Visit(Mod *n)
 {
 	//expression % expression
 	n->left->accept(this);
+	
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	n->right->accept(this);
+	
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	vout << "mod" << endl;
 }
 
@@ -977,7 +1198,15 @@ CodeVisitor::Visit(And *n)
 {
 	// expression And expression
 	n->left->accept(this);
+	
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	n->right->accept(this);
+	
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	vout << "mul" << endl;
 }
 
@@ -986,7 +1215,15 @@ CodeVisitor::Visit(Or *n)
 {
 	// expression Or expression
 	n->left->accept(this);
+	
+	if(n->left->Location != -1)
+		vout << "pushl " << n->left->Location << endl;
+
 	n->right->accept(this);
+	
+	if(n->right->Location != -1)
+		vout << "pushl " << n->right->Location << endl;
+
 	vout << "add" << endl;
 }
 
@@ -1094,8 +1331,17 @@ CodeVisitor::Visit(If *n)
 	this->ifno++;
 	int ifnum = this->ifno;
 	n->expr->accept(this);
+	
+	if(n->expr->Location != -1)
+		vout << "pushl " << n->expr->Location << endl;
+
 	vout << "jz " << "ENDIF_" << ifnum << endl;
+
 	n->stat->accept(this);
+	
+	if(n->stat->Location != -1)
+		vout << "pushl " << n->stat->Location << endl;
+
 	vout << "ENDIF_" << ifnum << ":" << endl;
 }
 
@@ -1107,11 +1353,23 @@ CodeVisitor::Visit(IfElse *n)
 	this->ifno++;
 	int ifnum = this->ifno;
 	n->expr->accept(this);
+	
+	if(n->expr->Location != -1)
+		vout << "pushl " << n->expr->Location << endl;
+
 	vout << "jz " << "ELSE_" << ifnum << endl;
 	n->stat->accept(this);
+	
+	if(n->stat->Location != -1)
+		vout << "pushl " << n->stat->Location << endl;
+
 	vout << "jump " << "ENDIF_" << ifnum << endl;
 	vout << "ELSE_" << ifnum << ":" << endl;
 	n->elseStat->accept(this);
+	
+	if(n->elseStat->Location != -1)
+		vout << "pushl " << n->elseStat->Location << endl;
+
 	vout << "ENDIF_" << ifnum << ":" << endl;
 }
 
@@ -1122,8 +1380,16 @@ CodeVisitor::Visit(While *n)
 	int whlienum = this->whileno;
 	vout << "WBegin_" << whlienum << ":" << endl;
 	n->expr->accept(this);
+	
+	if(n->expr->Location != -1)
+		vout << "pushl " << n->expr->Location << endl;
+
 	vout << "jz " << "WEnd_" << whlienum << endl;
 	n->stat->accept(this);
+	
+	if(n->stat->Location != -1)
+		vout << "pushl " << n->stat->Location << endl;
+
 	vout << "jump WBegin_" << whlienum << endl;
 	vout << "WEnd_" << whlienum << ":" <<endl;
 }
@@ -1138,6 +1404,7 @@ CodeVisitor::Visit(For *n)
 
 	if(n->variables_e != NULL)
 		n->variables_e->accept(this);
+
 	vout << "ForBegin_" << fornum << ":" << endl;
 
 	if(n->exprCond->type->type == 0)
@@ -1147,7 +1414,9 @@ CodeVisitor::Visit(For *n)
 
 	vout << "jz " << "ForEnd_" << fornum << endl;
 	n->stat->accept(this);
+
 	n->exprCount->accept(this);
+
 	vout << "jump " << "ForBegin_" << fornum << endl;
 	vout << "ForEnd_" << fornum << ":" << endl;
 }
@@ -1185,6 +1454,10 @@ CodeVisitor::Visit(Return *n)
 {
 	// RETURN expr_e ';'
 	n->expr->accept(this);
+	
+	if(n->expr->Location != -1)
+		vout << "pushl " << n->expr->Location << endl;
+
 	vout << "storeg " << n->function->name->symbol->ReturnValue << endl;
 	vout << "jump END_" << this->FuncName << endl;
 }
@@ -1222,4 +1495,27 @@ CodeVisitor::Rename(Ident *name)
 			final_name += types[typ];
 	}
 	return final_name;
+}
+
+void
+CodeVisitor::PrintPush(Node *node)
+{
+	 // -1: no push, 1: pushl, 2: pushg, 3:load.
+	switch(node->PushType)
+	{
+	case 1:
+		vout << "pushl " << node->Location << endl;
+		break;
+	case 2:
+		vout << "pushg " << node->Location << endl;
+		break;
+	case 3:
+		vout << "load " << node->Global_Location << endl;
+		break;
+	default:
+		{
+			vout << "pushs \"PushType is NULL\"" << endl;
+			vout << "writes" << endl;
+		}
+	}
 }

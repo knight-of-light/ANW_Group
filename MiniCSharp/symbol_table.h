@@ -28,6 +28,7 @@ public:
 
 	int location; // Ident location where is stored in memory, used in CodeVisitor.
 	int global_location; // Ident location where is stored in object memory, used in CodeVisitor.
+	int PushType; // -1: no push, 1: pushl, 2: pushg, 3:load.
 	int ReturnValue;
 	vector<Ident> *Globals;
 
@@ -40,7 +41,7 @@ public:
 	Function *method; // If the Ident is a Function name, pointer to its Function.
 	Args *args; // If the Ident is a Constructor or a Function, pointer to its Arguments.
 
-	Sym(string n, int kind, int acctype, Scope *scope, Type *type); // If the Ident is not Class, Constructor and Function use this Constructor.
+	Sym(string n, int kind, int acctype, Scope *scope, Type *type, int PushType); // If the Ident is not Class, Constructor and Function use this Constructor.
 	Sym(string n, int kind, Scope *scope, Class *clas); // If the Ident is a Class name use this Constructor.
 	Sym(string n, int kind, int acctype, Scope *scope, Args *args, Constructor *constr); // If the Ident is a Constructor name use this Constructor.
 	Sym(string n, int kind, int acctype, Scope *scope, Type *type, Args *args, Function *meth); // If the Ident is a Function Ident use this Constructor.
@@ -85,7 +86,7 @@ public:
 	SymTab(Errors *errors); // The Constructor.
 	Sym *Lookup(string key, Scope *Current);
 	
-	bool AddSym(Ident *id, int kind, int acctype, Type *type); // Add Symbol to Ident and add it to hashTable, used for Ident.
+	bool AddSym(Ident *id, int kind, int acctype, Type *type, int PushType); // Add Symbol to Ident and add it to hashTable, used for Ident.
 	bool AddSym(Ident *id, int kind, Class *clas); // Add Symbol to Ident and add it to hashTable, used for Ident of Class.
 	bool AddSym(Ident *id, int kind, int acctype, Args *args, Constructor *constr); // Add Symbol to Ident and add it to hashTable, used for Ident of Constructor.
 	bool AddSym(Ident *id, int kind, int acctype, Type *type, Args *args, Function *meth); // Add Symbol to Ident and add it to hashTable, used for Ident of Function.
