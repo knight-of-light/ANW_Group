@@ -203,11 +203,11 @@ CodeVisitor::Visit(Function *n)
 	n->IsCalled = true;
 	this->FuncName = this->Rename(n->name);
 
-	// if the Function is not main 
+	// if the Function is not main
 	if( !((n->name->name == "Main") && (n->type == NULL) && (n->args->args->size() == 0)) )
 	{
 		this->lps.push_back(this->lp);
-		this->lp = 2; // Should be 0.
+		this->lp = 0; // Should be 0.
 		
 		//vout << "jump END_" << this->Rename(n->name) << endl;
 		vout << this->Rename(n->name) << ":" << endl;
@@ -1018,7 +1018,11 @@ CodeVisitor::Visit(Integer *n)
 void
 CodeVisitor::Visit(Real *n)
 {
-	vout << "pushf " << n->value << endl;
+	int number = n->value;
+	if(n->value == number)
+		vout << "pushf " << n->value << ".0" << endl;
+	else
+		vout << "pushf " << n->value << endl;
 }
 
 void

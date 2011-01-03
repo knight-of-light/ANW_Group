@@ -6,6 +6,7 @@ Node::Node(int line, int column)
 	this->line = line;
 	this->column = column;
 	this->father = NULL;
+	this->Location = -1;
 }
 
 //*******     Root		*************
