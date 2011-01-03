@@ -11,7 +11,7 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	forno = 0;
 	whileno = 0;
 	this->gp = 999;
-	this->lp = 0; // 1
+	this->lp = 1; // 1
 	this->NullLoc = this->gp; // Null location
 	this->gp -= 1;
 	this->WriteLoc = this->gp;
@@ -207,7 +207,7 @@ CodeVisitor::Visit(Function *n)
 	if( !((n->name->name == "Main") && (n->type == NULL) && (n->args->args->size() == 0)) )
 	{
 		this->lps.push_back(this->lp);
-		this->lp = 0;
+		this->lp = 2; // Should be 0.
 		
 		//vout << "jump END_" << this->Rename(n->name) << endl;
 		vout << this->Rename(n->name) << ":" << endl;
@@ -295,9 +295,7 @@ CodeVisitor::Visit(Variables *n)
 void
 CodeVisitor::Visit(Variable  *n)
 {
-	//this code only for the real number type should to continue the other Type
-	//for flout number we write pushf
-
+	// IDENT '=' expr.
 	this->lp += 1;
 	n->name->symbol->location = this->lp;
 	
@@ -319,12 +317,14 @@ CodeVisitor::Visit(Variable  *n)
 	case 3:
 		if(n->expr == NULL)
 		{
-			vout << "pushf 0" << endl; // default value is 0.
+			vout << "pushf 0.0" << endl; // default value is 0.
 			vout << "storel " << this->lp << endl;
 		}
 		else
 		{
 			n->expr->accept(this);
+			if(n->expr->type->type == 2)
+				vout << "itof" << endl;
 			vout << "storel " << this->lp << endl;
 		}
 		break;
@@ -432,8 +432,8 @@ CodeVisitor::Visit(Incr *n)
 		// ++ IDENT
 		if(n->isPrev)
 		{
-			n->name->accept(this);
-			vout << "pushf 1" << endl;
+			vout << "pushl " << n->name->symbol->location << endl;
+			vout << "pushf 1.0" << endl;
 			vout << "fadd" << endl;
 			vout << "storel " << n->name->symbol->location << endl;
 			vout << "pushl " << n->name->symbol->location << endl;
@@ -441,11 +441,11 @@ CodeVisitor::Visit(Incr *n)
 		// IDENT ++
 		else
 		{
-			n->name->accept(this);
+			vout << "pushl " << n->name->symbol->location << endl;
 			this->gp -= 1;
 			vout << "storeg " << this->gp << endl;
 			vout << "pushg " << this->gp << endl;
-			vout << "pushf 1" << endl;
+			vout << "pushf 1.0" << endl;
 			vout << "fadd" << endl;
 			vout << "storel " << n->name->symbol->location << endl;
 			vout << "pushg " << this->gp << endl;
@@ -457,6 +457,56 @@ CodeVisitor::Visit(Incr *n)
 void
 CodeVisitor::Visit(Decr *n)
 {
+	if(n->name->symbol->type->type == 2)
+	{
+		// -- IDENT
+		if(n->isPrev)
+		{
+			vout << "pushl " << n->name->symbol->location << endl;
+			vout << "pushi 1" << endl;
+			vout << "sub" << endl; 
+			vout << "storel " << n->name->symbol->location << endl;
+			vout << "pushl " << n->name->symbol->location << endl;
+		}
+		// IDENT --
+		else
+		{
+			vout << "pushl " << n->name->symbol->location << endl;
+			this->gp -= 1;
+			vout << "storeg " << this->gp << endl;
+			vout << "pushg " << this->gp << endl;
+			vout << "pushi 1" << endl;
+			vout << "sub" << endl;
+			vout << "storel " << n->name->symbol->location << endl;
+			vout << "pushg " << this->gp << endl;
+			this->gp += 1;
+		}
+	}
+	else if(n->name->symbol->type->type == 3)
+	{
+		// -- IDENT
+		if(n->isPrev)
+		{
+			vout << "pushl " << n->name->symbol->location << endl;
+			vout << "pushf 1.0" << endl;
+			vout << "fsub" << endl;
+			vout << "storel " << n->name->symbol->location << endl;
+			vout << "pushl " << n->name->symbol->location << endl;
+		}
+		// IDENT --
+		else
+		{
+			vout << "pushl " << n->name->symbol->location << endl;
+			this->gp -= 1;
+			vout << "storeg " << this->gp << endl;
+			vout << "pushg " << this->gp << endl;
+			vout << "pushf 1.0" << endl;
+			vout << "fsub" << endl;
+			vout << "storel " << n->name->symbol->location << endl;
+			vout << "pushg " << this->gp << endl;
+			this->gp += 1;
+		}
+	}
 }
 
 void
@@ -472,18 +522,20 @@ CodeVisitor::Visit(Minus *n)
 {
 	// - expression, expression type is integer or double.
 	n->expr->accept(this);
+
 	// if expression is Integer
 	if(n->expr->type->type == 2)
 	{
 		vout << "pushi -1" << endl;
 		vout << "mul" << endl;
 	}
+
 	// if expression is Real
-	/*else if(n->expr->type->type == 3)
+	else if(n->expr->type->type == 3)
 	{
-		vout << "pushf -1" << endl;
+		vout << "pushf -1.0" << endl;
 		vout << "fmul" << endl;
-	}*/
+	}
 }
 
 void
@@ -527,6 +579,8 @@ CodeVisitor::Visit(Assign *n)
 	}
 
 	n->right->accept(this);
+	if(n->left->type->type == 3 && n->right->type->type == 2)
+		vout << "itof" << endl;
 
 	if(ident != NULL)
 	{

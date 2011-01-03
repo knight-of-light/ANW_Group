@@ -1,109 +1,13 @@
-class A //: C
+class E
 {
-    public A() { }
-    public static int x;
-    public int y;
-}
-class B : A
-{
-    public B() { }
-    public A a;
-    public void print()
-    {
-        z = 525;
-        Write(z);
-    }
-    public int returnInt()
-    {
-        z = 535;
-        return 2;
-    }
-    public int Argumentwithreturn(int x, int y, int z1)
-    {
-        x = returnInt();
-        return z1+x+y;
-    }
-    //public int re(int i)
-    //{
-    //    if (i == 1)
-    //    {
-    //        z = re(i + 1);
-    //        return 2;
-    //    }
-    //     return z;
-    //}
-    public int z;
-}
-class C : B
-{
-    public C() { }
-    public B b;
-    public int returnZ()
-    {
-        returnInt();
-        return z;
-    }
-    int zz;
-}
-class M
-{
-    public M() { }
-    public void test() { }
+    public E() { }
     public static void Main()
     {
-        //C c = new C();
-        //c.b = new B();
-        //c.b.a = new A();
-        //int num;
-
-        //c.b.a.y = 99;     // IdentCall.
-        //A a1 = c.b.a;
-        //Write(a1.y);
-        //Write(c.b.a.y);
-
-        //a1.y = 68;
-        //Write(a1.y);
-        //Write(c.b.a.y);
-
-        //B b1 = new B();
-        //b1.z = 10;
-
-        //b1.print();
-        B b2 = new B();
-        //b2.z = 15;
-        //b2.print();
-
-        b2.z = 44;
-        Write(b2.returnInt());
-        Write(b2.z);
-        Write(b2.Argumentwithreturn(3, 2, 2));
-        b2.print();
-
-        C c = new C();
-        c.b = new B();
-        Write(c.Argumentwithreturn(8, 8, 8));
-        Write(c.z);
-        c.z = 222;
-        Write(c.z);
-        Write(c.returnZ());
-
-        /*C c = new C();
-        c.b = new B();
-        Write(c.b.re(1));*/
-
-        //----------------
-        //int x = 0;
-        //int y = x++;
-        //Write(y);
-        //Write(x);
-
-        //----------------
-        //double x1 = 1;
-        //Write(-x1);
-        //----------------
-        //double x1 = 2.;
-        //double r1 = 3.;
-        //double div = r1 / x1;
-        //Write(div);
+        int x = 6;
+        int y = 2;
+        Write(x + y);
+        Write(x - y);
+        Write(x * y);
+        Write(x / y);
     }
 }

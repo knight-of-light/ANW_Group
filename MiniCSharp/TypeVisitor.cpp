@@ -291,7 +291,6 @@ TypeVisitor::Visit(Variable *n)
 				mismatch = true;
 				n->expr->type->type = 3;
 			}
-
 			break;
 		case 4:
 			if(right != 4)
