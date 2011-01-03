@@ -750,7 +750,11 @@ CodeVisitor::Visit(Equal *n)
 {
 	//expression == expression
 	n->left->accept(this);
+	if(n->left->type->type == 2)
+		vout << "itof" << endl;
 	n->right->accept(this);
+	if(n->right->type->type == 2)
+		vout << "itof" << endl;
 	vout << "equal" << endl;
 }
 
@@ -759,7 +763,11 @@ CodeVisitor::Visit(NotEq *n)
 {
 	//expression != expression
 	n->left->accept(this);
+	if(n->left->type->type == 2)
+		vout << "itof" << endl;
 	n->right->accept(this);
+	if(n->right->type->type == 2)
+		vout << "itof" << endl;
 	vout << "equal" << endl;
 	vout << "not" << endl;
 }
@@ -769,11 +777,12 @@ CodeVisitor::Visit(Smaller *n)
 {
 	//expression < expression
 	n->left->accept(this);
-	n->right->accept(this);
 	if(n->left->type->type == 2)
-		vout << "inf" << endl;
-	else if(n->left->type->type == 3)
-		vout << "finf" << endl;
+		vout << "itof" << endl;
+	n->right->accept(this);
+	if(n->right->type->type == 2)
+		vout << "itof" << endl;
+	vout << "finf" << endl;
 }
 
 void
@@ -781,11 +790,12 @@ CodeVisitor::Visit(SmallerEq *n)
 {
 	//expression <= expression
 	n->left->accept(this);
-	n->right->accept(this);
 	if(n->left->type->type == 2)
-		vout << "infeq" << endl;
-	else if(n->left->type->type == 3)
-		vout << "finfeq" << endl;
+		vout << "itof" << endl;
+	n->right->accept(this);
+	if(n->right->type->type == 2)
+		vout << "itof" << endl;
+	vout << "finfeq" << endl;
 }
 
 void
@@ -793,11 +803,12 @@ CodeVisitor::Visit(Larger *n)
 {
 	//expression > expression
 	n->left->accept(this);
-	n->right->accept(this);
 	if(n->left->type->type == 2)
-		vout << "sup" << endl;
-	else if(n->left->type->type == 3)
-		vout << "fsup" << endl;
+		vout << "itof" << endl;
+	n->right->accept(this);
+	if(n->right->type->type == 2)
+		vout << "itof" << endl;
+	vout << "fsup" << endl;
 }
 
 void
@@ -805,11 +816,12 @@ CodeVisitor::Visit(LargerEq *n)
 {
 	//expression >= expression
 	n->left->accept(this);
-	n->right->accept(this);
 	if(n->left->type->type == 2)
-		vout << "supeq" << endl;
-	else if(n->left->type->type == 3)
-		vout << "fsupeq" << endl;
+		vout << "itof" << endl;
+	n->right->accept(this);
+	if(n->right->type->type == 2)
+		vout << "itof" << endl;
+	vout << "fsupeq" << endl;
 }
 
 void
@@ -942,23 +954,13 @@ void
 CodeVisitor::Visit(Div *n)
 {
 	//expression / expression
+	n->left->accept(this);
 	if(n->left->type->type == 2)
-	{
-		n->left->accept(this);
 		vout << "itof" << endl;
-		n->right->accept(this);
-		if(n->right->type->type == 2)
-			vout << "itof" << endl;
-		vout << "fdiv" << endl;
-	}
-	else if(n->left->type->type == 3)
-	{
-		n->left->accept(this);
-		n->right->accept(this);
-		if(n->right->type->type == 2)
-			vout << "itof" << endl;
-		vout << "fdiv" << endl;
-	}
+	n->right->accept(this);
+	if(n->right->type->type == 2)
+		vout << "itof" << endl;
+	vout << "fdiv" << endl;
 }
 
 void
@@ -998,13 +1000,13 @@ void
 CodeVisitor::Visit(Cast *n)
 {
 	// ( basictype ) expression
-	n->expr->accept(this);
+	/*n->expr->accept(this);
 	int basic = n->typ->type;
 	int expr = n->expr->type->type;
 	if((basic == 2) && (expr == 3))
 		vout << "ftoi" << endl;
 	else if((basic == 3) && (expr == 2))
-		vout << "itof" << endl;
+		vout << "itof" << endl;*/
 }
 
 void
@@ -1107,7 +1109,6 @@ CodeVisitor::Visit(IfElse *n)
 	vout << "ELSE_" << ifnum << ":" << endl;
 	n->elseStat->accept(this);
 	vout << "ENDIF_" << ifnum << ":" << endl;
-
 }
 
 void
@@ -1126,6 +1127,8 @@ CodeVisitor::Visit(While *n)
 void
 CodeVisitor::Visit(For *n)
 {
+	// FOR '(' variables_e ';' expr_e ';' expr_e ')' statement
+
 	this->forno++;
 	int fornum = this->forno;
 
@@ -1143,30 +1146,6 @@ CodeVisitor::Visit(For *n)
 	n->exprCount->accept(this);
 	vout << "jump " << "ForBegin_" << fornum << endl;
 	vout << "ForEnd_" << fornum << ":" << endl;
-
-
-	//this->forno++;
-	//int number =this->forno;
-	//// for(;;) is infinity
-	//if( (n->variables_e == NULL) && (n->exprCond->type->type == 1) && (n->exprCount->type->type == 1) )
-	//{
-	//	vout << "ForBegin" << number<< ":" << endl;
-	//	n->stat->accept(this);
-	//	vout << "jump ForBegin" << number << endl;
-	//}
-	//// for( variables_e ';' expr_e ';' expr_e )
-	//else
-	//{
-
-	//	n->variables_e->accept(this);
-	//	vout << "ForBegin" << number << ":" << endl;
-	//	n->exprCond->accept(this);
-	//	vout << "jz " << "ForEnd" << number << endl;
-	//	n->stat->accept(this);
-	//	n->exprCount->accept(this);
-	//	vout << "jump " << "ForBegin" << number << endl;
-	//	vout << "ForEnd" << number << ":" << endl;
-	//}
 }
 
 void

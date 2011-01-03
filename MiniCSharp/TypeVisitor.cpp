@@ -765,14 +765,10 @@ TypeVisitor::Visit(Equal *n)
 	case 2:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else if(right == 3)
-			n->left->type->type = 3;
 		break;
 	case 3:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else
-			n->right->type->type = 3;
 		break;
 	case 4:
 		if(right != 4)
@@ -806,14 +802,10 @@ TypeVisitor::Visit(NotEq *n)
 	case 2:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else if(right == 3)
-			n->left->type->type = 3;
 		break;
 	case 3:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else
-			n->right->type->type = 3;
 		break;
 	case 4:
 		if(right != 4)
@@ -847,14 +839,10 @@ TypeVisitor::Visit(Smaller *n)
 	case 2:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else if(right == 3)
-			n->left->type->type = 3;
 		break;
 	case 3:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else
-			n->right->type->type = 3;
 		break;
 	default:
 		mismatch = true;
@@ -884,14 +872,10 @@ TypeVisitor::Visit(SmallerEq *n)
 	case 2:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else if(right == 3)
-			n->left->type->type = 3;
 		break;
 	case 3:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else
-			n->right->type->type = 3;
 		break;
 	default:
 		mismatch = true;
@@ -921,14 +905,10 @@ TypeVisitor::Visit(Larger *n)
 	case 2:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else if(right == 3)
-			n->left->type->type = 3;
 		break;
 	case 3:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else
-			n->right->type->type = 3;
 		break;
 	default:
 		mismatch = true;
@@ -958,14 +938,10 @@ TypeVisitor::Visit(LargerEq *n)
 	case 2:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else if(right == 3)
-			n->left->type->type = 3;
 		break;
 	case 3:
 		if( !((right == 2) || (right == 3)) )
 			mismatch = true;
-		else
-			n->right->type->type = 3;
 		break;
 	default:
 		mismatch = true;
@@ -995,20 +971,12 @@ TypeVisitor::Visit(Add *n)
 		if(right == 2)
 			n->type->type = 2;
 		else if(right == 3)
-		{
-			n->left->type->type = 3;
-			n->type->type = 3;			
-		}
+			n->type->type = 3;
 		else
 			mismatch = true;
 		break;
 	case 3:
-		if(right == 2)
-		{
-			n->right->type->type = 3;
-			n->type->type = 3;
-		}
-		else if(right == 3)
+		if((right == 2) || (right == 3))
 			n->type->type = 3;
 		else
 			mismatch = true;
@@ -1043,20 +1011,12 @@ TypeVisitor::Visit(Sub *n)
 		if(right == 2)
 			n->type->type = 2;
 		else if(right == 3)
-		{
-			n->left->type->type = 3;
-			n->type->type = 3;			
-		}
+			n->type->type = 3;
 		else
 			mismatch = true;
 		break;
 	case 3:
-		if(right == 2)
-		{
-			n->right->type->type = 3;
-			n->type->type = 3;
-		}
-		else if(right == 3)
+		if((right == 2) || (right == 3))
 			n->type->type = 3;
 		else
 			mismatch = true;
@@ -1091,20 +1051,12 @@ TypeVisitor::Visit(Mult *n)
 		if(right == 2)
 			n->type->type = 2;
 		else if(right == 3)
-		{
-			n->left->type->type = 3;
-			n->type->type = 3;			
-		}
+			n->type->type = 3;
 		else
 			mismatch = true;
 		break;
 	case 3:
-		if(right == 2)
-		{
-			n->right->type->type = 3;
-			n->type->type = 3;
-		}
-		else if(right == 3)
+		if((right == 2) || (right == 3))
 			n->type->type = 3;
 		else
 			mismatch = true;
@@ -1136,16 +1088,13 @@ TypeVisitor::Visit(Div *n)
 	switch(left)
 	{
 	case 2:
-		if(right != 2)
+		if((right == 2) || (right == 3))
+			n->type->type = 3;
+		else
 			mismatch = true;
 		break;
 	case 3:
-		if(right == 2)
-		{
-			n->right->type->type = 3;
-			n->type->type = 3;
-		}
-		else if(right == 3)
+		if((right == 2) || (right == 3))
 			n->type->type = 3;
 		else
 			mismatch = true;
@@ -1468,8 +1417,6 @@ TypeVisitor::Visit(For *n)
 		symtab->errors->AddError("Type mismatch between \'" + types[cond] + "\' and \'bool\'",
 		 n->exprCond->line,
 		 n->column);
-	else if(cond == 0)
-		n->exprCond->type->type = 4;
 
 	n->exprCount->accept(this);
 	int count = n->exprCount->type->type;
@@ -1513,6 +1460,8 @@ TypeVisitor::Visit(Block *n)
 void
 TypeVisitor::Visit(Return *n)
 {
+	// RETURN expr_e ';'
+
 	// find Father of this return and put it in this->function.
 	Node *node = n;
 	Function *function = NULL;
@@ -1528,7 +1477,6 @@ TypeVisitor::Visit(Return *n)
 		n->function = function;
 
 
-	// RETURN expr_e ';'
 	if(this->IsReturn) // Check if allow to use return.
 	{
 		this->NumReturns = this->NumReturns + 1;
@@ -1546,11 +1494,8 @@ TypeVisitor::Visit(Return *n)
 				mismatch = true;
 			break;
 		case 3:
-			if(!((right == 2)||(right == 3)))
-			{
+			if(right != 3)
 				mismatch = true;
-				n->expr->type->type = 3;
-			}
 			break;
 		case 4:
 			if(right != 4)
