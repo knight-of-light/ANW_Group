@@ -278,6 +278,7 @@ public:
 	CodeVisitor(Root *, SymTab *st, Function *mainFunc);
 	string Rename(Ident *name);
 	void PrintPush(Node *node);
+	void PrintStore(Node *node);
 	virtual void Visit(Root *);
 	virtual void Visit(Class *);
 	virtual void Visit(ClassInher *);

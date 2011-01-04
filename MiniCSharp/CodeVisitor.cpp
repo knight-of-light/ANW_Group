@@ -35,10 +35,6 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 	// Revers all Globals vector for all classes.
 	for(int i=0; i<ro->classes->size(); i++)
 	{
-		/*for(int j=0; j<ro->classes->at(i)->Globals->size(); j++)
-		{
-			ro->classes->at(i)->Globals->at(j)->symbol->PushType = 2;
-		}*/
 		ro->classes->at(i)->Reverse(ro->classes->at(i)->Globals);// Reverse Class->Globals Idents.
 		ro->classes->at(i)->GiveNum(ro->classes->at(i)->Globals);// Add num to global_location for each Ident in vector.
 	}
@@ -113,35 +109,41 @@ CodeVisitor::CodeVisitor(Root *ro, SymTab *st, Function *mainF)
 void
 CodeVisitor::Visit(Root *n)
 {
+	// empty.
 }
 
 void
 CodeVisitor::Visit(Class *n)
 {
-	n->members->accept(this);
+	//n->members->accept(this);
+	// empty.
 }
 
 void
 CodeVisitor::Visit(ClassInher *n)
 {
+	// empty.
 }
 
 void
 CodeVisitor::Visit(Members *n)
 {
-	for(int i=0; i < n->members->size(); i++)
-		n->members->at(i)->accept(this);
+	/*for(int i=0; i < n->members->size(); i++)
+		n->members->at(i)->accept(this);*/
+	// empty.
 }
 
 void
 CodeVisitor::Visit(Member  *n)
 {
+	// empty.
 }
 
 void
 CodeVisitor::Visit(Global  *n)
 {
 	n->variables->accept(this);
+	// empty.
 }
 
 void
@@ -279,11 +281,13 @@ CodeVisitor::Visit(Function *n)
 void
 CodeVisitor::Visit(Arg  *n)
 {
+	// empty.
 }
 
 void
 CodeVisitor::Visit(Args *n)
 {
+	// empty.
 }
 
 void
@@ -307,6 +311,7 @@ CodeVisitor::Visit(Variable  *n)
 		if(n->expr == NULL)
 		{
 			vout << "pushi 0" << endl; // default value is 0.
+			this->PrintStore(n->name);
 			vout << "storel " << this->lp << endl;
 		}
 		else
@@ -375,16 +380,19 @@ CodeVisitor::Visit(Variable  *n)
 void
 CodeVisitor::Visit(AccessModif *n)
 {
+	// empty.
 }
 
 void
 CodeVisitor::Visit(Type *n)
 {
+	// empty.
 }
 
 void
 CodeVisitor::Visit(NoArrayType *n)
 {
+	// empty.
 }
 
 void
@@ -405,6 +413,7 @@ CodeVisitor::Visit(Ident *n)
 	//		else
 	//			vout << "pushl " << n->symbol->location << endl; // Read value from location on lp and write to stack.
 	//	}
+
 	n->AddLocation(n->symbol->location, n->symbol->global_location, n->symbol->PushType);
 }
 
@@ -422,7 +431,19 @@ CodeVisitor::Visit(Incr *n)
 		// ++ IDENT
 		if(n->isPrev)
 		{
-			vout << "pushl " << n->name->symbol->location << endl;
+			if(n->name->symbol->location != -1)
+			{
+				switch(n->name->symbol->PushType)
+				{
+				case 1:
+					vout << "pushl " << n->name->symbol->location << endl;
+					break;
+				case 2:
+					vout << "pushg " << n->name->symbol->location << endl;
+					break;
+				}
+			}
+			//vout << "pushl " << n->name->symbol->location << endl;
 			vout << "pushi 1" << endl;
 			vout << "add" << endl; 
 			vout << "storel " << n->name->symbol->location << endl;
@@ -1501,21 +1522,47 @@ void
 CodeVisitor::PrintPush(Node *node)
 {
 	 // -1: no push, 1: pushl, 2: pushg, 3:load.
-	switch(node->PushType)
-	{
-	case 1:
-		vout << "pushl " << node->Location << endl;
-		break;
-	case 2:
-		vout << "pushg " << node->Location << endl;
-		break;
-	case 3:
+	if(node->Global_Location != -1)
 		vout << "load " << node->Global_Location << endl;
-		break;
-	default:
+	else if(node->Location != -1)
+	{
+		switch(node->PushType)
 		{
-			vout << "pushs \"PushType is NULL\"" << endl;
-			vout << "writes" << endl;
+		case 1:
+			vout << "pushl " << node->Location << endl;
+			break;
+		case 2:
+			vout << "pushg " << node->Location << endl;
+			break;
+		default:
+			{
+				vout << "pushs \"PushType is NULL\"" << endl;
+				vout << "writes" << endl;
+			}
+		}
+	}
+}
+void
+CodeVisitor::PrintStore(Node *node)
+{
+	 // -1: no push, 1: pushl, 2: pushg, 3:load.
+	if(node->Global_Location != -1)
+		vout << "store " << node->Global_Location << endl;
+	else if(node->Location != -1)
+	{
+		switch(node->PushType)
+		{
+		case 1:
+			vout << "storel " << node->Location << endl;
+			break;
+		case 2:
+			vout << "storeg " << node->Location << endl;
+			break;
+		default:
+			{
+				vout << "pushs \"StoreType is NULL\"" << endl;
+				vout << "writes" << endl;
+			}
 		}
 	}
 }
